@@ -1,0 +1,81 @@
+-- files
+CREATE TABLE files
+(
+    id           SERIAL PRIMARY KEY,
+    name         VARCHAR(255) NOT NULL,
+    content_type VARCHAR(100) NOT NULL,
+    size         BIGINT       NOT NULL,
+    created_at   TIMESTAMPTZ  NOT NULL
+);
+
+-- backups
+CREATE TYPE backup_status AS ENUM ('IN_PROGRESS','COMPLETED','SKIPPED','FAILED');
+CREATE TABLE backups
+(
+    id                SERIAL PRIMARY KEY,
+    created_at        TIMESTAMPTZ   NOT NULL,
+    file_id           INTEGER,
+    started_at        TIMESTAMPTZ   NOT NULL,
+    ended_at          TIMESTAMPTZ,
+    worker_ip_address VARCHAR(255)  NOT NULL,
+    status            backup_status NOT NULL,
+    batch_done_at     TIMESTAMPTZ,
+    CONSTRAINT fk_file FOREIGN KEY (file_id) REFERENCES files (id) ON DELETE SET NULL
+);
+
+-- departments
+CREATE TABLE departments
+(
+    id               SERIAL PRIMARY KEY,
+    created_at       TIMESTAMPTZ  NOT NULL,
+    name             VARCHAR(50)  NOT NULL,
+    description      VARCHAR(255) NOT NULL,
+    established_date TIMESTAMPTZ  NOT NULL,
+    CONSTRAINT departments_name_unique UNIQUE (name)
+);
+
+-- employees
+CREATE TYPE employee_status AS ENUM ('ACTIVE','RESIGNED','ON_LEAVE');
+CREATE TABLE employees
+(
+    id               SERIAL PRIMARY KEY,
+    created_at       TIMESTAMPTZ     NOT NULL,
+    department_id    INTEGER,
+    profile_image_id INTEGER,
+    name             VARCHAR(50)     NOT NULL,
+    email            VARCHAR(100)    NOT NULL,
+    employee_number  VARCHAR(255)    NOT NULL,
+    position         VARCHAR(255),
+    hire_date        TIMESTAMPTZ     NOT NULL,
+    status           employee_status NOT NULL,
+
+    CONSTRAINT employees_email_unique UNIQUE (email),
+    CONSTRAINT employees_employee_number_unique UNIQUE (employee_number),
+
+    CONSTRAINT fk_employees_department FOREIGN KEY (department_id)
+        REFERENCES departments (id) ON DELETE RESTRICT,
+
+    CONSTRAINT fk_profiles_employee FOREIGN KEY (profile_image_id)
+        REFERENCES files (id) ON DELETE SET NULL
+);
+
+CREATE TYPE change_type AS ENUM ('CREATED', 'UPDATED', 'DELETED');
+
+CREATE TABLE employee_history
+(
+    id              SERIAL PRIMARY KEY,
+    employee_number VARCHAR(50) NOT NULL,
+    type            change_type NOT NULL,
+    memo            TEXT,
+    logged_at       TIMESTAMPTZ NOT NULL,
+    modified_at     TIMESTAMPTZ NOT NULL,
+    ip_address      VARCHAR(50) NOT NULL,
+    changed_fields  jsonb       NOT NULL,
+    changed_by      VARCHAR(50) NOT NULL
+);
+
+
+
+
+
+

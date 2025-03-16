@@ -9,18 +9,18 @@ CREATE TABLE files
 );
 
 -- backups
-CREATE TYPE backup_status AS ENUM ('IN_PROGRESS','COMPLETED','SKIPPED','FAILED');
+-- CREATE TYPE backup_status AS ENUM ('IN_PROGRESS','COMPLETED','SKIPPED','FAILED');
 CREATE TABLE backups
 (
     id                SERIAL PRIMARY KEY,
-    created_at        TIMESTAMPTZ   NOT NULL,
+    created_at        TIMESTAMPTZ  NOT NULL,
     file_id           INTEGER,
-    started_at        TIMESTAMPTZ   NOT NULL,
+    started_at        TIMESTAMPTZ  NOT NULL,
     ended_at          TIMESTAMPTZ,
-    worker_ip_address VARCHAR(255)  NOT NULL,
-    status            backup_status NOT NULL,
+    worker_ip_address VARCHAR(255) NOT NULL,
+    status            VARCHAR(20)  NOT NULL,
     batch_done_at     TIMESTAMPTZ,
-    CONSTRAINT fk_file FOREIGN KEY (file_id) REFERENCES files (id) ON DELETE SET NULL
+    CONSTRAINT fk_file FOREIGN KEY (file_id) REFERENCES files (id) ON DELETE CASCADE
 );
 
 -- departments
@@ -35,19 +35,19 @@ CREATE TABLE departments
 );
 
 -- employees
-CREATE TYPE employee_status AS ENUM ('ACTIVE','RESIGNED','ON_LEAVE');
+-- CREATE TYPE employee_status AS ENUM ('ACTIVE','RESIGNED','ON_LEAVE');
 CREATE TABLE employees
 (
     id               SERIAL PRIMARY KEY,
-    created_at       TIMESTAMPTZ     NOT NULL,
+    created_at       TIMESTAMPTZ  NOT NULL,
     department_id    INTEGER,
     profile_image_id INTEGER,
-    name             VARCHAR(50)     NOT NULL,
-    email            VARCHAR(100)    NOT NULL,
-    employee_number  VARCHAR(255)    NOT NULL,
+    name             VARCHAR(50)  NOT NULL,
+    email            VARCHAR(100) NOT NULL,
+    employee_number  VARCHAR(255) NOT NULL,
     position         VARCHAR(255),
-    hire_date        TIMESTAMPTZ     NOT NULL,
-    status           employee_status NOT NULL,
+    hire_date        TIMESTAMPTZ  NOT NULL,
+    status           VARCHAR(20)  NOT NULL,
 
     CONSTRAINT employees_email_unique UNIQUE (email),
     CONSTRAINT employees_employee_number_unique UNIQUE (employee_number),
@@ -56,16 +56,15 @@ CREATE TABLE employees
         REFERENCES departments (id) ON DELETE RESTRICT,
 
     CONSTRAINT fk_profiles_employee FOREIGN KEY (profile_image_id)
-        REFERENCES files (id) ON DELETE SET NULL
+        REFERENCES files (id) ON DELETE CASCADE
 );
 
-CREATE TYPE change_type AS ENUM ('CREATED', 'UPDATED', 'DELETED');
-
-CREATE TABLE employee_history
+-- CREATE TYPE change_type AS ENUM ('CREATED', 'UPDATED', 'DELETED');
+CREATE TABLE employee_histories
 (
     id              SERIAL PRIMARY KEY,
     employee_number VARCHAR(50) NOT NULL,
-    type            change_type NOT NULL,
+    type            VARCHAR(20) NOT NULL,
     memo            TEXT,
     logged_at       TIMESTAMPTZ NOT NULL,
     modified_at     TIMESTAMPTZ NOT NULL,

@@ -9,7 +9,6 @@ CREATE TABLE files
 );
 
 -- backups
--- CREATE TYPE backup_status AS ENUM ('IN_PROGRESS','COMPLETED','SKIPPED','FAILED');
 CREATE TABLE backups
 (
     id                SERIAL PRIMARY KEY,
@@ -35,7 +34,6 @@ CREATE TABLE departments
 );
 
 -- employees
--- CREATE TYPE employee_status AS ENUM ('ACTIVE','RESIGNED','ON_LEAVE');
 CREATE TABLE employees
 (
     id               SERIAL PRIMARY KEY,
@@ -59,7 +57,6 @@ CREATE TABLE employees
         REFERENCES files (id) ON DELETE CASCADE
 );
 
--- CREATE TYPE change_type AS ENUM ('CREATED', 'UPDATED', 'DELETED');
 CREATE TABLE employee_histories
 (
     id              SERIAL PRIMARY KEY,

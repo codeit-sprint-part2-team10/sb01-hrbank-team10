@@ -2,6 +2,7 @@ package com.sprint.example.sb01part2hrbankteam10.service.impl;
 
 import com.sprint.example.sb01part2hrbankteam10.dto.DepartmentCreateRequest;
 import com.sprint.example.sb01part2hrbankteam10.dto.DepartmentDto;
+import com.sprint.example.sb01part2hrbankteam10.dto.DepartmentUpdateRequest;
 import com.sprint.example.sb01part2hrbankteam10.entity.Department;
 import com.sprint.example.sb01part2hrbankteam10.global.exception.RestApiException;
 import com.sprint.example.sb01part2hrbankteam10.global.exception.errorcode.DepartmentErrorCode;
@@ -49,7 +50,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 
   @Transactional
   @Override
-  public DepartmentDto update(Integer id, DepartmentCreateRequest request) {
+  public DepartmentDto update(Integer id, DepartmentUpdateRequest request) {
     Department findDepartment = departmentRepository.findById(id)
         .orElseThrow(() -> new RestApiException(DepartmentErrorCode.DEPARTMENT_NOT_EXIST,
             id.toString()));

@@ -2,6 +2,7 @@ package com.sprint.example.sb01part2hrbankteam10.controller;
 
 import com.sprint.example.sb01part2hrbankteam10.dto.DepartmentCreateRequest;
 import com.sprint.example.sb01part2hrbankteam10.dto.DepartmentDto;
+import com.sprint.example.sb01part2hrbankteam10.dto.DepartmentUpdateRequest;
 import com.sprint.example.sb01part2hrbankteam10.service.DepartmentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +35,7 @@ public class DepartmentController {
   @PutMapping("/{id}")
   public ResponseEntity<DepartmentDto> updateDepartment(
       @PathVariable Integer id,
-      @Valid @RequestBody DepartmentCreateRequest request) {
+      @Valid @RequestBody DepartmentUpdateRequest request) {
 
     DepartmentDto updatedDepartment = departmentService.update(id, request);
     return ResponseEntity.ok(updatedDepartment);

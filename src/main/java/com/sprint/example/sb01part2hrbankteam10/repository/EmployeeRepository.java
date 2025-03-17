@@ -11,4 +11,8 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
   boolean existsByEmail(String email);
 
   Optional<Employee> findTopByOrderByIdDesc();
+
+  //직원수 조회 - 부서별
+  Integer countByDepartmentId(Integer departmentId);
+
 }

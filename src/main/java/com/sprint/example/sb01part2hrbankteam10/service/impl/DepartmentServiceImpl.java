@@ -5,9 +5,14 @@ import com.sprint.example.sb01part2hrbankteam10.dto.DepartmentDto;
 import com.sprint.example.sb01part2hrbankteam10.entity.Department;
 import com.sprint.example.sb01part2hrbankteam10.global.exception.RestApiException;
 import com.sprint.example.sb01part2hrbankteam10.global.exception.errorcode.DepartmentErrorCode;
+import com.sprint.example.sb01part2hrbankteam10.global.exception.errorcode.EmployeeErrorCode;
 import com.sprint.example.sb01part2hrbankteam10.mapper.DepartmentMapper;
 import com.sprint.example.sb01part2hrbankteam10.repository.DepartmentRepository;
+import com.sprint.example.sb01part2hrbankteam10.repository.EmployeeRepository;
 import com.sprint.example.sb01part2hrbankteam10.service.DepartmentService;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeParseException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,10 +24,14 @@ public class DepartmentServiceImpl implements DepartmentService {
 
   private final DepartmentRepository departmentRepository;
   private final DepartmentMapper departmentMapper;
+  private final EmployeeRepository employeeRepository;
 
   @Transactional
   @Override
   public DepartmentDto create(DepartmentCreateRequest request) {
+
+    LocalDateTime establishedDate = parseLocalDateTime(request.getEstablishedDate());
+
 
     if (departmentRepository.existsByName(request.getName())) {
       throw new RestApiException(DepartmentErrorCode.DEPARTMENT_IS_ALREADY_EXIST, request.getName());
@@ -31,7 +40,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     Department department = Department.builder()
             .name(request.getName())
             .description(request.getDescription())
-            .establishedDate(request.getEstablishedDate())
+            .establishedDate(establishedDate)
             .build();
 
     Department saved = departmentRepository.save(department);
@@ -47,9 +56,17 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     findDepartment.setName(request.getName());
     findDepartment.setDescription(request.getDescription());
-    findDepartment.setEstablishedDate(request.getEstablishedDate());
+    findDepartment.setEstablishedDate(parseLocalDateTime(request.getEstablishedDate()));
 
     Department updatedDepartment = departmentRepository.save(findDepartment);
     return departmentMapper.toDto(updatedDepartment);
+  }
+
+  private LocalDateTime parseLocalDateTime(String dateString) {
+    try {
+      return LocalDate.parse(dateString).atStartOfDay();
+    } catch (DateTimeParseException e) {
+      throw new RestApiException(EmployeeErrorCode.INVALID_DATE, "establishedDate=" + dateString);
+    }
   }
 }

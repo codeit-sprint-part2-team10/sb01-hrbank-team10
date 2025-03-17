@@ -1,7 +1,7 @@
 package com.sprint.example.sb01part2hrbankteam10.dto;
 
 import jakarta.validation.constraints.NotNull;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,7 +22,7 @@ public class DepartmentDto {
   private String description;
 
   @NotNull
-  private LocalDateTime establishedDate;
+  private LocalDate establishedDate;
 
   private Integer employeeCount;
 

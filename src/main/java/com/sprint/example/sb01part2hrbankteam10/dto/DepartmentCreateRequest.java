@@ -1,6 +1,7 @@
 package com.sprint.example.sb01part2hrbankteam10.dto;
 
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
@@ -22,6 +23,10 @@ public class DepartmentCreateRequest {
   private String description;
 
   @NotNull
-  private LocalDateTime establishedDate;
+  @Pattern(
+      regexp = "^\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01])$",
+      message = "\"0000-00-00\" 형식에 맞지 않습니다."
+  )
+  private String establishedDate;
 
 }

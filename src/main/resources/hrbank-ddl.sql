@@ -66,8 +66,7 @@ CREATE TABLE employee_histories
     logged_at       TIMESTAMPTZ NOT NULL,
     modified_at     TIMESTAMPTZ NOT NULL,
     ip_address      VARCHAR(50) NOT NULL,
-    changed_fields  jsonb       NOT NULL,
-    changed_by      VARCHAR(50) NOT NULL
+    changed_fields  jsonb       NOT NULL
 );
 
 

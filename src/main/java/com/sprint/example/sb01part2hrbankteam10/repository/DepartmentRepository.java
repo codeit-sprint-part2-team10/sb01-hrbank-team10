@@ -9,4 +9,6 @@ import org.springframework.stereotype.Repository;
 public interface DepartmentRepository extends JpaRepository<Department, Integer> {
 
   Optional<Object> findByName(String name);
+
+  boolean existsByName(String name);
 }

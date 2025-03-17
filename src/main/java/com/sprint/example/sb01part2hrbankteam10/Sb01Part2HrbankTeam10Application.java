@@ -9,5 +9,4 @@ public class Sb01Part2HrbankTeam10Application {
   public static void main(String[] args) {
     SpringApplication.run(Sb01Part2HrbankTeam10Application.class, args);
   }
-
 }

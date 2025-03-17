@@ -13,10 +13,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 @SpringBootTest // @DataJpaTest 대신 전체 애플리케이션 컨텍스트를 로드
 @Transactional // 테스트 후 자동으로 롤백되도록 설정
-class ProfileFileImplTest {
+class ProfileFileStorageImplTest {
 
   @Autowired
-  ProfileFileImpl profileFile; // FileStorage, FileMapper 대신 직접 구현체 주입
+  ProfileFileStorageImpl profileFile; // FileStorage, FileMapper 대신 직접 구현체 주입
 
   @Test
   void saveProfileToLocalStorage() throws IOException {

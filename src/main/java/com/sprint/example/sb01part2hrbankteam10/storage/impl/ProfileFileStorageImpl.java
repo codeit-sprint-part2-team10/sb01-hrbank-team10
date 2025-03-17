@@ -12,10 +12,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 
 @Component
-public class ProfileFileImpl extends FileMapper implements FileStorage {
+public class ProfileFileStorageImpl extends FileMapper implements FileStorage {
 
   // 경로 의존성 주입 생성자
-  public ProfileFileImpl(@Value("${user.dir}/savedFiles/profiles") String rootStorage) {
+  public ProfileFileStorageImpl(@Value("${user.dir}/savedFiles/profiles") String rootStorage) {
     this.rootStorage = Path.of(rootStorage);
     init();
   }

@@ -18,10 +18,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 @Transactional
-class BackupFileImplTest {
+class BackupFileStorageImplTest {
 
   @Autowired
-  @Qualifier("backupFileImpl") // 특정 빈 이름으로 주입
+  @Qualifier("backupFileStorageImpl") // 특정 빈 이름으로 주입
   private FileStorage fileStorage;
 
   private Integer testFileId;
@@ -47,7 +47,7 @@ class BackupFileImplTest {
     fileStorage.save(testFileId, multipartFile);
 
     // then
-    Path path = ((BackupFileImpl)fileStorage).resolvePath(testFileId);
+    Path path = ((BackupFileStorageImpl)fileStorage).resolvePath(testFileId);
     java.io.File savedFile = path.toFile();
 
     // 파일 존재 여부 확인
@@ -63,7 +63,7 @@ class BackupFileImplTest {
   void cleanup() throws IOException {
     // 테스트 후 생성된 파일 삭제
     if (testFileId != null) {
-      Path path = ((BackupFileImpl)fileStorage).resolvePath(testFileId);
+      Path path = ((BackupFileStorageImpl)fileStorage).resolvePath(testFileId);
       Files.deleteIfExists(path);
     }
   }

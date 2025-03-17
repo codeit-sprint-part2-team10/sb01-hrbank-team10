@@ -12,10 +12,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 @Component
-public class BackupFileImpl extends FileMapper implements FileStorage {
+public class BackupFileStorageImpl extends FileMapper implements FileStorage {
 
   // 경로 의존성 주입 생성자
-  public BackupFileImpl(@Value("${user.dir}/savedFiles/backups") String rootStorage) {
+  public BackupFileStorageImpl(@Value("${user.dir}/savedFiles/backups") String rootStorage) {
     this.rootStorage = Path.of(rootStorage);
     init();
   }

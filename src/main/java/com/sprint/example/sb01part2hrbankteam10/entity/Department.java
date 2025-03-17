@@ -19,12 +19,13 @@ import org.hibernate.annotations.CreationTimestamp;
 @Getter @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Department {
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
 
   @CreationTimestamp
-  @Column(name = "created_at", columnDefinition= "timestamp with time zone", nullable = false, updatable = false)
+  @Column(name = "created_at", columnDefinition = "timestamp with time zone", nullable = false, updatable = false)
   private LocalDateTime createdAt;
 
   @Column(name = "name", length = 50, nullable = false, unique = true)

@@ -15,4 +15,6 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
   //직원수 조회 - 부서별
   Integer countByDepartmentId(Integer departmentId);
 
+  //부서에 속한 직원이 있는지 확인
+  boolean existsByDepartmentId(Integer id);
 }

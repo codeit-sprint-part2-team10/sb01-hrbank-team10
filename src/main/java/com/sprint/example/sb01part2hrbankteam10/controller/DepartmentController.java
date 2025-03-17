@@ -2,11 +2,14 @@ package com.sprint.example.sb01part2hrbankteam10.controller;
 
 import com.sprint.example.sb01part2hrbankteam10.dto.DepartmentCreateRequest;
 import com.sprint.example.sb01part2hrbankteam10.dto.DepartmentDto;
+import com.sprint.example.sb01part2hrbankteam10.global.response.RestApiResponse;
 import com.sprint.example.sb01part2hrbankteam10.service.DepartmentService;
+import io.swagger.v3.oas.models.responses.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -40,5 +43,10 @@ public class DepartmentController {
     return ResponseEntity.ok(updatedDepartment);
   }
 
-
+  // 부서 삭제
+  @DeleteMapping("/{id}")
+  public ResponseEntity<RestApiResponse<Void>> deleteDepartment(@PathVariable Integer id) {
+    departmentService.delete(id);
+    return ResponseEntity.noContent().build();
+  }
 }

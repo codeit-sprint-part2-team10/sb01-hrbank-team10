@@ -1,5 +1,6 @@
 package com.sprint.example.sb01part2hrbankteam10.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
@@ -12,6 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class DepartmentDto {
 
+  @JsonIgnore
   @NotNull
   private Integer id;
 
@@ -24,6 +26,7 @@ public class DepartmentDto {
   @NotNull
   private LocalDateTime establishedDate;
 
+  @JsonIgnore
   private Integer employeeCount;
 
 }

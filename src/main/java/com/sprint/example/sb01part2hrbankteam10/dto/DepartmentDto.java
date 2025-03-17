@@ -13,7 +13,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class DepartmentDto {
 
-  @JsonIgnore
   @NotNull
   private Integer id;
 
@@ -26,7 +25,6 @@ public class DepartmentDto {
   @NotNull
   private LocalDateTime establishedDate;
 
-  @JsonIgnore
   private Integer employeeCount;
 
 }

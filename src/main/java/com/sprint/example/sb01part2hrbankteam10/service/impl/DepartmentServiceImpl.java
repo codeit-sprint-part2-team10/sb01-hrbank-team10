@@ -3,7 +3,6 @@ package com.sprint.example.sb01part2hrbankteam10.service.impl;
 import com.sprint.example.sb01part2hrbankteam10.dto.DepartmentCreateRequest;
 import com.sprint.example.sb01part2hrbankteam10.dto.DepartmentDto;
 import com.sprint.example.sb01part2hrbankteam10.entity.Department;
-import com.sprint.example.sb01part2hrbankteam10.global.exception.ErrorCode;
 import com.sprint.example.sb01part2hrbankteam10.global.exception.RestApiException;
 import com.sprint.example.sb01part2hrbankteam10.global.exception.errorcode.DepartmentErrorCode;
 import com.sprint.example.sb01part2hrbankteam10.mapper.DepartmentMapper;
@@ -39,4 +38,18 @@ public class DepartmentServiceImpl implements DepartmentService {
     return departmentMapper.toDto(saved);
   }
 
+  @Transactional
+  @Override
+  public DepartmentDto update(Integer id, DepartmentCreateRequest request) {
+    Department findDepartment = departmentRepository.findById(id)
+        .orElseThrow(() -> new RestApiException(DepartmentErrorCode.DEPARTMENT_NOT_EXIST,
+            id.toString()));
+
+    findDepartment.setName(request.getName());
+    findDepartment.setDescription(request.getDescription());
+    findDepartment.setEstablishedDate(request.getEstablishedDate());
+
+    Department updatedDepartment = departmentRepository.save(findDepartment);
+    return departmentMapper.toDto(updatedDepartment);
+  }
 }

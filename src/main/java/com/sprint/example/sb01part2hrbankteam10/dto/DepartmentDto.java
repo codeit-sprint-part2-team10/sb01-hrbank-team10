@@ -1,6 +1,5 @@
 package com.sprint.example.sb01part2hrbankteam10.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;

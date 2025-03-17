@@ -5,6 +5,8 @@ import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeDto;
 import com.sprint.example.sb01part2hrbankteam10.entity.Department;
 import com.sprint.example.sb01part2hrbankteam10.entity.Employee;
 import com.sprint.example.sb01part2hrbankteam10.entity.Employee.EmployeeStatus;
+import com.sprint.example.sb01part2hrbankteam10.entity.EmployeeHistory;
+import com.sprint.example.sb01part2hrbankteam10.entity.EmployeeHistory.ChangeType;
 import com.sprint.example.sb01part2hrbankteam10.entity.File;
 import com.sprint.example.sb01part2hrbankteam10.global.exception.RestApiException;
 import com.sprint.example.sb01part2hrbankteam10.global.exception.errorcode.EmployeeErrorCode;
@@ -38,7 +40,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     validateEmail(request.getEmail());
 
     // 부서 확인 (에러 코드 수정 필요)
-//    Department department = getDepartmentOrThrow(request.getDepartmentId());
+    Department department = getDepartmentOrThrow(request.getDepartmentId());
 
     // 날짜 parsing 및 에러 처리
     LocalDateTime hireDate = parseLocalDateTime(request.getHireDate());
@@ -49,7 +51,6 @@ public class EmployeeServiceImpl implements EmployeeService {
     // 이미지가 존재하면 저장
     File newProfile = null;
     if (validateFile(profile)) {
-      // 저장 로직
       newProfile = fileRepository.save(
           File.builder()
               .name(profile.getName())
@@ -57,7 +58,7 @@ public class EmployeeServiceImpl implements EmployeeService {
               .size(BigInteger.valueOf(profile.getSize()))
               .build()
       );
-      // saveFile(profile.bytes()) + 파싱 에러 처리
+      // saveProfile(profile.bytes()) + 파싱 에러 처리
     }
 
     // 유저 저장
@@ -65,16 +66,19 @@ public class EmployeeServiceImpl implements EmployeeService {
         .name(request.getName())
         .email(request.getEmail())
         .employeeNumber(employeeNumber)
+        .position(request.getPosition())
         .hireDate(hireDate)
-        .department(null)
+        .department(department)
         .profileImage(newProfile)
         .status(EmployeeStatus.ACTIVE)
         .build();
 
-    // 저장 이력 정보 넘기기
-    // request.memo
+    EmployeeDto employeeDto = EmployeeMapper.toDto(employeeRepository.save(newEmployee));
 
-    return EmployeeMapper.toDto(employeeRepository.save(newEmployee)); // mapper 로 변경
+    // 이력 정보 넘기
+    //EmployeeHistoryService.create(ChangeType.CREATED, request.getMemo(), null, employeeDto);
+
+    return employeeDto;
   }
 
   private boolean validateFile(MultipartFile multipartFile) {
@@ -101,7 +105,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     Integer footerNumber = (previousId + 1) % 1000;
 
-    return String.format("EMP-%d-%03d", localDateTime.getDayOfYear(), footerNumber);
+    return String.format("EMP-%d-%03d", localDateTime.getYear(), footerNumber);
   }
 
   private LocalDateTime parseLocalDateTime(String dateString) {

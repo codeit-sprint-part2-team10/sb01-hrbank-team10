@@ -32,12 +32,10 @@ public class EmployeeController {
       @RequestPart(name = "profile", required = false) MultipartFile profile
   ) {
 
-    log.info(IpUtil.getClientIp(httpServletRequest));
-
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(RestApiResponse.success(
             HttpStatus.CREATED,
-            employeeService.create(request, profile)
+            employeeService.create(request, profile, IpUtil.getClientIp(httpServletRequest))
         ));
   }
 }

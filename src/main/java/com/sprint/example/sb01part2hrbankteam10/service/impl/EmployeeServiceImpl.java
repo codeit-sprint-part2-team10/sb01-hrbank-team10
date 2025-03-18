@@ -34,7 +34,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
   @Override
   @Transactional
-  public EmployeeDto create(EmployeeCreateRequest request, MultipartFile profile) {
+  public EmployeeDto create(EmployeeCreateRequest request, MultipartFile profile, String clientIp) {
 
     // 이메일 중복 검사 및 에러 처리
     validateEmail(request.getEmail());
@@ -76,7 +76,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     EmployeeDto employeeDto = EmployeeMapper.toDto(employeeRepository.save(newEmployee));
 
     // 이력 정보 넘기
-    //EmployeeHistoryService.create(ChangeType.CREATED, request.getMemo(), null, employeeDto);
+    //EmployeeHistoryService.create(ChangeType.CREATED, request.getMemo(), null, employeeDto, clientIp);
 
     return employeeDto;
   }

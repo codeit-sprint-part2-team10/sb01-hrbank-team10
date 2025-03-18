@@ -96,6 +96,14 @@ public class DepartmentServiceImpl implements DepartmentService {
         .collect(Collectors.toList());
   }
 
+  @Override
+  public DepartmentDto find(Integer id) {
+    Department department = departmentRepository.findById(id)
+        .orElseThrow(() -> new RestApiException(DepartmentErrorCode.DEPARTMENT_NOT_EXIST,
+            id.toString()));
+
+    return departmentMapper.toDto(department);
+  }
 
   private LocalDateTime parseLocalDateTime(String dateString) {
     try {

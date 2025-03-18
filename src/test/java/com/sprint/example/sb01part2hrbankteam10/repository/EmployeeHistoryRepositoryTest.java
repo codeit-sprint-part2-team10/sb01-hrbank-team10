@@ -80,7 +80,6 @@ class EmployeeHistoryRepositoryTest {
         .employeeNumber(employee.getEmployeeNumber())
         .type(ChangeType.CREATED)
         .memo("memo")
-        .changedBy("dada")
         .modifiedAt(LocalDateTime.now())
         .ipAddress("127.0.0.1")
         .changedFields(changeFields)

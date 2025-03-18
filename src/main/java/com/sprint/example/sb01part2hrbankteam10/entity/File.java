@@ -2,9 +2,10 @@ package com.sprint.example.sb01part2hrbankteam10.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
+import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Table;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
@@ -13,14 +14,18 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @Table(name = "files")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EntityListeners(AuditingEntityListener.class)
 public class File {
+
   @Id
-  @GeneratedValue(strategy= GenerationType.IDENTITY)
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
 
   @Column(name = "name", length = 255, nullable = false)
@@ -32,8 +37,8 @@ public class File {
   @Column(name = "size", nullable = false)
   private BigInteger size;
 
-  @CreationTimestamp
-  @Column(name = "created_at", columnDefinition= "timestamp with time zone", nullable = false, updatable = false)
+  @CreatedDate
+  @Column(name = "created_at", columnDefinition = "timestamp with time zone", nullable = false, updatable = false)
   private LocalDateTime createdAt;
 
   @Builder

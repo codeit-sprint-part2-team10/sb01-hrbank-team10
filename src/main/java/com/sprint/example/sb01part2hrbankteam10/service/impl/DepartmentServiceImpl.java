@@ -15,9 +15,11 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -62,6 +64,25 @@ public class DepartmentServiceImpl implements DepartmentService {
     Department updatedDepartment = departmentRepository.save(findDepartment);
     return departmentMapper.toDto(updatedDepartment);
   }
+
+  @Transactional
+  @Override
+  public void delete(Integer id){
+    Department findDepartment = departmentRepository.findById(id)
+        .orElseThrow(() -> new RestApiException(DepartmentErrorCode.DEPARTMENT_NOT_EXIST,
+            id.toString()));
+
+    // 부서에 속한 직원이 있는 경우 삭제 불가
+    if (employeeRepository.existsByDepartmentId(id)) {
+      log.error("Department has employee. id={}", id);
+      throw new RestApiException(DepartmentErrorCode.DEPARTMENT_HAS_EMPLOYEE, id.toString());
+    }
+
+    if (departmentRepository.existsById(id)) {
+      departmentRepository.delete(findDepartment);
+    }
+  }
+
 
   private LocalDateTime parseLocalDateTime(String dateString) {
     try {

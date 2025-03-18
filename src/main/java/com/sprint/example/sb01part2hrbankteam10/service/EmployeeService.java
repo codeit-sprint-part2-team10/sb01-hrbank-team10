@@ -13,4 +13,7 @@ public interface EmployeeService {
       String clientIp);
 
   String deleteById(Integer id);
+
+  EmployeeDto getById(Integer id);
+
 }

@@ -27,6 +27,7 @@ CREATE TABLE departments
 (
     id               SERIAL PRIMARY KEY,
     created_at       TIMESTAMPTZ  NOT NULL,
+    updated_at       TIMESTAMPTZ,
     name             VARCHAR(50)  NOT NULL,
     description      VARCHAR(255) NOT NULL,
     established_date TIMESTAMPTZ  NOT NULL,
@@ -38,6 +39,7 @@ CREATE TABLE employees
 (
     id               SERIAL PRIMARY KEY,
     created_at       TIMESTAMPTZ  NOT NULL,
+    updated_at       TIMESTAMPTZ,
     department_id    INTEGER,
     profile_image_id INTEGER,
     name             VARCHAR(50)  NOT NULL,
@@ -66,8 +68,7 @@ CREATE TABLE employee_histories
     logged_at       TIMESTAMPTZ NOT NULL,
     modified_at     TIMESTAMPTZ NOT NULL,
     ip_address      VARCHAR(50) NOT NULL,
-    changed_fields  jsonb       NOT NULL,
-    changed_by      VARCHAR(50) NOT NULL
+    changed_fields  jsonb       NOT NULL
 );
 
 

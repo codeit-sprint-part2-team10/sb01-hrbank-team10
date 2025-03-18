@@ -2,6 +2,7 @@ package com.sprint.example.sb01part2hrbankteam10.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
@@ -14,11 +15,14 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @Table(name = "employee_histories")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EntityListeners(AuditingEntityListener.class)
 public class EmployeeHistory {
 
   @Id
@@ -44,8 +48,8 @@ public class EmployeeHistory {
   @Column(name = "changed_fields", columnDefinition = "jsonb", nullable = false)
   private String changedFields;
 
-  @CreationTimestamp
-  @Column(name = "logged_at", columnDefinition= "timestamp with time zone", nullable = false, updatable = false)
+  @CreatedDate
+  @Column(name = "logged_at", columnDefinition = "timestamp with time zone", nullable = false, updatable = false)
   private LocalDateTime loggedAt;
 
   @Column(name = "changed_by", nullable = false, length = 50)

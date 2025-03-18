@@ -10,6 +10,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -54,6 +56,7 @@ public class FileStorageImpl implements FileStorage {
   @Override
   public Integer saveBackup(Integer fileId, MultipartFile file) {
     // fileId로 경로 생성
+
     Path path = resolvePath(fileId);
 
     // 파일을 스트림을 통해 저장
@@ -72,6 +75,27 @@ public class FileStorageImpl implements FileStorage {
     return fileId;
   }
 
+  // 파일 다운로드
+  @Override
+  public Resource download(Integer fileId){
+    // 다운받을 파일의 경로 생성
+    Path path = resolvePath(fileId);
+
+    if (!Files.exists(path)) {
+      throw new RestApiException(FileErrorCode.FILE_NOT_FOUND, resolvePath(fileId).toString());
+    }
+
+    // 파일 시스템 리소스 생성
+    FileSystemResource resource = new FileSystemResource(path);
+
+    // 리소스가 존재하고 읽을 수 있는지 확인
+    if (!resource.exists() || !resource.isReadable()) {
+      throw new RestApiException(FileErrorCode.FILE_READ_ERROR, resolvePath(fileId).toString());
+    }
+
+    // Resource 반환
+    return resource;
+  }
 
   // 아이디로 경로를 설정하는 메서드 resolvePath
   @Override

@@ -3,6 +3,7 @@ package com.sprint.example.sb01part2hrbankteam10.entity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
@@ -17,31 +18,32 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @Table(name = "backups")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@EntityListeners(AuditingEntityListener.class)
 public class Backup {
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
 
-  @CreationTimestamp
-  @Column(name = "created_at", columnDefinition= "timestamp with time zone", nullable = false, updatable = false)
+  @CreatedDate
+  @Column(name = "created_at", columnDefinition = "timestamp with time zone", nullable = false, updatable = false)
   private LocalDateTime createdAt;
 
   @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
   @JoinColumn(name = "file_id")
   private File file;
 
-  @Column(name = "started_at", columnDefinition= "timestamp with time zone", nullable = false)
+  @Column(name = "started_at", columnDefinition = "timestamp with time zone", nullable = false)
   private LocalDateTime startedAt;
 
-  @Column(name = "ended_at", columnDefinition= "timestamp with time zone")
+  @Column(name = "ended_at", columnDefinition = "timestamp with time zone")
   private LocalDateTime endedAt;
 
   @Column(name = "worker_ip_address", length = 255, nullable = false)
@@ -51,15 +53,8 @@ public class Backup {
   @Column(name = "status", nullable = false)
   private BackupStatus status;
 
-  @Column(name = "batch_done_at", columnDefinition= "timestamp with time zone")
+  @Column(name = "batch_done_at", columnDefinition = "timestamp with time zone")
   private LocalDateTime batchDoneAt;
-
-  public enum BackupStatus {
-    IN_PROGRESS,
-    COMPLETED,
-    SKIPPED,
-    FAILED
-  }
 
   @Builder
   public Backup(File file, LocalDateTime startedAt, LocalDateTime endedAt, String workerIpAddress,
@@ -70,6 +65,13 @@ public class Backup {
     this.workerIpAddress = workerIpAddress;
     this.status = status;
     this.batchDoneAt = batchDoneAt;
+  }
+
+  public enum BackupStatus {
+    IN_PROGRESS,
+    COMPLETED,
+    SKIPPED,
+    FAILED
   }
 }
 

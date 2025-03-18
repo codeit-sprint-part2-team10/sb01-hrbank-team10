@@ -29,7 +29,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @Entity
 @Table(name = "employees")
 @Getter
-@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @EntityListeners(AuditingEntityListener.class)
 public class Employee {
@@ -91,5 +90,33 @@ public class Employee {
     ACTIVE,
     RESIGNED,
     ON_LEAVE
+  }
+
+  public void updateName(String name) {
+    this.name = name;
+  }
+
+  public void updateEmail(String email) {
+    this.email = email;
+  }
+
+  public void updatePosition(String position) {
+    this.position = position;
+  }
+
+  public void updateHireDate(LocalDateTime hireDate) {
+    this.hireDate = hireDate;
+  }
+
+  public void updateStatus(EmployeeStatus status) {
+    this.status = status;
+  }
+
+  public void updateDepartment(Department department) {
+    this.department = department;
+  }
+
+  public void updateProfileImage(File profileImage) {
+    this.profileImage = profileImage;
   }
 }

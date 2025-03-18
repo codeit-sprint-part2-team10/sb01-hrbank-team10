@@ -118,6 +118,10 @@ public class EmployeeServiceImpl implements EmployeeService {
     return after;
   }
 
+  @Override
+  public EmployeeDto getById(Integer id) {
+    return EmployeeMapper.toDto(getByIdOrThrow(id));
+  }
 
   private boolean validateFile(MultipartFile multipartFile) {
     return multipartFile != null && !multipartFile.isEmpty();

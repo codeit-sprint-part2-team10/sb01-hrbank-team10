@@ -52,7 +52,7 @@ public class EmployeeController {
     return ResponseEntity.ok()
         .body(RestApiResponse.success(
             HttpStatus.OK,
-            employeeService.update(id, request, profile)
+            employeeService.update(id, request, profile, IpUtil.getClientIp(httpServletRequest))
         ));
   }
 }

@@ -6,8 +6,6 @@ import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeUpdateRequest;
 import com.sprint.example.sb01part2hrbankteam10.entity.Department;
 import com.sprint.example.sb01part2hrbankteam10.entity.Employee;
 import com.sprint.example.sb01part2hrbankteam10.entity.Employee.EmployeeStatus;
-import com.sprint.example.sb01part2hrbankteam10.entity.EmployeeHistory;
-import com.sprint.example.sb01part2hrbankteam10.entity.EmployeeHistory.ChangeType;
 import com.sprint.example.sb01part2hrbankteam10.entity.File;
 import com.sprint.example.sb01part2hrbankteam10.global.exception.RestApiException;
 import com.sprint.example.sb01part2hrbankteam10.global.exception.errorcode.EmployeeErrorCode;
@@ -21,6 +19,7 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -37,13 +36,11 @@ public class EmployeeServiceImpl implements EmployeeService {
   @Transactional
   public EmployeeDto create(EmployeeCreateRequest request, MultipartFile profile, String clientIp) {
 
-    // 이메일 중복 검사 및 에러 처리
     validateEmail(request.getEmail());
 
     // 부서 확인 (에러 코드 수정 필요)
     Department department = getDepartmentOrThrow(request.getDepartmentId());
 
-    // 날짜 parsing 및 에러 처리
     LocalDateTime hireDate = parseLocalDateTime(request.getHireDate());
 
     // 사원 번호 생성
@@ -84,7 +81,10 @@ public class EmployeeServiceImpl implements EmployeeService {
 
   @Transactional
   @Override
-  public EmployeeDto update(Integer id, EmployeeUpdateRequest request, MultipartFile profile) {
+  public EmployeeDto update(Integer id, EmployeeUpdateRequest request, MultipartFile profile,
+      String clientIp) {
+
+    Employee employee = getByIdOrThrow(id);
 
     // 이메일 중복 검사 및 에러 처리
     validateEmail(request.getEmail());

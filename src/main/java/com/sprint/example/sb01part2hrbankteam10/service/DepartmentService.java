@@ -13,7 +13,7 @@ public interface DepartmentService {
 
   DepartmentDto update(Integer id, DepartmentUpdateRequest request);
 
-  void delete(Integer id);
+  String delete(Integer id);
 
   List<DepartmentDto> getDepartment(String name, String description);
 

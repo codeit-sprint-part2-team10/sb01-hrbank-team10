@@ -25,7 +25,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @Slf4j
 @Service
@@ -80,7 +79,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 
   @Transactional
   @Override
-  public void delete(Integer id) {
+  public String delete(Integer id) {
     Department findDepartment = departmentRepository.findById(id)
         .orElseThrow(() -> new RestApiException(DepartmentErrorCode.DEPARTMENT_NOT_EXIST,
             id.toString()));
@@ -94,6 +93,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     if (departmentRepository.existsById(id)) {
       departmentRepository.delete(findDepartment);
     }
+    return null;
   }
 
   @Override

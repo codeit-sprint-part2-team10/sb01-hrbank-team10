@@ -54,24 +54,24 @@ public class FileStorageImpl implements FileStorage {
 
   // 백업 파일 저장
   @Override
-  public Integer saveBackup(Integer fileId, MultipartFile file){
-    // fileId로 경로 생성 -> resolvePath
+  public Integer saveBackup(Integer fileId, MultipartFile file) {
+    // fileId로 경로 생성
+
     Path path = resolvePath(fileId);
 
-    // file 데이터 output stream 생성
-    try(OutputStream outputStream = Files.newOutputStream(path)){
-      outputStream.write(file.getBytes());
-    }catch(IOException e){
+    // 파일을 스트림을 통해 저장
+    try (InputStream inputStream = file.getInputStream();
+        OutputStream outputStream = Files.newOutputStream(path, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)) {
+
+      byte[] buffer = new byte[32768]; // 32KB씩 저장
+      int bytesRead;
+      while ((bytesRead = inputStream.read(buffer)) != -1) {
+        outputStream.write(buffer, 0, bytesRead);
+      }
+    } catch (IOException e) {
       throw new RestApiException(FileErrorCode.FILE_STREAM_ERROR, e.getMessage());
     }
 
-    // byte[] data를 로컬저장소에 넣기
-    try{
-      byte[] data = file.getBytes();
-      Files.write(path, data, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
-    }catch(IOException e){
-      throw new RestApiException(FileErrorCode.FILE_WRITE_ERROR, e.getMessage());
-    }
     return fileId;
   }
 
@@ -96,7 +96,6 @@ public class FileStorageImpl implements FileStorage {
     // Resource 반환
     return resource;
   }
-
 
   // 아이디로 경로를 설정하는 메서드 resolvePath
   @Override

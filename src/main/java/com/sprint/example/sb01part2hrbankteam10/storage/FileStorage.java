@@ -13,6 +13,7 @@ public interface FileStorage {
   // 백업 파일 저장
   Integer saveBackup(Integer fileId, MultipartFile file);
 
+
   // 파일 다운로드
   Resource download(Integer fileId);
 

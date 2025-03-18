@@ -14,12 +14,11 @@ public class EmployeeMapper {
         .email(employee.getEmail())
         .employeeNumber(employee.getEmployeeNumber())
         .status(employee.getStatus())
-        .departmentId(employee.getDepartment().getId())
-        .departmentName(employee.getDepartment().getName())
+        .departmentId(employee.getDepartment() != null ? employee.getDepartment().getId() : null)
+        .departmentName(employee.getDepartment() != null ? employee.getDepartment().getName() : null)
         .position(employee.getPosition())
         .hireDate(employee.getHireDate().toLocalDate())
-//        .profileImageId(employee.getProfileImage().getId())
-        .profileImageId(null)
+        .profileImageId(employee.getProfileImage() != null ? employee.getProfileImage().getId() : null)
         .build();
   }
 

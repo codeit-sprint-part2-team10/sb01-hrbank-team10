@@ -15,6 +15,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,16 +38,16 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     LocalDateTime establishedDate = parseLocalDateTime(request.getEstablishedDate());
 
-
     if (departmentRepository.existsByName(request.getName())) {
-      throw new RestApiException(DepartmentErrorCode.DEPARTMENT_IS_ALREADY_EXIST, request.getName());
+      throw new RestApiException(DepartmentErrorCode.DEPARTMENT_IS_ALREADY_EXIST,
+          request.getName());
     }
 
     Department department = Department.builder()
-            .name(request.getName())
-            .description(request.getDescription())
-            .establishedDate(establishedDate)
-            .build();
+        .name(request.getName())
+        .description(request.getDescription())
+        .establishedDate(establishedDate)
+        .build();
 
     Department saved = departmentRepository.save(department);
     return departmentMapper.toDto(saved);
@@ -59,9 +60,7 @@ public class DepartmentServiceImpl implements DepartmentService {
         .orElseThrow(() -> new RestApiException(DepartmentErrorCode.DEPARTMENT_NOT_EXIST,
             id.toString()));
 
-    findDepartment.setName(request.getName());
-    findDepartment.setDescription(request.getDescription());
-    findDepartment.setEstablishedDate(parseLocalDateTime(request.getEstablishedDate()));
+    findDepartment.patchUpdate(request.getName(), request.getDescription(), request.getEstablishedDate());
 
     Department updatedDepartment = departmentRepository.save(findDepartment);
     return departmentMapper.toDto(updatedDepartment);
@@ -69,7 +68,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 
   @Transactional
   @Override
-  public void delete(Integer id){
+  public void delete(Integer id) {
     Department findDepartment = departmentRepository.findById(id)
         .orElseThrow(() -> new RestApiException(DepartmentErrorCode.DEPARTMENT_NOT_EXIST,
             id.toString()));
@@ -80,7 +79,7 @@ public class DepartmentServiceImpl implements DepartmentService {
       throw new RestApiException(DepartmentErrorCode.DEPARTMENT_HAS_EMPLOYEE, id.toString());
     }
 
-    if (departmentRepository.existsById(id)) {
+    if (!departmentRepository.existsById(id)) {
       departmentRepository.delete(findDepartment);
     }
   }

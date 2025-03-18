@@ -1,7 +1,9 @@
 package com.sprint.example.sb01part2hrbankteam10.controller;
 
+import com.sprint.example.sb01part2hrbankteam10.dto.CursorPageResponseDto;
 import com.sprint.example.sb01part2hrbankteam10.dto.DepartmentCreateRequest;
 import com.sprint.example.sb01part2hrbankteam10.dto.DepartmentDto;
+import com.sprint.example.sb01part2hrbankteam10.dto.DepartmentResponseDto;
 import com.sprint.example.sb01part2hrbankteam10.dto.DepartmentUpdateRequest;
 import com.sprint.example.sb01part2hrbankteam10.global.response.RestApiResponse;
 import com.sprint.example.sb01part2hrbankteam10.repository.DepartmentRepository;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
@@ -59,12 +62,27 @@ public class DepartmentController {
   @GetMapping("/{id}")
   public ResponseEntity<DepartmentDto> getDepartment(@PathVariable Integer id) {
     DepartmentDto department = departmentService.find(id);
-    if (department == null) {
-      log.error("부서를 찾을 수 없습니다. id = {}", id);
-      return ResponseEntity.notFound().build();
-    }
 
     return ResponseEntity.ok(department);
   }
 
+  // 부서 목록 조회
+  @GetMapping
+  public CursorPageResponseDto<DepartmentResponseDto> getDepartments(
+      @RequestParam(required = false) String nameOrDescription,
+      @RequestParam(required = false) Integer idAfter,
+      @RequestParam(required = false) String cursor,
+      @RequestParam(defaultValue = "10") int size,
+      @RequestParam(defaultValue = "establishedDate") String sortField,
+      @RequestParam(defaultValue = "asc") String sortDirection) {
+
+    return departmentService.getDepartments(
+        nameOrDescription,
+        idAfter,
+        cursor,
+        size,
+        sortField,
+        sortDirection
+    );
+  }
 }

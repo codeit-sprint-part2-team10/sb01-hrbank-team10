@@ -1,5 +1,7 @@
 package com.sprint.example.sb01part2hrbankteam10.storage.impl;
 
+import com.sprint.example.sb01part2hrbankteam10.global.exception.RestApiException;
+import com.sprint.example.sb01part2hrbankteam10.global.exception.errorcode.FileErrorCode;
 import com.sprint.example.sb01part2hrbankteam10.storage.FileStorage;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -30,7 +32,7 @@ public class FileStorageImpl implements FileStorage {
       Files.createDirectories(profileStorage);
       Files.createDirectories(backupStorage);
     } catch(IOException e){
-      throw new RuntimeException(e);
+      throw new RestApiException(FileErrorCode.DIRECTORY_CREATION_FAILED, e.getMessage());
     }
   }
 
@@ -40,19 +42,12 @@ public class FileStorageImpl implements FileStorage {
     // fileId로 경로 생성 -> resolvePath
     Path path = profileResolvePath(fileId);
 
-    // file 데이터를 byte[]에 넣기
-    byte[] data;
-    try{
-      data = file.getBytes();
-    }catch(IOException e){
-      throw new RuntimeException("파일 쓰기 중 오류가 발생했습니다." + e);
-    }
-
     // byte[] data를 로컬저장소에 넣기
     try{
+      byte[] data = file.getBytes();
       Files.write(path, data, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
     }catch(IOException e){
-      throw new RuntimeException("파일 저장 중 오류가 발생했습니다." + e);
+      throw new RestApiException(FileErrorCode.FILE_WRITE_ERROR, e.getMessage());
     }
     return fileId;
   }
@@ -64,19 +59,18 @@ public class FileStorageImpl implements FileStorage {
     Path path = backupResolvePath(fileId);
 
     // file 데이터 output stream 생성
-    byte[] data;
     try(OutputStream outputStream = Files.newOutputStream(path)){
-      data = file.getBytes();
-      outputStream.write(data);
+      outputStream.write(file.getBytes());
     }catch(IOException e){
-      throw new RuntimeException("백업 데이터 스트리밍 중 오류가 발생했습니다." + e);
+      throw new RestApiException(FileErrorCode.FILE_STREAM_ERROR, e.getMessage());
     }
 
     // byte[] data를 로컬저장소에 넣기
     try{
+      byte[] data = file.getBytes();
       Files.write(path, data, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
     }catch(IOException e){
-      throw new RuntimeException("파일 저장 중 오류가 발생했습니다." + e);
+      throw new RestApiException(FileErrorCode.FILE_WRITE_ERROR, e.getMessage());
     }
     return fileId;
   }

@@ -1,5 +1,6 @@
 package com.sprint.example.sb01part2hrbankteam10.dto;
 
+
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -27,5 +28,7 @@ public class DepartmentUpdateRequest {
       message = "\"0000-00-00\" 형식에 맞지 않습니다."
   )
   private String establishedDate;
+
+
 
 }

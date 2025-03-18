@@ -14,6 +14,8 @@ import com.sprint.example.sb01part2hrbankteam10.service.DepartmentService;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -83,6 +85,25 @@ public class DepartmentServiceImpl implements DepartmentService {
     }
   }
 
+  @Override
+  public List<DepartmentDto> getDepartment(String name, String description) {
+    List<Department> departments = departmentRepository.findByNameAndDescription(
+        name != null ? name : "",
+        description != null ? description : "");
+
+    return departments.stream()
+        .map(departmentMapper::toDto)
+        .collect(Collectors.toList());
+  }
+
+  @Override
+  public DepartmentDto find(Integer id) {
+    Department department = departmentRepository.findById(id)
+        .orElseThrow(() -> new RestApiException(DepartmentErrorCode.DEPARTMENT_NOT_EXIST,
+            id.toString()));
+
+    return departmentMapper.toDto(department);
+  }
 
   private LocalDateTime parseLocalDateTime(String dateString) {
     try {

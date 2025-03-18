@@ -1,20 +1,17 @@
 package com.sprint.example.sb01part2hrbankteam10.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+
 import java.time.LocalDateTime;
+import java.util.Map;
+
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
@@ -46,25 +43,22 @@ public class EmployeeHistory {
   private String ipAddress;
 
   @Column(name = "changed_fields", columnDefinition = "jsonb", nullable = false)
-  private String changedFields;
+  @JdbcTypeCode(SqlTypes.JSON)
+  private Map<String, Object> changedFields;
 
   @CreatedDate
   @Column(name = "logged_at", columnDefinition = "timestamp with time zone", nullable = false, updatable = false)
   private LocalDateTime loggedAt;
 
-  @Column(name = "changed_by", nullable = false, length = 50)
-  private String changedBy;
-
   @Builder
   public EmployeeHistory(String employeeNumber, ChangeType type, String memo,
-      LocalDateTime modifiedAt, String ipAddress, String changedFields, String changedBy) {
+      LocalDateTime modifiedAt, String ipAddress, Map<String, Object> changedFields) {
     this.employeeNumber = employeeNumber;
     this.type = type;
     this.memo = memo;
     this.modifiedAt = modifiedAt;
     this.ipAddress = ipAddress;
     this.changedFields = changedFields;
-    this.changedBy = changedBy;
   }
 
   public enum ChangeType {

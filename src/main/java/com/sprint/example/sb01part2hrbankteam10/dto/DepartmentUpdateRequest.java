@@ -1,7 +1,6 @@
 package com.sprint.example.sb01part2hrbankteam10.dto;
 
 
-import jakarta.validation.constraints.NotNull;
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -10,24 +9,19 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Getter
-@Builder
 @Getter @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class DepartmentUpdateRequest {
-  @NotNull
 
   @Nullable
   @Size(min = 1, max = 50)
   private String name;
 
-  @NotNull
   @Nullable
   @Size(min = 1, max = 255)
   private String description;
 
-  @NotNull
   @Nullable
   @Pattern(
       regexp = "^\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01])$",

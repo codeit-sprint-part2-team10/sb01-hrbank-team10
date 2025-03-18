@@ -8,6 +8,7 @@ import com.sprint.example.sb01part2hrbankteam10.global.exception.RestApiExceptio
 import com.sprint.example.sb01part2hrbankteam10.global.exception.errorcode.DepartmentErrorCode;
 import com.sprint.example.sb01part2hrbankteam10.global.exception.errorcode.EmployeeErrorCode;
 import com.sprint.example.sb01part2hrbankteam10.mapper.DepartmentMapper;
+import com.sprint.example.sb01part2hrbankteam10.mapper.DepartmentUpdateMapper;
 import com.sprint.example.sb01part2hrbankteam10.repository.DepartmentRepository;
 import com.sprint.example.sb01part2hrbankteam10.repository.EmployeeRepository;
 import com.sprint.example.sb01part2hrbankteam10.service.DepartmentService;
@@ -31,6 +32,7 @@ public class DepartmentServiceImpl implements DepartmentService {
   private final DepartmentRepository departmentRepository;
   private final DepartmentMapper departmentMapper;
   private final EmployeeRepository employeeRepository;
+  private final DepartmentUpdateMapper departmentUpdateMapper;
 
   @Transactional
   @Override
@@ -60,10 +62,16 @@ public class DepartmentServiceImpl implements DepartmentService {
         .orElseThrow(() -> new RestApiException(DepartmentErrorCode.DEPARTMENT_NOT_EXIST,
             id.toString()));
 
-    findDepartment.patchUpdate(request.getName(), request.getDescription(), request.getEstablishedDate());
+    Optional.ofNullable(request.getName()).ifPresent(name -> {
+      if (!name.equals(findDepartment.getName()) && departmentRepository.existsByName(name)) {
+        throw new RestApiException(DepartmentErrorCode.DUPLICATION_NAME, name);
+      }
+    });
 
-    Department updatedDepartment = departmentRepository.save(findDepartment);
-    return departmentMapper.toDto(updatedDepartment);
+    departmentUpdateMapper.updateDepartmentFromRequest(request, findDepartment);
+
+    Department savedDepartment = departmentRepository.save(findDepartment);
+    return departmentMapper.toDto(savedDepartment);
   }
 
   @Transactional
@@ -79,7 +87,7 @@ public class DepartmentServiceImpl implements DepartmentService {
       throw new RestApiException(DepartmentErrorCode.DEPARTMENT_HAS_EMPLOYEE, id.toString());
     }
 
-    if (!departmentRepository.existsById(id)) {
+    if (departmentRepository.existsById(id)) {
       departmentRepository.delete(findDepartment);
     }
   }

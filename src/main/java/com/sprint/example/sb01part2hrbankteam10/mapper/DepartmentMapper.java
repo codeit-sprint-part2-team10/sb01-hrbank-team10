@@ -24,7 +24,7 @@ public class DepartmentMapper {
         .name(department.getName())
         .description(department.getDescription())
         .establishedDate(department.getEstablishedDate().toLocalDate())
-        .employeeCount(employeeRepository.countByDepartmentId(department.getId())) //employees가 없어서 주석처리
+        .employeeCount(employeeRepository.countByDepartmentId(department.getId()))
         .build();
   }
 }

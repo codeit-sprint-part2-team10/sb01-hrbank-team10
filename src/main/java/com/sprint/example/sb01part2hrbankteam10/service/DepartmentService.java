@@ -8,7 +8,7 @@ public interface DepartmentService {
 
   DepartmentDto create(DepartmentCreateRequest request);
 
-  DepartmentDto update(Integer id, DepartmentCreateRequest request);
+  DepartmentDto update(Integer id, DepartmentUpdateRequest request);
 
   void delete(Integer id);
 }

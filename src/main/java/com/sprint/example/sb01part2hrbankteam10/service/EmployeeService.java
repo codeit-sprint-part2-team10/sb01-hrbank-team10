@@ -11,4 +11,6 @@ public interface EmployeeService {
 
   EmployeeDto update(Integer id, EmployeeUpdateRequest request, MultipartFile profile,
       String clientIp);
+
+  String deleteById(Integer id);
 }

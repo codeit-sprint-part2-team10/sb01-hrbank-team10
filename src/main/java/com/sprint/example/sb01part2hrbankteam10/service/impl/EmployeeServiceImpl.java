@@ -118,6 +118,20 @@ public class EmployeeServiceImpl implements EmployeeService {
     return after;
   }
 
+  @Override
+  public String deleteById(Integer id) {
+    Employee employee = getByIdOrThrow(id);
+    Integer previousProfileImageId = employee.getProfileImage().getId();
+    employee.updateStatus(EmployeeStatus.RESIGNED);
+    employee.updateProfileImage(null);
+    // 로컬 파일 삭제 추가 예정
+    fileRepository.deleteById(previousProfileImageId);
+
+    EmployeeDto before = EmployeeMapper.toDto(employee);
+    // EmployeeHistoryService.create(ChangeType.DELETE, request.getMemo(), before, null, clientIp);
+
+    return "직원이 성공적으로 삭제되었습니다.";
+  }
 
   private boolean validateFile(MultipartFile multipartFile) {
     return multipartFile != null && !multipartFile.isEmpty();

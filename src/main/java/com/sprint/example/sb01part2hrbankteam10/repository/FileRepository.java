@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface FileRepository extends JpaRepository<File,Integer> {
-  Integer findByFileName(String name);
+  Integer findByName(String name);
 }

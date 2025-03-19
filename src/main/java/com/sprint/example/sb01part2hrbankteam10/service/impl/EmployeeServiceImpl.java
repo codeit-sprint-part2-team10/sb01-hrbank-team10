@@ -123,10 +123,10 @@ public class EmployeeServiceImpl implements EmployeeService {
               .build()
       );
       Integer previousProfileImageId = employee.getProfileImage().getId();
-      fileStorage.saveProfile(newProfile.getId(), profile); // 로컬 저장
       employee.updateProfileImage(newProfile);              // 프로필 업데이트
+      fileStorage.saveProfile(newProfile.getId(), profile); // 로컬 저장
       fileRepository.deleteById(previousProfileImageId);    // 기존 프로필 데이터 삭제
-//      fileStorage.deleteProfile(previousProfileImageId);    // 로컬 데이터 삭제
+      fileStorage.deleteProfile(previousProfileImageId);    // 로컬 데이터 삭제
     }
 
     EmployeeDto after = EmployeeMapper.toDto(employee);
@@ -148,7 +148,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     Integer previousProfileImageId = employee.getProfileImage().getId();
     employee.updateProfileImage(null);
     fileRepository.deleteById(previousProfileImageId);
-//    fileStorage.deleteProfile(previousProfileImageId);
+    fileStorage.deleteProfile(previousProfileImageId);
 
     EmployeeDto before = EmployeeMapper.toDto(employee);
     EmployeeDto after = EmployeeMapper.toDto(Employee.builder().build());

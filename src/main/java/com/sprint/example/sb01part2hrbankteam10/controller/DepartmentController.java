@@ -32,44 +32,44 @@ public class DepartmentController {
 
   // 부서 생성
   @PostMapping
-  public ResponseEntity<RestApiResponse<DepartmentDto>> createDepartment(
+  public ResponseEntity<DepartmentDto> createDepartment(
       @Valid @RequestBody DepartmentCreateRequest request) {
 
     DepartmentDto department = departmentService.create(request);
     return ResponseEntity.status(HttpStatus.CREATED)
-        .body(RestApiResponse.success(HttpStatus.CREATED, department));
+        .body(departmentService.create(request));
   }
 
   // 부서 수정
   @PatchMapping("/{id}")
-  public ResponseEntity<RestApiResponse<DepartmentDto>> updateDepartment(
+  public ResponseEntity<DepartmentDto> updateDepartment(
       @PathVariable Integer id,
       @Valid @RequestBody DepartmentUpdateRequest request) {
 
     DepartmentDto updatedDepartment = departmentService.update(id, request);
     return ResponseEntity.ok()
-        .body(RestApiResponse.success(HttpStatus.OK, updatedDepartment));
+        .body(updatedDepartment);
   }
 
   // 부서 삭제
   @DeleteMapping("/{id}")
-  public ResponseEntity<RestApiResponse<Void>> deleteDepartment(@PathVariable Integer id) {
+  public ResponseEntity<String> deleteDepartment(@PathVariable Integer id) {
     return ResponseEntity.ok()
-        .body(RestApiResponse.success(HttpStatus.OK, departmentService.delete(id)));
+        .body(departmentService.delete(id));
   }
 
   // 부서 상세 조회
   @GetMapping("/{id}")
-  public ResponseEntity<RestApiResponse<DepartmentDto>> getDepartment(@PathVariable Integer id) {
+  public ResponseEntity<DepartmentDto> getDepartment(@PathVariable Integer id) {
     DepartmentDto department = departmentService.find(id);
 
     return ResponseEntity.ok()
-    .body(RestApiResponse.success(HttpStatus.OK, department));
+    .body(department);
   }
 
   // 부서 목록 조회
   @GetMapping
-  public ResponseEntity<RestApiResponse<CursorPageResponseDto<DepartmentResponseDto>>> getDepartments(
+  public ResponseEntity<CursorPageResponseDto<DepartmentResponseDto>> getDepartments(
       @RequestParam(required = false) String nameOrDescription,
       @RequestParam(required = false) Integer idAfter,
       @RequestParam(required = false) String cursor,
@@ -87,6 +87,6 @@ public class DepartmentController {
     );
 
     return ResponseEntity.ok()
-        .body(RestApiResponse.success(HttpStatus.OK, response));
+        .body(response);
   }
 }

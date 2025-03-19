@@ -22,7 +22,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -46,56 +45,46 @@ public class EmployeeController {
 
 
   @PostMapping
-  public ResponseEntity<RestApiResponse<EmployeeDto>> createEmployee (
+  public ResponseEntity<EmployeeDto> createEmployee (
       HttpServletRequest httpServletRequest,
       @Valid @RequestPart(name = "employee")EmployeeCreateRequest request,
       @RequestPart(name = "profile", required = false) MultipartFile profile
   ) {
 
     return ResponseEntity.status(HttpStatus.CREATED)
-        .body(RestApiResponse.success(
-            HttpStatus.CREATED,
-            employeeService.create(request, profile, IpUtil.getClientIp(httpServletRequest))
-        ));
+        .body(employeeService.create(request, profile, IpUtil.getClientIp(httpServletRequest)));
   }
 
   @PatchMapping("/{id}")
-  public ResponseEntity<RestApiResponse<EmployeeDto>> updateEmployee (
+  public ResponseEntity<EmployeeDto> updateEmployee (
       HttpServletRequest httpServletRequest,
       @PathVariable Integer id,
       @Valid @RequestPart(name = "employee") EmployeeUpdateRequest request,
       @RequestPart(name = "profile", required = false) MultipartFile profile
   ) {
     return ResponseEntity.ok()
-        .body(RestApiResponse.success(
-            HttpStatus.OK,
+        .body(
             employeeService.update(id, request, profile, IpUtil.getClientIp(httpServletRequest))
-        ));
+        );
   }
   
   @GetMapping("/{id}")
-  public ResponseEntity<RestApiResponse<EmployeeDto>> getEmployee (@PathVariable Integer id) {
+  public ResponseEntity<EmployeeDto> getEmployee (@PathVariable Integer id) {
     return ResponseEntity.ok()
-        .body(RestApiResponse.success(
-            HttpStatus.OK,
-            employeeService.getById(id)
-        ));
+        .body(employeeService.getById(id));
   }
 
   @DeleteMapping("/{id}")
-  public ResponseEntity<RestApiResponse<Void>> deleteEmployee (
+  public ResponseEntity<String> deleteEmployee (
       HttpServletRequest httpServletRequest,
       @PathVariable Integer id
   ) {
     return ResponseEntity.ok()
-        .body(RestApiResponse.success(
-            HttpStatus.OK,
-            employeeService.deleteById(id, IpUtil.getClientIp(httpServletRequest)))
-        );
+        .body(employeeService.deleteById(id, IpUtil.getClientIp(httpServletRequest)));
   }
 
   @GetMapping
-  public ResponseEntity<RestApiResponse<CursorPageResponseDto<EmployeeDto>>> getListEmployee(
+  public ResponseEntity<CursorPageResponseDto<EmployeeDto>> getListEmployee(
       @RequestParam(name = "nameOrEmail", required = false) String nameOrEmail,
       @RequestParam(name = "employeeNumber", required = false) String employeeNumber,
       @RequestParam(name = "departmentName", required = false) String departmentName,
@@ -115,10 +104,7 @@ public class EmployeeController {
     );
 
     return ResponseEntity.ok()
-        .body(RestApiResponse.success(
-            HttpStatus.OK,
-            employeeService.getAllByQuery(request)
-        ));
+        .body(employeeService.getAllByQuery(request));
   }
 
   @GetMapping("/stats/distribution")
@@ -147,15 +133,15 @@ public class EmployeeController {
   }
 
   @GetMapping("/count")
-  public ResponseEntity<RestApiResponse<EmployeeDashboardResponse>> getEmployeeDashboard(
+  public ResponseEntity<EmployeeDashboardResponse> getEmployeeDashboard(
       @RequestParam(required = false) String status,
       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate) {
 
     EmployeeDashboardResponse response = employeeStatusService.getEmployeeDashboard(status, fromDate,
         toDate);
-    return ResponseEntity.status(HttpStatus.OK)
-        .body(RestApiResponse.success(HttpStatus.OK, response));
+    return ResponseEntity.ok()
+        .body(response);
 
   }
 }

@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -98,12 +99,12 @@ public class EmployeeController {
     return ResponseEntity.status(HttpStatus.OK).body(RestApiResponse.success(HttpStatus.OK, distribution));
   }
 
-  @GetMapping("/status/trend")
+  @GetMapping(value = "/status/trend")
   public ResponseEntity<RestApiResponse<List<EmployeeTrendDto>>> getEmployeeTrend(
       @RequestParam(required = false)
-      @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
+      @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDateTime from,
       @RequestParam(required = false)
-      @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to,
+      @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDateTime to,
       @RequestParam(defaultValue = "month") String unit) {
 
     List<EmployeeTrendDto> trend = employeeStatusService.getEmployeeTrend(from, to, unit);

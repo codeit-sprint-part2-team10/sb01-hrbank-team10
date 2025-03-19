@@ -1,14 +1,15 @@
 package com.sprint.example.sb01part2hrbankteam10.global.exception.errorcode;
 
+import com.sprint.example.sb01part2hrbankteam10.global.exception.ErrorCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 
 @Getter
 @RequiredArgsConstructor
-public enum BackupErrorCode {
-  BACKUP_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "BACKUP_001", "백업 중 오류가 발생했습니다."),
-  BACKUP_TO_CSV_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "BACKUP_002", "백업을 CSV 파일 변환하는 중 오류가 발생했습니다.");
+public enum BackupErrorCode implements ErrorCode {
+  BACKUP_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "BACKUP_001", "백업 도중 오류가 발생했습니다."),
+  BACKUP_TO_CSV_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "BACKUP_002", "백업을 CSV 파일로 변환 중 오류가 발생했습니다.");
 
   private final HttpStatus httpStatus;
   private final String code;

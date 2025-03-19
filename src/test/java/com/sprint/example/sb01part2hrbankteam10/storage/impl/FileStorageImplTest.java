@@ -43,11 +43,11 @@ class FileStorageImplTest {
 
     // then
     // 프로필 파일이 savedFiles/profiles에 저장되었나 확인
-    Path profilePath = fileStorage.resolvePath(savedProfileId);
+    Path profilePath = fileStorage.profileResolvePath(savedProfileId);
     File savedProfileFile = new File("profilePath");
 
     // 백업 파일이 savedFiles/backups에 저장되었나 확인
-    Path backupPath = fileStorage.resolvePath(savedBackupId);
+    Path backupPath = fileStorage.backupResolvePath(savedBackupId);
     File savedBackupFile = new File("backupPath");
   }
 

@@ -13,10 +13,15 @@ public interface FileStorage {
   // 백업 파일 저장
   Integer saveBackup(Integer fileId, MultipartFile file);
 
+  // 프로필 피일 다운로드
+  Resource downloadProfile(Integer fileId);
 
-  // 파일 다운로드
-  Resource download(Integer fileId);
+  // 백업 파일 다운로드
+  Resource downloadBackup(Integer fileId);
 
-  // 파일 경로 생성
-  Path resolvePath(Integer fileId);
+  // 프로필 파일 경로 생성
+  Path profileResolvePath(Integer fileId);
+
+  // 백업 파일 경로 생성
+  Path backupResolvePath(Integer fileId);
 }

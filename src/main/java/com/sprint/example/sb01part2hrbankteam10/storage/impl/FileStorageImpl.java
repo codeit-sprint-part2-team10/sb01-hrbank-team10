@@ -19,18 +19,21 @@ import org.springframework.web.multipart.MultipartFile;
 public class FileStorageImpl implements FileStorage {
 
   // 저장 디렉토리 경로 선언
-  private final Path rootStorage;
+  private final Path profileStorage;
+  private final Path backupStorage;
 
   // 경로 의존성 주입 생성자
-  public FileStorageImpl(@Value("${user.dir}/savedFiles") String rootStorage) {
-    this.rootStorage= Path.of(rootStorage);
+  public FileStorageImpl(@Value("${user.dir}/savedFiles/profiles") String profileStorage, @Value("${user.dir}/savedFiles/backups") String backupStorage) {
+    this.profileStorage = Path.of(profileStorage);
+    this.backupStorage = Path.of(backupStorage);
     init();
   }
 
   // 해당 디렉토리가 없을 시 만들어주는 초기화 메서드
   private void init(){
     try {
-      Files.createDirectories(rootStorage);
+      Files.createDirectories(profileStorage);
+      Files.createDirectories(backupStorage);
     } catch(IOException e){
       throw new RestApiException(FileErrorCode.DIRECTORY_CREATION_FAILED, e.getMessage());
     }
@@ -40,7 +43,7 @@ public class FileStorageImpl implements FileStorage {
   @Override
   public Integer saveProfile(Integer fileId, MultipartFile file){
     // fileId로 경로 생성 -> resolvePath
-    Path path = resolvePath(fileId);
+    Path path = profileResolvePath(fileId);
 
     // byte[] data를 로컬저장소에 넣기
     try{
@@ -57,7 +60,7 @@ public class FileStorageImpl implements FileStorage {
   public Integer saveBackup(Integer fileId, MultipartFile file) {
     // fileId로 경로 생성
 
-    Path path = resolvePath(fileId);
+    Path path = backupResolvePath(fileId);
 
     // 파일을 스트림을 통해 저장
     try (InputStream inputStream = file.getInputStream();
@@ -75,14 +78,14 @@ public class FileStorageImpl implements FileStorage {
     return fileId;
   }
 
-  // 파일 다운로드
+  // 프로필 파일 다운로드
   @Override
-  public Resource download(Integer fileId){
+  public Resource downloadProfile(Integer fileId){
     // 다운받을 파일의 경로 생성
-    Path path = resolvePath(fileId);
+    Path path = profileResolvePath(fileId);
 
     if (!Files.exists(path)) {
-      throw new RestApiException(FileErrorCode.FILE_NOT_FOUND, resolvePath(fileId).toString());
+      throw new RestApiException(FileErrorCode.FILE_NOT_FOUND, profileResolvePath(fileId).toString());
     }
 
     // 파일 시스템 리소스 생성
@@ -90,17 +93,46 @@ public class FileStorageImpl implements FileStorage {
 
     // 리소스가 존재하고 읽을 수 있는지 확인
     if (!resource.exists() || !resource.isReadable()) {
-      throw new RestApiException(FileErrorCode.FILE_READ_ERROR, resolvePath(fileId).toString());
+      throw new RestApiException(FileErrorCode.FILE_READ_ERROR, profileResolvePath(fileId).toString());
     }
 
     // Resource 반환
     return resource;
   }
 
+  // 백업 파일 다운로드
+  @Override
+  public Resource downloadBackup(Integer fileId){
+    // 다운받을 파일의 경로 생성
+    Path path = backupResolvePath(fileId);
+
+    if (!Files.exists(path)) {
+      throw new RestApiException(FileErrorCode.FILE_NOT_FOUND, backupResolvePath(fileId).toString());
+    }
+
+    // 파일 시스템 리소스 생성
+    FileSystemResource resource = new FileSystemResource(path);
+
+    // 리소스가 존재하고 읽을 수 있는지 확인
+    if (!resource.exists() || !resource.isReadable()) {
+      throw new RestApiException(FileErrorCode.FILE_READ_ERROR, backupResolvePath(fileId).toString());
+    }
+
+    // Resource 반환
+    return resource;
+  }
+
+
   // 아이디로 경로를 설정하는 메서드 resolvePath
   @Override
-  public Path resolvePath(Integer fileId){
-    return rootStorage.resolve(fileId.toString());
+  public Path profileResolvePath(Integer fileId){
+    return profileStorage.resolve(fileId.toString());
+  }
+
+
+  @Override
+  public Path backupResolvePath(Integer fileId){
+    return backupStorage.resolve(fileId.toString());
   }
 }
 

@@ -35,7 +35,7 @@ public class Department {
 
   @LastModifiedDate
   @Column(name = "updated_at",columnDefinition = "timestamp with time zone")
-  protected LocalDateTime updatedAt;
+  private LocalDateTime updatedAt;
 
   @Column(name = "name", length = 50, nullable = false, unique = true)
   private String name;

@@ -60,9 +60,10 @@ public class Employee {
   @Column(name = "created_at", columnDefinition = "timestamp with time zone", nullable = false, updatable = false)
   private LocalDateTime createdAt;
 
+  @Getter
   @LastModifiedDate
   @Column(name = "updated_at",columnDefinition = "timestamp with time zone")
-  protected LocalDateTime updatedAt;
+  private LocalDateTime updatedAt;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "department_id", columnDefinition = "INTEGER")
@@ -85,6 +86,7 @@ public class Employee {
     this.department = department;
     this.profileImage = profileImage;
   }
+
 
   public enum EmployeeStatus {
     ACTIVE,

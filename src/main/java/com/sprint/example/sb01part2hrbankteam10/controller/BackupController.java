@@ -4,6 +4,8 @@ import com.sprint.example.sb01part2hrbankteam10.dto.BackupDto;
 import com.sprint.example.sb01part2hrbankteam10.entity.Backup;
 import com.sprint.example.sb01part2hrbankteam10.repository.BackupRepository;
 import com.sprint.example.sb01part2hrbankteam10.service.BackupService;
+import com.sprint.example.sb01part2hrbankteam10.util.IpUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -14,9 +16,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Base64;
 
 @RestController
 @RequestMapping("api/backups")
@@ -28,8 +30,8 @@ public class BackupController {
 
     // 백업 요청 TODO 에러 코드
     @PostMapping
-    public ResponseEntity<Integer> Backup(@RequestParam String workerIpAddress) {
-        Integer backupId = backupService.performBackup(workerIpAddress);
+    public ResponseEntity<Integer> Backup(HttpServletRequest request) {
+        Integer backupId = backupService.performBackup(IpUtil.getClientIp(request));
         return ResponseEntity.status(HttpStatus.OK).body(backupId);
     }
 

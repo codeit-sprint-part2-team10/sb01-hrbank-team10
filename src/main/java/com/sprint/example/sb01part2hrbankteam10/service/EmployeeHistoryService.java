@@ -28,7 +28,7 @@ public interface EmployeeHistoryService {
             String sortDirection
     );
 
-    List<DiffDto> getChangeDetails(Integer id);
+    List<DiffDto> getChangeDiffs(Integer id);
 
     Long countEmployeeHistories(String employeeNumber,
                                 String type,

@@ -82,7 +82,7 @@ class EmployeeHistoryRepositoryTest {
         .memo("memo")
         .modifiedAt(LocalDateTime.now())
         .ipAddress("127.0.0.1")
-        .changedFields(changeFields)
+//        .changedFields(changeFields)
         .build();
     employeeHistoryRepository.save(employeeHistory);
 

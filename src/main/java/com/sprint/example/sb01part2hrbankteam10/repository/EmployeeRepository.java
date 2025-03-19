@@ -2,6 +2,8 @@ package com.sprint.example.sb01part2hrbankteam10.repository;
 
 import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeDistributionDto;
 import com.sprint.example.sb01part2hrbankteam10.entity.Employee;
+import com.sprint.example.sb01part2hrbankteam10.entity.Employee.EmployeeStatus;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;

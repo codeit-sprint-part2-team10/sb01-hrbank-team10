@@ -3,7 +3,6 @@ package com.sprint.example.sb01part2hrbankteam10.service.impl;
 import com.sprint.example.sb01part2hrbankteam10.dto.CursorPageResponseDto;
 import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeCreateRequest;
 import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeDto;
-import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeSearchRequest;
 import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeUpdateRequest;
 import com.sprint.example.sb01part2hrbankteam10.entity.Department;
 import com.sprint.example.sb01part2hrbankteam10.entity.Employee;
@@ -23,6 +22,8 @@ import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
+import java.util.Base64;
+import java.util.Objects;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -150,9 +151,37 @@ public class EmployeeServiceImpl implements EmployeeService {
   public CursorPageResponseDto<EmployeeDto> searchByQuery(
       String nameOrEmail, String employeeNumber, String departmentName, String position,
       LocalDate hireDateFrom, LocalDate hireDateTo, EmployeeStatus status, Integer idAfter,
-      String cursor, Integer size, Integer sortField, String sortDirection
+      String cursor, Integer size, String sortField, String sortDirection
   ) {
+    // 기본값 설정
+    size = (size == null || size <= 0) ?  10 : size;
+    sortField = sortField == null ? "name" : sortField;
+    sortDirection = !Objects.equals(sortDirection, "desc") ? "asc" : sortDirection;
+
+    // 커서에서 idAfter 추출
+    if (cursor != null && !cursor.isEmpty() && idAfter == null) {
+      try {
+        String decodedCursor = new String(Base64.getDecoder().decode(cursor));
+        idAfter = Integer.parseInt(decodedCursor.split(":")[1]);
+      } catch (Exception e) {
+        idAfter = null;
+      }
+    }
+
+
+
     // 이름, 이메일, 부서, 직함, 사원번호 부분 일치
+
+
+    // 입사일 범위 조건 (시작이 종료 보다 늦을 수 없음)
+
+
+    // 상태는 완전 일치 조건 (null 이 아닌 경우 적용)
+
+
+    // 정렬 및 페이지네이션 (이름: default or 입사일 or 사원번호)
+    // 정렬 방향 (asc: default)
+
     return null;
   }
 

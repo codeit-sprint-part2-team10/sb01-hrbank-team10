@@ -23,6 +23,6 @@ public class EmployeeSearchRequest {
   private String cursor;
 
   private Integer size = 10;  // 기본값 설정
-  private Integer sortField;
+  private String sortField;
   private String sortDirection = "ASC";  // 기본값 설정
 }

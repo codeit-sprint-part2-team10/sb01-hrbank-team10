@@ -21,19 +21,4 @@ public class EmployeeDto {
   private EmployeeStatus status;
   private Integer profileImageId;
 
-  @Override
-  public String toString() {
-    return "EmployeeDto{" +
-        "id=" + id +
-        ", name='" + name + '\'' +
-        ", email='" + email + '\'' +
-        ", employeeNumber='" + employeeNumber + '\'' +
-        ", departmentName='" + departmentName + '\'' +
-        ", position='" + position + '\'' +
-        ", hireDate=" + hireDate +
-        ", status=" + status +
-        ", profileImageId=" + profileImageId +
-        ", departmentId=" + departmentId +
-        '}';
-  }
 }

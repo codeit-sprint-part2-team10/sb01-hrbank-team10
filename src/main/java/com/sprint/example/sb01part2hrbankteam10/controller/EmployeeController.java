@@ -3,6 +3,7 @@ package com.sprint.example.sb01part2hrbankteam10.controller;
 import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeCreateRequest;
 import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeDistributionDto;
 import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeDto;
+import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeTrendDto;
 import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeUpdateRequest;
 import com.sprint.example.sb01part2hrbankteam10.global.response.RestApiResponse;
 import com.sprint.example.sb01part2hrbankteam10.service.EmployeeService;
@@ -10,10 +11,13 @@ import com.sprint.example.sb01part2hrbankteam10.service.EmployeeStatusService;
 import jakarta.servlet.http.HttpServletRequest;
 import com.sprint.example.sb01part2hrbankteam10.util.IpUtil;
 import jakarta.validation.Valid;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -95,4 +99,17 @@ public class EmployeeController {
     return ResponseEntity.status(HttpStatus.OK).body(RestApiResponse.success(HttpStatus.OK, distribution));
   }
 
+  @GetMapping(value = "/status/trend")
+  public ResponseEntity<RestApiResponse<List<EmployeeTrendDto>>> getEmployeeTrend(
+      @RequestParam(required = false)
+      @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDateTime from,
+      @RequestParam(required = false)
+      @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDateTime to,
+      @RequestParam(defaultValue = "month") String unit) {
+
+    List<EmployeeTrendDto> trend = employeeStatusService.getEmployeeTrend(from, to, unit);
+
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(RestApiResponse.success(HttpStatus.OK, trend));
+  }
 }

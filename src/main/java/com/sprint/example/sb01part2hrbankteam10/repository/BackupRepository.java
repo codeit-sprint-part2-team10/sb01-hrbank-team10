@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface BackupRepository extends JpaRepository<Backup, Integer>{
-  LocalDateTime findLastCompletedBackup();
+//  LocalDateTime findLastCompletedBackup();
 
 }

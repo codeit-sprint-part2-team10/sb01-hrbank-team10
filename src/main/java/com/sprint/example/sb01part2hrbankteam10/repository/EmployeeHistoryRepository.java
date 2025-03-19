@@ -9,5 +9,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface EmployeeHistoryRepository extends JpaRepository<EmployeeHistory, Integer>, JpaSpecificationExecutor<EmployeeHistory>{
-  LocalDateTime findLastModifiedAt();
+//  LocalDateTime findLastModifiedAt();
 }

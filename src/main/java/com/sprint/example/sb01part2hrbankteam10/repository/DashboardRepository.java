@@ -12,6 +12,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface DashboardRepository extends JpaRepository<Employee, Integer> {
 
+  /**
+   * 직원 분포 조회
+   */
   @Query(value =
       "SELECT " +
           "  name AS group_key, " +
@@ -35,6 +38,10 @@ public interface DashboardRepository extends JpaRepository<Employee, Integer> {
   List<Object[]> findEmployeeDistribution(@Param("groupBy") String groupBy,
       @Param("status") String status);
 
+  /**
+   * 직원 추이 조회
+   */
+
   @Query(value =
       "WITH employee_counts AS (" +
           "  SELECT " +
@@ -56,4 +63,36 @@ public interface DashboardRepository extends JpaRepository<Employee, Integer> {
       @Param("from") LocalDateTime from,
       @Param("to") LocalDateTime to,
       @Param("unit") String unit);
+
+  /**
+   * 직원수 조회
+   */
+
+  @Query("SELECT COUNT(e) FROM Employee e")
+  int countEmployees();
+
+  @Query("SELECT COUNT(e) FROM Employee e WHERE e.status = :status")
+  int countEmployeesByStatus(@Param("status") Employee.EmployeeStatus status);
+
+  @Query("SELECT COUNT(e) FROM Employee e WHERE e.status = :status AND e.hireDate <= :toDate")
+  int countEmployeesByStatusAndToDate(@Param("status") Employee.EmployeeStatus status,
+      @Param("toDate") LocalDateTime toDate);
+
+  @Query("SELECT COUNT(e) FROM Employee e WHERE e.status = :status AND e.hireDate >= :fromDate")
+  int countEmployeesByStatusAndFromDate(@Param("status") Employee.EmployeeStatus status,
+      @Param("fromDate") LocalDateTime fromDate);
+
+  @Query("SELECT COUNT(e) FROM Employee e WHERE e.hireDate >= :fromDate AND e.hireDate <= :toDate")
+  int countEmployeesByDateRange(@Param("fromDate") LocalDateTime fromDate,
+      @Param("toDate") LocalDateTime toDate);
+
+  @Query("SELECT COUNT(e) FROM Employee e WHERE e.status = :status AND e.hireDate >= :fromDate AND e.hireDate <= :toDate")
+  int countEmployeesByAllConditions(
+      @Param("status") Employee.EmployeeStatus status,
+      @Param("fromDate") LocalDateTime fromDate,
+      @Param("toDate") LocalDateTime toDate);
+
+  @Query("SELECT COUNT(e) FROM Employee e WHERE e.updatedAt >= :fromDate AND e.updatedAt <= :toDate")
+  int countEmployeesUpdatedInRange(@Param("fromDate") LocalDateTime fromDate,
+      @Param("toDate") LocalDateTime toDate);
 }

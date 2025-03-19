@@ -1,8 +1,11 @@
 package com.sprint.example.sb01part2hrbankteam10.service.impl;
 
 import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeDistributionDto;
+import com.sprint.example.sb01part2hrbankteam10.global.exception.RestApiException;
+import com.sprint.example.sb01part2hrbankteam10.global.exception.errorcode.DepartmentErrorCode;
 import com.sprint.example.sb01part2hrbankteam10.repository.EmployeeRepository;
 import com.sprint.example.sb01part2hrbankteam10.service.EmployeeStatusService;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +25,7 @@ public class EmployeeStatusServiceImpl implements EmployeeStatusService {
     status = status == null || status.isEmpty() ? "ACTIVE" : status.toUpperCase();
 
     if (!"ACTIVE".equals(status) && !"RESIGNED".equals(status) && !"ON_LEAVE".equals(status)) {
-      throw new IllegalArgumentException("Invalid status value: " + status + ". Use ACTIVE, RESIGNED, or ON_LEAVE.");
+      throw new RestApiException(DepartmentErrorCode.DEPARTMENT_STATUS_NOT_VALID, status);
     }
 
     List<Object[]> results = employeeRepository.findEmployeeDistribution(groupBy, status);
@@ -37,6 +40,7 @@ public class EmployeeStatusServiceImpl implements EmployeeStatusService {
               .percentage(percentage)
               .build();
         })
+        .sorted(Comparator.comparing(EmployeeDistributionDto::getPercentage, Comparator.reverseOrder())) // 퍼센티지 내림차순 정렬
         .collect(Collectors.toList());
   }
 

@@ -3,6 +3,7 @@ package com.sprint.example.sb01part2hrbankteam10.service.impl;
 import com.sprint.example.sb01part2hrbankteam10.dto.CursorPageResponseDto;
 import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeCreateRequest;
 import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeDto;
+import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeSearchRequest;
 import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeUpdateRequest;
 import com.sprint.example.sb01part2hrbankteam10.entity.Department;
 import com.sprint.example.sb01part2hrbankteam10.entity.Employee;
@@ -15,6 +16,7 @@ import com.sprint.example.sb01part2hrbankteam10.mapper.EmployeeMapper;
 import com.sprint.example.sb01part2hrbankteam10.repository.DepartmentRepository;
 import com.sprint.example.sb01part2hrbankteam10.repository.EmployeeRepository;
 import com.sprint.example.sb01part2hrbankteam10.repository.FileRepository;
+import com.sprint.example.sb01part2hrbankteam10.repository.specification.EmployeeSpecification;
 import com.sprint.example.sb01part2hrbankteam10.service.EmployeeHistoryService;
 import com.sprint.example.sb01part2hrbankteam10.service.EmployeeService;
 import com.sprint.example.sb01part2hrbankteam10.storage.FileStorage;
@@ -25,8 +27,14 @@ import java.time.format.DateTimeParseException;
 import java.util.Base64;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -41,6 +49,8 @@ public class EmployeeServiceImpl implements EmployeeService {
   private final FileRepository fileRepository;
   private final FileStorage fileStorage;
   private final EmployeeHistoryService employeeHistoryService;
+
+  private static final Set<String> SORT_FIELDS = Set.of("name", "employeeNumber", "hireDate");
 
   @Override
   @Transactional
@@ -148,41 +158,67 @@ public class EmployeeServiceImpl implements EmployeeService {
 
   @Override
   @Transactional(readOnly = true)
-  public CursorPageResponseDto<EmployeeDto> searchByQuery(
-      String nameOrEmail, String employeeNumber, String departmentName, String position,
-      LocalDate hireDateFrom, LocalDate hireDateTo, EmployeeStatus status, Integer idAfter,
-      String cursor, Integer size, String sortField, String sortDirection
-  ) {
+  public CursorPageResponseDto<EmployeeDto> searchByQuery(EmployeeSearchRequest request) {
+
+    // 유효성 검사
+    validateSearchQuery(request);
+
     // 기본값 설정
-    size = (size == null || size <= 0) ?  10 : size;
-    sortField = sortField == null ? "name" : sortField;
-    sortDirection = !Objects.equals(sortDirection, "desc") ? "asc" : sortDirection;
-
-    // 커서에서 idAfter 추출
-    if (cursor != null && !cursor.isEmpty() && idAfter == null) {
-      try {
-        String decodedCursor = new String(Base64.getDecoder().decode(cursor));
-        idAfter = Integer.parseInt(decodedCursor.split(":")[1]);
-      } catch (Exception e) {
-        idAfter = null;
-      }
-    }
+    // 정렬 및 페이지네이션 (이름: default or 입사일 or 사원번호), (asc: default)
+    Direction getSortDirection = Objects.equals(request.getSortDirection(), "desc") ? Direction.DESC : Direction.ASC;
+    request.setSortField(request.getSortField() == null ? "name" : request.getSortField());
+    int pageSize = (request.getSize() == null || request.getSize() <= 0) ?  10 : request.getSize();
 
 
+    Pageable pageable = PageRequest.of(0, pageSize + 1, getSortDirection, request.getSortField());
+
+//    Page<EmployeeDto> employeeDtos = findAllBySearchQueryAndCheckExistsCursor(pageable, request);
+
+    return null;
+  }
+
+
+  private Specification<Employee> findAllBySearchQueryAndCheckExistsCursor(EmployeeSearchRequest request) {
+
+    Specification<Employee> spec = ((root, query, criteriaBuilder) -> null);
 
     // 이름, 이메일, 부서, 직함, 사원번호 부분 일치
+    if (request.getNameOrEmail() != null && !request.getNameOrEmail().isBlank()) {
+      spec = spec.and(EmployeeSpecification.likeName(request.getNameOrEmail()));
+      spec = spec.and(EmployeeSpecification.likeEmail(request.getNameOrEmail()));
+    }
+    if (request.getEmployeeNumber() != null && !request.getEmployeeNumber().isBlank()) {
+      spec = spec.and(EmployeeSpecification.likeEmployeeNumber(request.getEmployeeNumber()));
+    }
+    if (request.getDepartmentName() != null && !request.getDepartmentName().isBlank()) {
+      spec = spec.and(EmployeeSpecification.likeDepartmentName(request.getDepartmentName()));
+    }
+    if (request.getPosition() != null && !request.getPosition().isBlank()) {
+      spec = spec.and(EmployeeSpecification.likePosition(request.getPosition()));
+    }
 
-
-    // 입사일 범위 조건 (시작이 종료 보다 늦을 수 없음)
-
+    // 입사일 범위 조건 O (시작이 종료 보다 늦을 수 없음)
+    if (request.getHireDateFrom() != null) {
+      spec = spec.and(EmployeeSpecification.equalOrGreaterHireDateFrom(request.getHireDateFrom().atStartOfDay()));
+    }
+    if (request.getHireDateTo() != null) {
+      spec = spec.and(EmployeeSpecification.equalOrLessHireDateTo(request.getHireDateTo().atStartOfDay()));
+    }
 
     // 상태는 완전 일치 조건 (null 이 아닌 경우 적용)
 
-
-    // 정렬 및 페이지네이션 (이름: default or 입사일 or 사원번호)
-    // 정렬 방향 (asc: default)
-
+//    Page<Employee> getAll = employeeRepository.findAll(specification, pageable);
     return null;
+  }
+
+  private void validateSearchQuery(EmployeeSearchRequest request) {
+    if (!SORT_FIELDS.contains(request.getSortField())) {
+      throw new RestApiException(EmployeeErrorCode.INVALID_SORT_FIELD, "sortField=" + request.getSortField());
+    }
+    if (request.getHireDateFrom().isAfter(request.getHireDateTo())) {
+      throw new RestApiException(EmployeeErrorCode.INVALID_DATE_RANGE,
+          "hireDateFrom=" + request.getHireDateFrom() + ",hireDateTo=" + request.getHireDateTo());
+    }
   }
 
   private boolean validateFile(MultipartFile multipartFile) {

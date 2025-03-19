@@ -5,8 +5,9 @@ import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Getter
+@Getter @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class EmployeeSearchRequest {
@@ -22,7 +23,7 @@ public class EmployeeSearchRequest {
   private Integer idAfter;
   private String cursor;
 
-  private Integer size = 10;  // 기본값 설정
+  private Integer size;
   private String sortField;
-  private String sortDirection = "ASC";  // 기본값 설정
+  private String sortDirection;
 }

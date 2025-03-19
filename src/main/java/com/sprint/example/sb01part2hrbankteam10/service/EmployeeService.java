@@ -3,6 +3,7 @@ package com.sprint.example.sb01part2hrbankteam10.service;
 import com.sprint.example.sb01part2hrbankteam10.dto.CursorPageResponseDto;
 import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeCreateRequest;
 import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeDto;
+import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeSearchRequest;
 import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeUpdateRequest;
 import com.sprint.example.sb01part2hrbankteam10.entity.Employee.EmployeeStatus;
 import java.time.LocalDate;
@@ -19,11 +20,11 @@ public interface EmployeeService {
 
   EmployeeDto getById(Integer id);
 
-//  CursorPageResponseDto<EmployeeDto> searchByQuery(EmployeeSearchRequest request);
+  CursorPageResponseDto<EmployeeDto> searchByQuery(EmployeeSearchRequest request);
 
-  CursorPageResponseDto<EmployeeDto> searchByQuery(
-      String nameOrEmail, String employeeNumber, String departmentName, String position,
-      LocalDate hireDateFrom, LocalDate hireDateTo, EmployeeStatus status, Integer idAfter,
-      String cursor, Integer size, String sortField, String sortDirection
-  );
+//  CursorPageResponseDto<EmployeeDto> searchByQuery(
+//      String nameOrEmail, String employeeNumber, String departmentName, String position,
+//      LocalDate hireDateFrom, LocalDate hireDateTo, EmployeeStatus status, Integer idAfter,
+//      String cursor, Integer size, String sortField, String sortDirection
+//  );
 }

@@ -134,7 +134,7 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     return after;
   }
-  
+
   @Override
   public EmployeeDto getById(Integer id) {
     return EmployeeMapper.toDto(getByIdOrThrow(id));

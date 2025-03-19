@@ -32,10 +32,8 @@ public class EmployeeHistoryServiceImpl implements EmployeeHistoryService {
     public ChangeLogDto create(String employeeNumber, EmployeeHistory.ChangeType type,
                        String memo, EmployeeDto beforeData,
                        EmployeeDto afterData,
-                       HttpServletRequest request) {
+                       String clientIp) {
         List<DiffDto> changedFields = compareChanges(beforeData, afterData);
-
-        String clientIp = getClientIp(request);
 
         Map<String, Object> changedFieldMap = changedFields.stream()
                 .collect(Collectors.toMap(
@@ -65,6 +63,8 @@ public class EmployeeHistoryServiceImpl implements EmployeeHistoryService {
     private List<DiffDto> compareChanges(EmployeeDto beforeData, EmployeeDto afterData) {
         List<DiffDto> changes = new ArrayList<>();
 
+        if (beforeData == null) {}
+
         if(!Objects.equals(beforeData.getName(), afterData.getName())) {
             changes.add(new DiffDto("name", beforeData.getName(), afterData.getName()));
         }
@@ -72,7 +72,7 @@ public class EmployeeHistoryServiceImpl implements EmployeeHistoryService {
             changes.add(new DiffDto("email", beforeData.getEmail(), afterData.getEmail()));
         }
         if (!Objects.equals(beforeData.getPosition(), afterData.getPosition())) {
-            changes.add(new DiffDto("position", beforeData.getPosition(), afterData.getPosition()));
+            changes.add(new DiffDto("직함", beforeData.getPosition(), afterData.getPosition()));
         }
         if (!Objects.equals(beforeData.getDepartmentId(), afterData.getDepartmentId())) {
             changes.add(new DiffDto("departmentId", String.valueOf(beforeData.getDepartmentId()), String.valueOf(afterData.getDepartmentId())));
@@ -81,25 +81,20 @@ public class EmployeeHistoryServiceImpl implements EmployeeHistoryService {
             changes.add(new DiffDto("departmentName", beforeData.getDepartmentName(), afterData.getDepartmentName()));
         }
         if (!Objects.equals(beforeData.getHireDate(), afterData.getHireDate())) {
-            changes.add(new DiffDto("hireDate", beforeData.getHireDate().toString(), afterData.getHireDate().toString()));
+            changes.add(new DiffDto("hireDate",
+                    beforeData.getHireDate() != null ? beforeData.getHireDate().toString() : null,
+                    afterData.getHireDate() != null ? afterData.getHireDate().toString() : null));
         }
         if (!Objects.equals(beforeData.getStatus(), afterData.getStatus())) {
-            changes.add(new DiffDto("status", beforeData.getStatus().toString(), afterData.getStatus().toString()));
+            changes.add(new DiffDto("status",
+                    beforeData.getStatus() != null ?  beforeData.getStatus().toString() : null,
+                    afterData.getStatus() != null ?  afterData.getStatus().toString() : null));
         }
-        if (!Objects.equals(beforeData.getProfileImageId(), afterData.getProfileImageId())) {
-            changes.add(new DiffDto("profileImageId", String.valueOf(beforeData.getProfileImageId()), String.valueOf(afterData.getProfileImageId())));
-        }
+//        if (!Objects.equals(beforeData.getProfileImageId(), afterData.getProfileImageId())) {
+//            changes.add(new DiffDto("profileImageId", String.valueOf(beforeData.getProfileImageId()), String.valueOf(afterData.getProfileImageId())));
+//        }
 
         return changes;
-    }
-
-
-    private String getClientIp(HttpServletRequest request) {
-        String ip = request.getHeader("X-Forwarded-For");
-        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getRemoteAddr();
-        }
-        return ip;
     }
 
     @Override
@@ -203,5 +198,89 @@ public class EmployeeHistoryServiceImpl implements EmployeeHistoryService {
                 new CursorPageResponseChangeLogDto<>(content, nextCursor, nextIdAfter, size, totalElements, hasNext);
 
         return response;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<DiffDto> getChangeDetails(Integer id) {
+        EmployeeHistory history = employeeHistoryRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Employee history not found"));
+
+        Map<String, Object> changedFields = history.getChangedFields(); // 변환 문제?
+        List<DiffDto> diffList = new ArrayList<>();
+
+        for(Map.Entry<String, Object> entry : changedFields.entrySet()) {
+            String propertyName = entry.getKey();
+            Object value = entry.getValue();
+            if(value instanceof Map<?, ?> detailMap) {
+                String before = detailMap.get("before") != null ? detailMap.get("before").toString() : "";
+                String after = detailMap.get("after") != null ? detailMap.get("after").toString() : "";
+                diffList.add(new DiffDto(propertyName, before, after));
+            }
+        }
+        return diffList;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Long countEmployeeHistories(String employeeNumber,
+                                       String type,
+                                       String memo,
+                                       String ipAddress,
+                                       LocalDateTime atFrom,
+                                       LocalDateTime atTo,
+                                       Integer idAfter,
+                                       int size,
+                                       String sortField,
+                                       String sortDirection) {
+        final LocalDateTime finalAtFrom;
+        final LocalDateTime finalAtTo;
+
+        if(atFrom == null || atTo == null) {
+            finalAtTo = LocalDateTime.now();
+            finalAtFrom = finalAtTo.minusDays(7);
+        } else {
+            finalAtFrom = atFrom;
+            finalAtTo = atTo;
+        }
+
+        Specification<EmployeeHistory> spec = (root, query, cb) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            if(employeeNumber != null && !employeeNumber.isEmpty()) {
+                predicates.add(cb.like(root.get("employeeNumber"), "%" + employeeNumber + "%"));
+            }
+            if(type != null && !type.isEmpty()) {
+                try{
+                    EmployeeHistory.ChangeType ct = EmployeeHistory.ChangeType.valueOf(type);
+                    predicates.add(cb.equal(root.get("type"), ct));
+                } catch (IllegalArgumentException e) {
+
+                }
+            }
+            if(memo != null && !memo.isEmpty()) {
+                predicates.add(cb.like(root.get("memo"), "%" + memo + "%"));
+            }
+            if(ipAddress != null && !ipAddress.isEmpty()) {
+                predicates.add(cb.like(root.get("ipAddress"), "%" + ipAddress + "%"));
+            }
+            if(finalAtFrom != null) {
+                predicates.add(cb.greaterThanOrEqualTo(root.get("modifiedAt"), finalAtFrom));
+            }
+            if(finalAtTo != null) {
+                predicates.add(cb.lessThanOrEqualTo(root.get("modifiedAt"), finalAtTo));
+            }
+            if(idAfter != null) {
+                if("desc".equalsIgnoreCase(sortDirection)) {
+                    predicates.add(cb.lessThan(root.get("id"), idAfter));
+                } else {
+                    predicates.add(cb.greaterThan(root.get("id"), idAfter));
+                }
+            }
+
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+
+        return employeeHistoryRepository.count(spec);
     }
 }

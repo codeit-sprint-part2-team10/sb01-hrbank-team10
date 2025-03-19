@@ -11,6 +11,7 @@ import com.sprint.example.sb01part2hrbankteam10.entity.Employee.EmployeeStatus;
 import com.sprint.example.sb01part2hrbankteam10.entity.EmployeeHistory.ChangeType;
 import com.sprint.example.sb01part2hrbankteam10.entity.File;
 import com.sprint.example.sb01part2hrbankteam10.global.exception.RestApiException;
+import com.sprint.example.sb01part2hrbankteam10.global.exception.errorcode.DepartmentErrorCode;
 import com.sprint.example.sb01part2hrbankteam10.global.exception.errorcode.EmployeeErrorCode;
 import com.sprint.example.sb01part2hrbankteam10.mapper.EmployeeMapper;
 import com.sprint.example.sb01part2hrbankteam10.repository.DepartmentRepository;
@@ -58,7 +59,6 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     validateEmail(request.getEmail());
 
-    // 부서 확인 (에러 코드 수정 필요)
     Department department = getDepartmentOrThrow(request.getDepartmentId());
     LocalDateTime hireDate = parseLocalDateTime(request.getHireDate());
     String employeeNumber = generateEmployeeNumber(hireDate);
@@ -126,6 +126,7 @@ public class EmployeeServiceImpl implements EmployeeService {
       fileStorage.saveProfile(newProfile.getId(), profile); // 로컬 저장
       employee.updateProfileImage(newProfile);              // 프로필 업데이트
       fileRepository.deleteById(previousProfileImageId);    // 기존 프로필 데이터 삭제
+//      fileStorage.deleteProfile(previousProfileImageId);    // 로컬 데이터 삭제
     }
 
     EmployeeDto after = EmployeeMapper.toDto(employee);
@@ -142,11 +143,12 @@ public class EmployeeServiceImpl implements EmployeeService {
   @Override
   public String deleteById(Integer id, String clientIp) {
     Employee employee = getByIdOrThrow(id);
-    Integer previousProfileImageId = employee.getProfileImage().getId();
     employee.updateStatus(EmployeeStatus.RESIGNED);
+
+    Integer previousProfileImageId = employee.getProfileImage().getId();
     employee.updateProfileImage(null);
-    // 로컬 파일 삭제 추가 예정
     fileRepository.deleteById(previousProfileImageId);
+//    fileStorage.deleteProfile(previousProfileImageId);
 
     EmployeeDto before = EmployeeMapper.toDto(employee);
     EmployeeDto after = EmployeeMapper.toDto(Employee.builder().build());
@@ -158,64 +160,120 @@ public class EmployeeServiceImpl implements EmployeeService {
 
   @Override
   @Transactional(readOnly = true)
-  public CursorPageResponseDto<EmployeeDto> searchByQuery(EmployeeSearchRequest request) {
-
+  public CursorPageResponseDto<EmployeeDto> getAllByQuery(EmployeeSearchRequest request) {
     // 유효성 검사
     validateSearchQuery(request);
 
     // 기본값 설정
-    // 정렬 및 페이지네이션 (이름: default or 입사일 or 사원번호), (asc: default)
-    Direction getSortDirection = Objects.equals(request.getSortDirection(), "desc") ? Direction.DESC : Direction.ASC;
-    request.setSortField(request.getSortField() == null ? "name" : request.getSortField());
-    int pageSize = (request.getSize() == null || request.getSize() <= 0) ?  10 : request.getSize();
+    Direction getSortDirection = request.getSortDirection().equals("desc") ? Direction.DESC : Direction.ASC;
 
+    Pageable pageable = PageRequest.of(0, request.getSize(), getSortDirection, request.getSortField());
+    Specification<Employee> specification = getSpecification(request);
 
-    Pageable pageable = PageRequest.of(0, pageSize + 1, getSortDirection, request.getSortField());
+    Page<EmployeeDto> getAll = employeeRepository.findAll(specification, pageable).map(EmployeeMapper::toDto);
 
-//    Page<EmployeeDto> employeeDtos = findAllBySearchQueryAndCheckExistsCursor(pageable, request);
+    String nextCursor = null;
+    Long nextIdAfter = null;
+    if (!getAll.getContent().isEmpty()) {
 
-    return null;
+      EmployeeDto lastEmployee = getAll.getContent().get(getAll.getContent().size() - 1);
+
+      if (request.equalsSortField("name")) {
+        nextCursor = lastEmployee.getName();
+
+      } else if (request.equalsSortField("employeeNumber")) {
+        nextCursor = lastEmployee.getEmployeeNumber();
+
+      } else if (request.equalsSortField("hireDate")) {
+        nextCursor = lastEmployee.getHireDate().toString();
+      }
+      nextIdAfter = lastEmployee.getId().longValue();
+    }
+
+    return CursorPageResponseDto.<EmployeeDto>builder()
+        .content(getAll.getContent())
+        .nextCursor(nextCursor)
+        .nextIdAfter(nextIdAfter)
+        .size(getAll.getSize())
+        .totalElements(getAll.getTotalElements())
+        .hasNext(getAll.hasNext())
+        .build();
   }
 
-
-  private Specification<Employee> findAllBySearchQueryAndCheckExistsCursor(EmployeeSearchRequest request) {
+  private Specification<Employee> getSpecification(EmployeeSearchRequest request) {
 
     Specification<Employee> spec = ((root, query, criteriaBuilder) -> null);
 
+    // 다음 요소 커서를 기준으로 가져오기
+    String sortField = request.getSortField();
+    String sortDirection = request.getSortDirection();
+    String cursor = request.getCursor();
+    if (request.getIdAfter() != null && cursor != null &&  cursor.isBlank()) {
+
+      if (sortField.equals("name")) {
+        if (sortDirection.equals("desc")) {
+          spec = spec.and(EmployeeSpecification.lessThanName(cursor));
+        } else {
+          spec = spec.and(EmployeeSpecification.greaterThanName(cursor));
+        }
+
+      } else if (sortField.equals("employeeNumber")) {
+        if (sortDirection.equals("desc")) {
+          spec = spec.and(EmployeeSpecification.lessThanEmployeeNumber(cursor));
+        } else {
+          spec = spec.and(EmployeeSpecification.greaterThanEmployeeNumber(cursor));
+        }
+
+      } else if (sortField.equals("hireDate")) {
+        if (sortDirection.equals("desc")) {
+          spec = spec.and(EmployeeSpecification.lessThanHireDate(parseLocalDateTime(cursor)));
+        } else {
+          spec = spec.and(EmployeeSpecification.lessThanHireDate(parseLocalDateTime(cursor)));
+        }
+      }
+    }
+
     // 이름, 이메일, 부서, 직함, 사원번호 부분 일치
     if (request.getNameOrEmail() != null && !request.getNameOrEmail().isBlank()) {
-      spec = spec.and(EmployeeSpecification.likeName(request.getNameOrEmail()));
-      spec = spec.and(EmployeeSpecification.likeEmail(request.getNameOrEmail()));
+      spec = spec.and(EmployeeSpecification.likeName(request.getNameOrEmail()))
+          .or(EmployeeSpecification.likeEmail(request.getNameOrEmail()));
     }
+
     if (request.getEmployeeNumber() != null && !request.getEmployeeNumber().isBlank()) {
       spec = spec.and(EmployeeSpecification.likeEmployeeNumber(request.getEmployeeNumber()));
     }
+
     if (request.getDepartmentName() != null && !request.getDepartmentName().isBlank()) {
       spec = spec.and(EmployeeSpecification.likeDepartmentName(request.getDepartmentName()));
     }
+
     if (request.getPosition() != null && !request.getPosition().isBlank()) {
       spec = spec.and(EmployeeSpecification.likePosition(request.getPosition()));
     }
 
-    // 입사일 범위 조건 O (시작이 종료 보다 늦을 수 없음)
+    // 입사일 범위 조건
     if (request.getHireDateFrom() != null) {
-      spec = spec.and(EmployeeSpecification.equalOrGreaterHireDateFrom(request.getHireDateFrom().atStartOfDay()));
+      spec = spec.and(EmployeeSpecification.equalOrGreaterThanHireDateFrom(request.getHireDateFrom().atStartOfDay()));
     }
+
     if (request.getHireDateTo() != null) {
-      spec = spec.and(EmployeeSpecification.equalOrLessHireDateTo(request.getHireDateTo().atStartOfDay()));
+      spec = spec.and(EmployeeSpecification.equalOrLessThanHireDateTo(request.getHireDateTo().atStartOfDay()));
     }
 
-    // 상태는 완전 일치 조건 (null 이 아닌 경우 적용)
-
-//    Page<Employee> getAll = employeeRepository.findAll(specification, pageable);
-    return null;
+    // 상태 조건
+    if (request.getStatus() != null) {
+      spec = spec.and(EmployeeSpecification.equalStatus(request.getStatus()));
+    }
+    return spec;
   }
 
+  // 유효성 검사
   private void validateSearchQuery(EmployeeSearchRequest request) {
     if (!SORT_FIELDS.contains(request.getSortField())) {
       throw new RestApiException(EmployeeErrorCode.INVALID_SORT_FIELD, "sortField=" + request.getSortField());
     }
-    if (request.getHireDateFrom().isAfter(request.getHireDateTo())) {
+    if (request.getHireDateFrom() != null && request.getHireDateTo() != null
+        && request.getHireDateFrom().isAfter(request.getHireDateTo())) {
       throw new RestApiException(EmployeeErrorCode.INVALID_DATE_RANGE,
           "hireDateFrom=" + request.getHireDateFrom() + ",hireDateTo=" + request.getHireDateTo());
     }
@@ -232,6 +290,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
   }
 
+  // Get or Throw
   private Employee getByIdOrThrow(Integer id) {
     return employeeRepository.findById(id).orElseThrow(() ->
         new RestApiException(EmployeeErrorCode.EMPLOYEE_NOT_FOUND, "id=" + id));
@@ -239,10 +298,11 @@ public class EmployeeServiceImpl implements EmployeeService {
 
   private Department getDepartmentOrThrow(Integer departmentId) {
     return departmentRepository.findById(departmentId)
-        .orElseThrow(() -> new RestApiException(EmployeeErrorCode.EMPLOYEE_NOT_FOUND,
+        .orElseThrow(() -> new RestApiException(DepartmentErrorCode.DEPARTMENT_NOT_FOUND,
             "departmentId=" + departmentId));
   }
 
+  // 사번 생성
   private String generateEmployeeNumber(LocalDateTime localDateTime) {
     Integer previousId = employeeRepository.findTopByOrderByIdDesc()
         .map(Employee::getId)

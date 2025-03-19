@@ -7,7 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter @Setter
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
 public class EmployeeSearchRequest {
@@ -26,4 +26,8 @@ public class EmployeeSearchRequest {
   private Integer size;
   private String sortField;
   private String sortDirection;
+
+  public boolean equalsSortField(String sortField) {
+    return this.getSortField().equals(sortField);
+  }
 }

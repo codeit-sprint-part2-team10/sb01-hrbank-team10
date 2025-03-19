@@ -7,6 +7,37 @@ import org.springframework.data.jpa.domain.Specification;
 
 public class EmployeeSpecification {
 
+  // 커서 다음 요소 조건
+  public static Specification<Employee> greaterThanName(String name) {
+    return (root, query, criteriaBuilder)
+        -> criteriaBuilder.greaterThan(root.get("name"), name);
+  }
+
+  public static Specification<Employee> lessThanName(String name) {
+    return (root, query, criteriaBuilder)
+        -> criteriaBuilder.lessThan(root.get("name"), name);
+  }
+
+  public static Specification<Employee> greaterThanEmployeeNumber(String employeeNumber) {
+    return (root, query, criteriaBuilder)
+        -> criteriaBuilder.greaterThan(root.get("employeeNumber"), employeeNumber);
+  }
+
+  public static Specification<Employee> lessThanEmployeeNumber(String employeeNumber) {
+    return (root, query, criteriaBuilder)
+        -> criteriaBuilder.lessThan(root.get("employeeNumber"), employeeNumber);
+  }
+
+  public static Specification<Employee> greaterThanHireDate(LocalDateTime hireDate) {
+    return (root, query, criteriaBuilder)
+        -> criteriaBuilder.greaterThan(root.get("hireDate"), hireDate);
+  }
+
+  public static Specification<Employee> lessThanHireDate(LocalDateTime hireDate) {
+    return (root, query, criteriaBuilder)
+        -> criteriaBuilder.lessThan(root.get("hireDate"), hireDate);
+  }
+
   // 포함 조건
   public static Specification<Employee> likeName(String name) {
     return (root, query, criteriaBuilder)
@@ -40,12 +71,12 @@ public class EmployeeSpecification {
   }
 
   // 범위 조건
-  public static Specification<Employee> equalOrGreaterHireDateFrom(LocalDateTime hireDateFrom) {
+  public static Specification<Employee> equalOrGreaterThanHireDateFrom(LocalDateTime hireDateFrom) {
     return (root, query, criteriaBuilder)
         -> criteriaBuilder.greaterThanOrEqualTo(root.get("hireDate"), hireDateFrom);
   }
 
-  public static Specification<Employee> equalOrLessHireDateTo(LocalDateTime hireDateTo) {
+  public static Specification<Employee> equalOrLessThanHireDateTo(LocalDateTime hireDateTo) {
     return (root, query, criteriaBuilder)
         -> criteriaBuilder.lessThanOrEqualTo(root.get("hireDate"), hireDateTo);
   }

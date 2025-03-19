@@ -20,11 +20,5 @@ public interface EmployeeService {
 
   EmployeeDto getById(Integer id);
 
-  CursorPageResponseDto<EmployeeDto> searchByQuery(EmployeeSearchRequest request);
-
-//  CursorPageResponseDto<EmployeeDto> searchByQuery(
-//      String nameOrEmail, String employeeNumber, String departmentName, String position,
-//      LocalDate hireDateFrom, LocalDate hireDateTo, EmployeeStatus status, Integer idAfter,
-//      String cursor, Integer size, String sortField, String sortDirection
-//  );
+  CursorPageResponseDto<EmployeeDto> getAllByQuery(EmployeeSearchRequest request);
 }

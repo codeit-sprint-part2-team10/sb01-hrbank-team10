@@ -7,6 +7,7 @@ import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeDto;
 import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeSearchRequest;
 import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeTrendDto;
 import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeUpdateRequest;
+import com.sprint.example.sb01part2hrbankteam10.dto.response.EmployeeDashboardResponse;
 import com.sprint.example.sb01part2hrbankteam10.entity.Employee.EmployeeStatus;
 import com.sprint.example.sb01part2hrbankteam10.global.response.RestApiResponse;
 import com.sprint.example.sb01part2hrbankteam10.service.EmployeeService;
@@ -120,7 +121,7 @@ public class EmployeeController {
         ));
   }
 
-  @GetMapping("/status/distribution")
+  @GetMapping("/stats/distribution")
   public ResponseEntity<RestApiResponse<List<EmployeeDistributionDto>>> getDistribution(
       @RequestParam(defaultValue = "department") String groupBy,
       @RequestParam(defaultValue = "ACTIVE") String Status) {
@@ -131,7 +132,7 @@ public class EmployeeController {
     return ResponseEntity.status(HttpStatus.OK).body(RestApiResponse.success(HttpStatus.OK, distribution));
   }
 
-  @GetMapping(value = "/status/trend")
+  @GetMapping(value = "/stats/trend")
   public ResponseEntity<RestApiResponse<List<EmployeeTrendDto>>> getEmployeeTrend(
       @RequestParam(required = false)
       @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDateTime from,
@@ -143,5 +144,18 @@ public class EmployeeController {
 
     return ResponseEntity.status(HttpStatus.OK)
         .body(RestApiResponse.success(HttpStatus.OK, trend));
+  }
+
+  @GetMapping("/count")
+  public ResponseEntity<RestApiResponse<EmployeeDashboardResponse>> getEmployeeDashboard(
+      @RequestParam(required = false) String status,
+      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
+      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate) {
+
+    EmployeeDashboardResponse response = employeeStatusService.getEmployeeDashboard(status, fromDate,
+        toDate);
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(RestApiResponse.success(HttpStatus.OK, response));
+
   }
 }

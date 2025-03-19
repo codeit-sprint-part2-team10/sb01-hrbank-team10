@@ -1,6 +1,7 @@
 package com.sprint.example.sb01part2hrbankteam10.repository;
 
 import com.sprint.example.sb01part2hrbankteam10.entity.Department;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,6 +18,7 @@ public interface DepartmentRepository extends JpaRepository<Department, Integer>
 
   List<Department> findByNameAndDescription(String name, String description);
 
+
   @Query("SELECT d FROM Department d " +
       "WHERE (:nameOrDesc IS NULL OR d.name LIKE %:nameOrDesc% OR d.description LIKE %:nameOrDesc%) " +
       "AND (:idAfter IS NULL OR d.id > :idAfter) " +
@@ -32,4 +34,7 @@ public interface DepartmentRepository extends JpaRepository<Department, Integer>
       @Param("sortDirection") String sortDirection);
 
   long countByNameContainingOrDescriptionContaining(String name, String description);
+
+  Optional<Object> findFirstByEstablishedDateAfterOrderById(LocalDateTime date);
+
 }

@@ -146,11 +146,33 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     // 커서에서 idAfter 추출
     if (cursor != null && !cursor.isEmpty() && idAfter == null) {
-      try {
-        String decodedCursor = new String(Base64.getDecoder().decode(cursor));
-        idAfter = Integer.parseInt(decodedCursor.split(":")[1]);
-      } catch (Exception e) {
-        idAfter = null;
+      if ("name".equals(sortField)) {
+        // 이름 기반 커서
+        Department dept = (Department) departmentRepository.findByName(cursor)
+            .orElse(null);
+        if (dept != null) {
+          idAfter = dept.getId();
+        }
+      } else if ("establishedDate".equals(sortField)) {
+        // 설립일 기반 커서 - 해당 날짜 이후의 첫 번째 부서를 찾아야 함
+        try {
+          LocalDateTime date = LocalDateTime.parse(cursor);
+          Department dept = (Department) departmentRepository.findFirstByEstablishedDateAfterOrderById(date)
+              .orElse(null);
+          if (dept != null) {
+            idAfter = dept.getId();
+          }
+        } catch (Exception e) {
+          // 날짜 파싱 오류 처리
+          log.warn("설립일 커서 파싱 오류: {}", cursor);
+        }
+      } else {
+        // ID 기반 커서
+        try {
+          idAfter = Integer.parseInt(cursor);
+        } catch (NumberFormatException e) {
+          log.warn("ID 커서 파싱 오류: {}", cursor);
+        }
       }
     }
 
@@ -187,8 +209,15 @@ public class DepartmentServiceImpl implements DepartmentService {
     if (hasNext && !content.isEmpty()) {
       Department lastItem = departments.get((int)Math.min(size, departments.size()) - 1);
       nextIdAfter = lastItem.getId();
-      nextCursor = Base64.getEncoder()
-          .encodeToString(("id:" + nextIdAfter).getBytes());
+
+      // 정렬 필드에 따라 커서 값을 다르게 설정
+      if ("name".equals(sortField)) {
+        nextCursor = lastItem.getName();
+      } else if ("establishedDate".equals(sortField)) {
+        nextCursor = lastItem.getEstablishedDate().toString();
+      } else {
+        nextCursor = null;
+      }
     }
 
     return CursorPageResponseDto.<DepartmentResponseDto>builder()

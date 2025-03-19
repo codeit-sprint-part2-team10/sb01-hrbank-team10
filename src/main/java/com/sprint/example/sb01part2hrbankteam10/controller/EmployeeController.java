@@ -1,15 +1,19 @@
 package com.sprint.example.sb01part2hrbankteam10.controller;
 
+import com.sprint.example.sb01part2hrbankteam10.dto.CursorPageResponseDto;
 import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeCreateRequest;
 import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeDistributionDto;
 import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeDto;
+import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeSearchRequest;
 import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeUpdateRequest;
+import com.sprint.example.sb01part2hrbankteam10.entity.Employee.EmployeeStatus;
 import com.sprint.example.sb01part2hrbankteam10.global.response.RestApiResponse;
 import com.sprint.example.sb01part2hrbankteam10.service.EmployeeService;
 import com.sprint.example.sb01part2hrbankteam10.service.EmployeeStatusService;
 import jakarta.servlet.http.HttpServletRequest;
 import com.sprint.example.sb01part2hrbankteam10.util.IpUtil;
 import jakarta.validation.Valid;
+import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -82,6 +86,30 @@ public class EmployeeController {
             HttpStatus.OK,
             employeeService.deleteById(id))
         );
+  }
+
+  @GetMapping
+  public ResponseEntity<RestApiResponse<CursorPageResponseDto<EmployeeDto>>> getListEmployee(
+      @RequestParam(name = "nameOrEmail") String nameOrEmail,
+      @RequestParam(name = "employeeNumber") String employeeNumber,
+      @RequestParam(name = "departmentName") String departmentName,
+      @RequestParam(name = "position") String position,
+      @RequestParam(name = "hireDateFrom") LocalDate hireDateFrom,
+      @RequestParam(name = "hireDateTo") LocalDate hireDateTo,
+      @RequestParam(name = "status") EmployeeStatus status,
+      @RequestParam(name = "idAfter") Integer idAfter,
+      @RequestParam(name = "cursor") String cursor,
+      @RequestParam(name = "size") Integer size,
+      @RequestParam(name = "sortField") Integer sortField,
+      @RequestParam(name = "sortDirection") String sortDirection
+  ) {
+
+    @Valid EmployeeSearchRequest request = new EmployeeSearchRequest(
+        nameOrEmail, employeeNumber, departmentName, position,
+        hireDateFrom, hireDateTo, status, idAfter, cursor, size, sortField, sortDirection
+    );
+
+    return ResponseEntity.ok(null);
   }
 
   @GetMapping("/status/distribution")

@@ -1,5 +1,6 @@
 package com.sprint.example.sb01part2hrbankteam10.service.impl;
 
+import com.sprint.example.sb01part2hrbankteam10.dto.CursorPageResponseDto;
 import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeCreateRequest;
 import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeDto;
 import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeUpdateRequest;
@@ -15,7 +16,6 @@ import com.sprint.example.sb01part2hrbankteam10.repository.EmployeeRepository;
 import com.sprint.example.sb01part2hrbankteam10.repository.FileRepository;
 import com.sprint.example.sb01part2hrbankteam10.service.EmployeeService;
 import com.sprint.example.sb01part2hrbankteam10.storage.FileStorage;
-import jakarta.transaction.Transactional;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -24,6 +24,7 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
@@ -77,8 +78,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     return employeeDto;
   }
 
-  @Transactional
   @Override
+  @Transactional
   public EmployeeDto update(Integer id, EmployeeUpdateRequest request, MultipartFile profile,
       String clientIp) {
 
@@ -138,6 +139,16 @@ public class EmployeeServiceImpl implements EmployeeService {
     return "직원이 성공적으로 삭제되었습니다.";
   }
 
+  @Override
+  @Transactional(readOnly = true)
+  public CursorPageResponseDto<EmployeeDto> searchByQuery(
+      String nameOrEmail, String employeeNumber, String departmentName, String position,
+      LocalDate hireDateFrom, LocalDate hireDateTo, EmployeeStatus status, Integer idAfter,
+      String cursor, Integer size, Integer sortField, String sortDirection
+  ) {
+
+  }
+
   private boolean validateFile(MultipartFile multipartFile) {
     return multipartFile != null && !multipartFile.isEmpty();
   }
@@ -166,7 +177,6 @@ public class EmployeeServiceImpl implements EmployeeService {
         .orElse(0);
 
     Integer footerNumber = (previousId + 1) % 1000;
-
     return String.format("EMP-%d-%03d", localDateTime.getYear(), footerNumber);
   }
 

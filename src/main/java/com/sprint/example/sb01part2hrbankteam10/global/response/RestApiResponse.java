@@ -17,16 +17,14 @@ public class RestApiResponse<T> {
   private boolean success;
   private String message;
   private HttpStatus status;
-  @Nullable
-  private T data;
-  @Nullable
+  private T content;
   private ErrorResponse error;
 
   public static <T> RestApiResponse<T> success(HttpStatus status, T data) {
     return RestApiResponse.<T>builder()
         .success(true)
         .status(status)
-        .data(data)
+        .content(data)
         .build();
   }
 

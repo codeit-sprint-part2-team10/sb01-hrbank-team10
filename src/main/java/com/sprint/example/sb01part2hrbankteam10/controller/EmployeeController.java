@@ -1,19 +1,27 @@
 package com.sprint.example.sb01part2hrbankteam10.controller;
 
+import com.sprint.example.sb01part2hrbankteam10.dto.CursorPageResponseDto;
 import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeCreateRequest;
 import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeDistributionDto;
 import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeDto;
+import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeSearchRequest;
+import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeTrendDto;
 import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeUpdateRequest;
+import com.sprint.example.sb01part2hrbankteam10.entity.Employee.EmployeeStatus;
 import com.sprint.example.sb01part2hrbankteam10.global.response.RestApiResponse;
 import com.sprint.example.sb01part2hrbankteam10.service.EmployeeService;
 import com.sprint.example.sb01part2hrbankteam10.service.EmployeeStatusService;
 import jakarta.servlet.http.HttpServletRequest;
 import com.sprint.example.sb01part2hrbankteam10.util.IpUtil;
 import jakarta.validation.Valid;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -75,13 +83,41 @@ public class EmployeeController {
 
   @DeleteMapping("/{id}")
   public ResponseEntity<RestApiResponse<Void>> deleteEmployee (
+      HttpServletRequest httpServletRequest,
       @PathVariable Integer id
   ) {
     return ResponseEntity.ok()
         .body(RestApiResponse.success(
             HttpStatus.OK,
-            employeeService.deleteById(id))
+            employeeService.deleteById(id, IpUtil.getClientIp(httpServletRequest)))
         );
+  }
+
+  @GetMapping
+  public ResponseEntity<RestApiResponse<CursorPageResponseDto<EmployeeDto>>> getListEmployee(
+      @RequestParam(name = "nameOrEmail", required = false) String nameOrEmail,
+      @RequestParam(name = "employeeNumber", required = false) String employeeNumber,
+      @RequestParam(name = "departmentName", required = false) String departmentName,
+      @RequestParam(name = "position", required = false) String position,
+      @RequestParam(name = "hireDateFrom", required = false) LocalDate hireDateFrom,
+      @RequestParam(name = "hireDateTo", required = false) LocalDate hireDateTo,
+      @RequestParam(name = "status", required = false) EmployeeStatus status,
+      @RequestParam(name = "idAfter", required = false) Integer idAfter,
+      @RequestParam(name = "cursor", required = false) String cursor,
+      @RequestParam(name = "size", required = false, defaultValue = "10") Integer size,
+      @RequestParam(name = "sortField", required = false, defaultValue = "name") String sortField,
+      @RequestParam(name = "sortDirection", required = false, defaultValue = "asc") String sortDirection
+  ) {
+    EmployeeSearchRequest request = new EmployeeSearchRequest(
+        nameOrEmail, employeeNumber, departmentName, position,
+        hireDateFrom, hireDateTo, status, idAfter, cursor, size, sortField, sortDirection
+    );
+
+    return ResponseEntity.ok()
+        .body(RestApiResponse.success(
+            HttpStatus.OK,
+            employeeService.getAllByQuery(request)
+        ));
   }
 
   @GetMapping("/status/distribution")
@@ -95,4 +131,17 @@ public class EmployeeController {
     return ResponseEntity.status(HttpStatus.OK).body(RestApiResponse.success(HttpStatus.OK, distribution));
   }
 
+  @GetMapping(value = "/status/trend")
+  public ResponseEntity<RestApiResponse<List<EmployeeTrendDto>>> getEmployeeTrend(
+      @RequestParam(required = false)
+      @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDateTime from,
+      @RequestParam(required = false)
+      @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDateTime to,
+      @RequestParam(defaultValue = "month") String unit) {
+
+    List<EmployeeTrendDto> trend = employeeStatusService.getEmployeeTrend(from, to, unit);
+
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(RestApiResponse.success(HttpStatus.OK, trend));
+  }
 }

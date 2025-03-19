@@ -1,9 +1,6 @@
 package com.sprint.example.sb01part2hrbankteam10.mapper;
 
-import com.sprint.example.sb01part2hrbankteam10.dto.ChangeLogDto;
-import com.sprint.example.sb01part2hrbankteam10.dto.DiffDto;
-import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeDto;
-import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeHistoryCreateRequest;
+import com.sprint.example.sb01part2hrbankteam10.dto.*;
 import com.sprint.example.sb01part2hrbankteam10.entity.EmployeeHistory;
 import org.springframework.stereotype.Component;
 
@@ -14,22 +11,25 @@ import java.util.stream.Collectors;
 @Component
 public class EmployeeHistoryMapper {
 
-    public static EmployeeHistory toEntity(EmployeeHistoryCreateRequest request, String clientIp) {
-        List<DiffDto> changedFields = compareChanges(request.getBeforeData(), request.getAfterData());
+    public static EmployeeHistory toEntity(String employeeNumber, EmployeeHistory.ChangeType type, String memo,
+                                           EmployeeCreateRequest changes, EmployeeDto afterData, String clientIp) {
+        Map<String, Object> changedFields = new HashMap<>();
 
-        Map<String, Object> changedFieldMap = changedFields.stream()
-                .collect(Collectors.toMap(
-                        DiffDto::getPropertyName,
-                        EmployeeHistoryMapper::toDetailMap
-                ));
+        if(changes != null) {
+            changedFields.put("name", changes.getName());
+            changedFields.put("email", changes.getEmail());
+            changedFields.put("departmentId", changes.getDepartmentId());
+            changedFields.put("position", changes.getPosition());
+            changedFields.put("hireDate", changes.getHireDate());
+        }
 
         return EmployeeHistory.builder()
-                .employeeNumber(request.getEmployeeNumber())
-                .type(request.getType())
-                .memo(request.getMemo())
+                .employeeNumber(employeeNumber)
+                .type(type)
+                .memo(memo)
                 .modifiedAt(LocalDateTime.now())
                 .ipAddress(clientIp)
-                .changedFields(changedFieldMap)
+                .changedFields(changedFields)
                 .build();
     }
 

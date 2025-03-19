@@ -1,29 +1,43 @@
 package com.sprint.example.sb01part2hrbankteam10.service.impl;
 
+import com.sprint.example.sb01part2hrbankteam10.dto.CursorPageResponseDto;
 import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeCreateRequest;
 import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeDto;
+import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeSearchRequest;
 import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeUpdateRequest;
 import com.sprint.example.sb01part2hrbankteam10.entity.Department;
 import com.sprint.example.sb01part2hrbankteam10.entity.Employee;
 import com.sprint.example.sb01part2hrbankteam10.entity.Employee.EmployeeStatus;
+import com.sprint.example.sb01part2hrbankteam10.entity.EmployeeHistory.ChangeType;
 import com.sprint.example.sb01part2hrbankteam10.entity.File;
 import com.sprint.example.sb01part2hrbankteam10.global.exception.RestApiException;
+import com.sprint.example.sb01part2hrbankteam10.global.exception.errorcode.DepartmentErrorCode;
 import com.sprint.example.sb01part2hrbankteam10.global.exception.errorcode.EmployeeErrorCode;
 import com.sprint.example.sb01part2hrbankteam10.mapper.EmployeeMapper;
 import com.sprint.example.sb01part2hrbankteam10.repository.DepartmentRepository;
 import com.sprint.example.sb01part2hrbankteam10.repository.EmployeeRepository;
 import com.sprint.example.sb01part2hrbankteam10.repository.FileRepository;
+import com.sprint.example.sb01part2hrbankteam10.repository.specification.EmployeeSpecification;
+import com.sprint.example.sb01part2hrbankteam10.service.EmployeeHistoryService;
 import com.sprint.example.sb01part2hrbankteam10.service.EmployeeService;
 import com.sprint.example.sb01part2hrbankteam10.storage.FileStorage;
-import jakarta.transaction.Transactional;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
+import java.util.Base64;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
@@ -31,10 +45,13 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class EmployeeServiceImpl implements EmployeeService {
 
+  private final DepartmentRepository departmentRepository;
   private final EmployeeRepository employeeRepository;
   private final FileRepository fileRepository;
-  private final DepartmentRepository departmentRepository;
   private final FileStorage fileStorage;
+  private final EmployeeHistoryService employeeHistoryService;
+
+  private static final Set<String> SORT_FIELDS = Set.of("name", "employeeNumber", "hireDate");
 
   @Override
   @Transactional
@@ -42,7 +59,6 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     validateEmail(request.getEmail());
 
-    // 부서 확인 (에러 코드 수정 필요)
     Department department = getDepartmentOrThrow(request.getDepartmentId());
     LocalDateTime hireDate = parseLocalDateTime(request.getHireDate());
     String employeeNumber = generateEmployeeNumber(hireDate);
@@ -70,15 +86,16 @@ public class EmployeeServiceImpl implements EmployeeService {
         .status(EmployeeStatus.ACTIVE)
         .build();
 
-    EmployeeDto employeeDto = EmployeeMapper.toDto(employeeRepository.save(newEmployee));
+    EmployeeDto before = EmployeeMapper.toDto(Employee.builder().build());
+    EmployeeDto after = EmployeeMapper.toDto(employeeRepository.save(newEmployee));
 
-    //EmployeeHistoryService.create(ChangeType.CREATED, request.getMemo(), null, employeeDto, clientIp);
+    employeeHistoryService.create(employeeNumber, ChangeType.CREATED, request.getMemo(),before, after, clientIp);
 
-    return employeeDto;
+    return after;
   }
 
-  @Transactional
   @Override
+  @Transactional
   public EmployeeDto update(Integer id, EmployeeUpdateRequest request, MultipartFile profile,
       String clientIp) {
 
@@ -106,14 +123,14 @@ public class EmployeeServiceImpl implements EmployeeService {
               .build()
       );
       Integer previousProfileImageId = employee.getProfileImage().getId();
-      fileStorage.saveProfile(newProfile.getId(), profile); // 로컬 저장
       employee.updateProfileImage(newProfile);              // 프로필 업데이트
+      fileStorage.saveProfile(newProfile.getId(), profile); // 로컬 저장
       fileRepository.deleteById(previousProfileImageId);    // 기존 프로필 데이터 삭제
+      fileStorage.deleteProfile(previousProfileImageId);    // 로컬 데이터 삭제
     }
 
     EmployeeDto after = EmployeeMapper.toDto(employee);
-
-    // EmployeeHistoryService.create(ChangeType.UPDATE, request.getMemo(), before, after, clientIp);
+    employeeHistoryService.create(employee.getEmployeeNumber(), ChangeType.UPDATED, request.getMemo(),before, after, clientIp);
 
     return after;
   }
@@ -124,18 +141,142 @@ public class EmployeeServiceImpl implements EmployeeService {
   }
 
   @Override
-  public String deleteById(Integer id) {
+  public String deleteById(Integer id, String clientIp) {
     Employee employee = getByIdOrThrow(id);
-    Integer previousProfileImageId = employee.getProfileImage().getId();
     employee.updateStatus(EmployeeStatus.RESIGNED);
+
+    Integer previousProfileImageId = employee.getProfileImage().getId();
     employee.updateProfileImage(null);
-    // 로컬 파일 삭제 추가 예정
     fileRepository.deleteById(previousProfileImageId);
+    fileStorage.deleteProfile(previousProfileImageId);
 
     EmployeeDto before = EmployeeMapper.toDto(employee);
-    // EmployeeHistoryService.create(ChangeType.DELETE, request.getMemo(), before, null, clientIp);
+    EmployeeDto after = EmployeeMapper.toDto(Employee.builder().build());
+
+    employeeHistoryService.create(employee.getEmployeeNumber(), ChangeType.UPDATED, null, before, after, clientIp);
 
     return "직원이 성공적으로 삭제되었습니다.";
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public CursorPageResponseDto<EmployeeDto> getAllByQuery(EmployeeSearchRequest request) {
+    // 유효성 검사
+    validateSearchQuery(request);
+
+    // 기본값 설정
+    Direction getSortDirection = request.getSortDirection().equals("desc") ? Direction.DESC : Direction.ASC;
+
+    Pageable pageable = PageRequest.of(0, request.getSize(), getSortDirection, request.getSortField());
+    Specification<Employee> specification = getSpecification(request);
+
+    Page<EmployeeDto> getAll = employeeRepository.findAll(specification, pageable).map(EmployeeMapper::toDto);
+
+    String nextCursor = null;
+    Long nextIdAfter = null;
+    if (!getAll.getContent().isEmpty()) {
+
+      EmployeeDto lastEmployee = getAll.getContent().get(getAll.getContent().size() - 1);
+
+      if (request.equalsSortField("name")) {
+        nextCursor = lastEmployee.getName();
+
+      } else if (request.equalsSortField("employeeNumber")) {
+        nextCursor = lastEmployee.getEmployeeNumber();
+
+      } else if (request.equalsSortField("hireDate")) {
+        nextCursor = lastEmployee.getHireDate().toString();
+      }
+      nextIdAfter = lastEmployee.getId().longValue();
+    }
+
+    return CursorPageResponseDto.<EmployeeDto>builder()
+        .content(getAll.getContent())
+        .nextCursor(nextCursor)
+        .nextIdAfter(nextIdAfter)
+        .size(getAll.getSize())
+        .totalElements(getAll.getTotalElements())
+        .hasNext(getAll.hasNext())
+        .build();
+  }
+
+  private Specification<Employee> getSpecification(EmployeeSearchRequest request) {
+
+    Specification<Employee> spec = ((root, query, criteriaBuilder) -> null);
+
+    // 다음 요소 커서를 기준으로 가져오기
+    String sortField = request.getSortField();
+    String sortDirection = request.getSortDirection();
+    String cursor = request.getCursor();
+    if (request.getIdAfter() != null && cursor != null &&  cursor.isBlank()) {
+
+      if (sortField.equals("name")) {
+        if (sortDirection.equals("desc")) {
+          spec = spec.and(EmployeeSpecification.lessThanName(cursor));
+        } else {
+          spec = spec.and(EmployeeSpecification.greaterThanName(cursor));
+        }
+
+      } else if (sortField.equals("employeeNumber")) {
+        if (sortDirection.equals("desc")) {
+          spec = spec.and(EmployeeSpecification.lessThanEmployeeNumber(cursor));
+        } else {
+          spec = spec.and(EmployeeSpecification.greaterThanEmployeeNumber(cursor));
+        }
+
+      } else if (sortField.equals("hireDate")) {
+        if (sortDirection.equals("desc")) {
+          spec = spec.and(EmployeeSpecification.lessThanHireDate(parseLocalDateTime(cursor)));
+        } else {
+          spec = spec.and(EmployeeSpecification.lessThanHireDate(parseLocalDateTime(cursor)));
+        }
+      }
+    }
+
+    // 이름, 이메일, 부서, 직함, 사원번호 부분 일치
+    if (request.getNameOrEmail() != null && !request.getNameOrEmail().isBlank()) {
+      spec = spec.and(EmployeeSpecification.likeName(request.getNameOrEmail()))
+          .or(EmployeeSpecification.likeEmail(request.getNameOrEmail()));
+    }
+
+    if (request.getEmployeeNumber() != null && !request.getEmployeeNumber().isBlank()) {
+      spec = spec.and(EmployeeSpecification.likeEmployeeNumber(request.getEmployeeNumber()));
+    }
+
+    if (request.getDepartmentName() != null && !request.getDepartmentName().isBlank()) {
+      spec = spec.and(EmployeeSpecification.likeDepartmentName(request.getDepartmentName()));
+    }
+
+    if (request.getPosition() != null && !request.getPosition().isBlank()) {
+      spec = spec.and(EmployeeSpecification.likePosition(request.getPosition()));
+    }
+
+    // 입사일 범위 조건
+    if (request.getHireDateFrom() != null) {
+      spec = spec.and(EmployeeSpecification.equalOrGreaterThanHireDateFrom(request.getHireDateFrom().atStartOfDay()));
+    }
+
+    if (request.getHireDateTo() != null) {
+      spec = spec.and(EmployeeSpecification.equalOrLessThanHireDateTo(request.getHireDateTo().atStartOfDay()));
+    }
+
+    // 상태 조건
+    if (request.getStatus() != null) {
+      spec = spec.and(EmployeeSpecification.equalStatus(request.getStatus()));
+    }
+    return spec;
+  }
+
+  // 유효성 검사
+  private void validateSearchQuery(EmployeeSearchRequest request) {
+    if (!SORT_FIELDS.contains(request.getSortField())) {
+      throw new RestApiException(EmployeeErrorCode.INVALID_SORT_FIELD, "sortField=" + request.getSortField());
+    }
+    if (request.getHireDateFrom() != null && request.getHireDateTo() != null
+        && request.getHireDateFrom().isAfter(request.getHireDateTo())) {
+      throw new RestApiException(EmployeeErrorCode.INVALID_DATE_RANGE,
+          "hireDateFrom=" + request.getHireDateFrom() + ",hireDateTo=" + request.getHireDateTo());
+    }
   }
 
   private boolean validateFile(MultipartFile multipartFile) {
@@ -149,6 +290,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
   }
 
+  // Get or Throw
   private Employee getByIdOrThrow(Integer id) {
     return employeeRepository.findById(id).orElseThrow(() ->
         new RestApiException(EmployeeErrorCode.EMPLOYEE_NOT_FOUND, "id=" + id));
@@ -156,17 +298,17 @@ public class EmployeeServiceImpl implements EmployeeService {
 
   private Department getDepartmentOrThrow(Integer departmentId) {
     return departmentRepository.findById(departmentId)
-        .orElseThrow(() -> new RestApiException(EmployeeErrorCode.EMPLOYEE_NOT_FOUND,
+        .orElseThrow(() -> new RestApiException(DepartmentErrorCode.DEPARTMENT_NOT_FOUND,
             "departmentId=" + departmentId));
   }
 
+  // 사번 생성
   private String generateEmployeeNumber(LocalDateTime localDateTime) {
     Integer previousId = employeeRepository.findTopByOrderByIdDesc()
         .map(Employee::getId)
         .orElse(0);
 
     Integer footerNumber = (previousId + 1) % 1000;
-
     return String.format("EMP-%d-%03d", localDateTime.getYear(), footerNumber);
   }
 

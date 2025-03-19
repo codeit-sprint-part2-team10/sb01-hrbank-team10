@@ -134,5 +134,37 @@ public class FileStorageImpl implements FileStorage {
   public Path backupResolvePath(Integer fileId){
     return backupStorage.resolve(fileId.toString());
   }
+
+  // 프로필 파일 삭제
+  @Override
+  public void deleteProfile(Integer fileId) {
+    Path path = profileResolvePath(fileId);
+
+    try {
+      if (Files.deleteIfExists(path)) {
+        System.out.println("삭제된 파일 " + path);
+      } else {
+        throw new RestApiException(FileErrorCode.FILE_NOT_FOUND, path.toString());
+      }
+    } catch (IOException e) {
+      throw new RestApiException(FileErrorCode.FILE_DELETE_ERROR, e.getMessage());
+    }
+  }
+
+  // 백업 파일 삭제
+  @Override
+  public void deleteBackup(Integer fileId) {
+    Path path = backupResolvePath(fileId);
+
+    try {
+      if (Files.deleteIfExists(path)) {
+        System.out.println("삭제된 파일 " + path);
+      } else {
+        throw new RestApiException(FileErrorCode.FILE_NOT_FOUND, path.toString());
+      }
+    } catch (IOException e) {
+      throw new RestApiException(FileErrorCode.FILE_DELETE_ERROR, e.getMessage());
+    }
+  }
 }
 

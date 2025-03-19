@@ -22,8 +22,6 @@ public class RestApiResponse<T> {
 
   public static <T> RestApiResponse<T> success(HttpStatus status, T data) {
     return RestApiResponse.<T>builder()
-        .success(true)
-        .status(status)
         .content(data)
         .build();
   }

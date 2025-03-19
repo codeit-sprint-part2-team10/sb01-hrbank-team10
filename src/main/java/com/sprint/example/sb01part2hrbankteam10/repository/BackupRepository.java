@@ -45,4 +45,10 @@ public interface BackupRepository extends JpaRepository<Backup, Integer> {
   // 가장 최근 완료된 백업 시간 조회
   @Query("SELECT MAX(b.endedAt) FROM Backup b WHERE b.status = 'COMPLETED'")
   LocalDateTime findLastCompletedBackupAt();
+
+  @Query("SELECT b FROM Backup b WHERE b.status = 'COMPLETED' ORDER BY b.createdAt DESC")
+  Optional<Backup> findLastCompletedBackup();
+
+  @Query("SELECT COUNT(e) FROM Employee e WHERE e.updatedAt <= :backupDate")
+  int countEmployeesBackedUpAt(@Param("backupDate") LocalDateTime backupDate);
 }

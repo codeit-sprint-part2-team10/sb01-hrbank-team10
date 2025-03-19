@@ -17,7 +17,7 @@ public class EmployeeMapper {
         .departmentId(employee.getDepartment() != null ? employee.getDepartment().getId() : null)
         .departmentName(employee.getDepartment() != null ? employee.getDepartment().getName() : null)
         .position(employee.getPosition())
-        .hireDate(employee.getHireDate().toLocalDate())
+        .hireDate(employee.getHireDate() != null ? employee.getHireDate().toLocalDate() : null)
         .profileImageId(employee.getProfileImage() != null ? employee.getProfileImage().getId() : null)
         .build();
   }

@@ -3,6 +3,7 @@ package com.sprint.example.sb01part2hrbankteam10.service.impl;
 import com.sprint.example.sb01part2hrbankteam10.dto.CursorPageResponseDto;
 import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeCreateRequest;
 import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeDto;
+import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeSearchRequest;
 import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeUpdateRequest;
 import com.sprint.example.sb01part2hrbankteam10.entity.Department;
 import com.sprint.example.sb01part2hrbankteam10.entity.Employee;
@@ -144,15 +145,16 @@ public class EmployeeServiceImpl implements EmployeeService {
     return "직원이 성공적으로 삭제되었습니다.";
   }
 
-//  @Override
-//  @Transactional(readOnly = true)
-//  public CursorPageResponseDto<EmployeeDto> searchByQuery(
-//      String nameOrEmail, String employeeNumber, String departmentName, String position,
-//      LocalDate hireDateFrom, LocalDate hireDateTo, EmployeeStatus status, Integer idAfter,
-//      String cursor, Integer size, Integer sortField, String sortDirection
-//  ) {
-//
-//  }
+  @Override
+  @Transactional(readOnly = true)
+  public CursorPageResponseDto<EmployeeDto> searchByQuery(
+      String nameOrEmail, String employeeNumber, String departmentName, String position,
+      LocalDate hireDateFrom, LocalDate hireDateTo, EmployeeStatus status, Integer idAfter,
+      String cursor, Integer size, Integer sortField, String sortDirection
+  ) {
+    // 이름, 이메일, 부서, 직함, 사원번호 부분 일치
+    return null;
+  }
 
   private boolean validateFile(MultipartFile multipartFile) {
     return multipartFile != null && !multipartFile.isEmpty();

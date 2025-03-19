@@ -105,7 +105,7 @@ public class EmployeeController {
       @RequestParam(name = "sortDirection") String sortDirection
   ) {
 
-    @Valid EmployeeSearchRequest request = new EmployeeSearchRequest(
+    EmployeeSearchRequest request = new EmployeeSearchRequest(
         nameOrEmail, employeeNumber, departmentName, position,
         hireDateFrom, hireDateTo, status, idAfter, cursor, size, sortField, sortDirection
     );

@@ -6,7 +6,6 @@ import com.sprint.example.sb01part2hrbankteam10.dto.DepartmentDto;
 import com.sprint.example.sb01part2hrbankteam10.dto.DepartmentResponseDto;
 import com.sprint.example.sb01part2hrbankteam10.dto.DepartmentUpdateRequest;
 import com.sprint.example.sb01part2hrbankteam10.global.response.RestApiResponse;
-import com.sprint.example.sb01part2hrbankteam10.repository.DepartmentRepository;
 import com.sprint.example.sb01part2hrbankteam10.service.DepartmentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,45 +29,47 @@ import org.springframework.web.bind.annotation.RestController;
 public class DepartmentController {
 
   private final DepartmentService departmentService;
-  private final DepartmentRepository departmentRepository;
 
   // 부서 생성
   @PostMapping
-  public ResponseEntity<DepartmentDto> createDepartment(
+  public ResponseEntity<RestApiResponse<DepartmentDto>> createDepartment(
       @Valid @RequestBody DepartmentCreateRequest request) {
 
     DepartmentDto department = departmentService.create(request);
-    return ResponseEntity.status(HttpStatus.CREATED).body(department);
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(RestApiResponse.success(HttpStatus.CREATED, department));
   }
 
   // 부서 수정
   @PatchMapping("/{id}")
-  public ResponseEntity<DepartmentDto> updateDepartment(
+  public ResponseEntity<RestApiResponse<DepartmentDto>> updateDepartment(
       @PathVariable Integer id,
       @Valid @RequestBody DepartmentUpdateRequest request) {
 
     DepartmentDto updatedDepartment = departmentService.update(id, request);
-    return ResponseEntity.ok(updatedDepartment);
+    return ResponseEntity.ok()
+        .body(RestApiResponse.success(HttpStatus.OK, updatedDepartment));
   }
 
   // 부서 삭제
   @DeleteMapping("/{id}")
   public ResponseEntity<RestApiResponse<Void>> deleteDepartment(@PathVariable Integer id) {
-    departmentService.delete(id);
-    return ResponseEntity.noContent().build();
+    return ResponseEntity.ok()
+        .body(RestApiResponse.success(HttpStatus.OK, departmentService.delete(id)));
   }
 
   // 부서 상세 조회
   @GetMapping("/{id}")
-  public ResponseEntity<DepartmentDto> getDepartment(@PathVariable Integer id) {
+  public ResponseEntity<RestApiResponse<DepartmentDto>> getDepartment(@PathVariable Integer id) {
     DepartmentDto department = departmentService.find(id);
 
-    return ResponseEntity.ok(department);
+    return ResponseEntity.ok()
+    .body(RestApiResponse.success(HttpStatus.OK, department));
   }
 
   // 부서 목록 조회
   @GetMapping
-  public CursorPageResponseDto<DepartmentResponseDto> getDepartments(
+  public ResponseEntity<RestApiResponse<CursorPageResponseDto<DepartmentResponseDto>>> getDepartments(
       @RequestParam(required = false) String nameOrDescription,
       @RequestParam(required = false) Integer idAfter,
       @RequestParam(required = false) String cursor,
@@ -76,7 +77,7 @@ public class DepartmentController {
       @RequestParam(defaultValue = "establishedDate") String sortField,
       @RequestParam(defaultValue = "asc") String sortDirection) {
 
-    return departmentService.getDepartments(
+    CursorPageResponseDto<DepartmentResponseDto> response = departmentService.getDepartments(
         nameOrDescription,
         idAfter,
         cursor,
@@ -84,5 +85,8 @@ public class DepartmentController {
         sortField,
         sortDirection
     );
+
+    return ResponseEntity.ok()
+        .body(RestApiResponse.success(HttpStatus.OK, response));
   }
 }

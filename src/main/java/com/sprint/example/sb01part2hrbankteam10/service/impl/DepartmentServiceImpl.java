@@ -25,7 +25,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @Slf4j
 @Service
@@ -63,7 +62,7 @@ public class DepartmentServiceImpl implements DepartmentService {
   @Override
   public DepartmentDto update(Integer id, DepartmentUpdateRequest request) {
     Department findDepartment = departmentRepository.findById(id)
-        .orElseThrow(() -> new RestApiException(DepartmentErrorCode.DEPARTMENT_NOT_EXIST,
+        .orElseThrow(() -> new RestApiException(DepartmentErrorCode.DEPARTMENT_NOT_FOUND,
             id.toString()));
 
     Optional.ofNullable(request.getName()).ifPresent(name -> {
@@ -80,9 +79,9 @@ public class DepartmentServiceImpl implements DepartmentService {
 
   @Transactional
   @Override
-  public void delete(Integer id) {
+  public String delete(Integer id) {
     Department findDepartment = departmentRepository.findById(id)
-        .orElseThrow(() -> new RestApiException(DepartmentErrorCode.DEPARTMENT_NOT_EXIST,
+        .orElseThrow(() -> new RestApiException(DepartmentErrorCode.DEPARTMENT_NOT_FOUND,
             id.toString()));
 
     // 부서에 속한 직원이 있는 경우 삭제 불가
@@ -94,6 +93,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     if (departmentRepository.existsById(id)) {
       departmentRepository.delete(findDepartment);
     }
+    return "부서가 성공적으로 삭제되었습니다.";
   }
 
   @Override
@@ -110,7 +110,7 @@ public class DepartmentServiceImpl implements DepartmentService {
   @Override
   public DepartmentDto find(Integer id) {
     Department department = departmentRepository.findById(id)
-        .orElseThrow(() -> new RestApiException(DepartmentErrorCode.DEPARTMENT_NOT_EXIST,
+        .orElseThrow(() -> new RestApiException(DepartmentErrorCode.DEPARTMENT_NOT_FOUND,
             id.toString()));
 
     return departmentMapper.toDto(department);

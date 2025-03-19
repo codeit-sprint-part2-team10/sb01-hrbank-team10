@@ -34,17 +34,9 @@ public class EmployeeHistoryServiceImpl implements EmployeeHistoryService {
     @Transactional
     @Override
     public ChangeLogDto create(String employeeNumber, EmployeeHistory.ChangeType type,
-                       String memo, EmployeeDto beforeData,
-                       EmployeeDto afterData,
-                       String clientIp) {
-        EmployeeHistoryCreateRequest createRequest = new EmployeeHistoryCreateRequest();
-        createRequest.setEmployeeNumber(employeeNumber);
-        createRequest.setType(type);
-        createRequest.setMemo(memo);
-        createRequest.setBeforeData(beforeData);
-        createRequest.setAfterData(afterData);
+                               String memo, EmployeeCreateRequest changes, EmployeeDto afterData, String clientIp) {
 
-        EmployeeHistory history = EmployeeHistoryMapper.toEntity(createRequest, clientIp);
+        EmployeeHistory history = EmployeeHistoryMapper.toEntity(employeeNumber, type, memo, changes, afterData, clientIp);
         EmployeeHistory savedHistory = employeeHistoryRepository.save(history);
 
         return EmployeeHistoryMapper.toChangeLogDto(savedHistory);

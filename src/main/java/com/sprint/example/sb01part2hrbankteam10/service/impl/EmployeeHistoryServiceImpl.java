@@ -36,55 +36,11 @@ public class EmployeeHistoryServiceImpl implements EmployeeHistoryService {
     public ChangeLogDto create(String employeeNumber, EmployeeHistory.ChangeType type,
                                String memo, EmployeeCreateRequest changes, EmployeeDto afterData, String clientIp) {
 
-        List<DiffDto> diffs = compareChanges(null, afterData);
-
-        Map<String, Object> changedFields = diffs.stream()
-                .collect(Collectors.toMap(DiffDto::getPropertyName, EmployeeHistoryMapper::toDetailMap));
-
-        EmployeeHistory history = EmployeeHistory.builder()
-                .employeeNumber(employeeNumber)
-                .type(type)
-                .memo(memo)
-                .modifiedAt(LocalDateTime.now())
-                .ipAddress(clientIp)
-                .changedFields(changedFields) // 변경 사항 저장
-                .build();
-
-//        EmployeeHistory history = EmployeeHistoryMapper.toEntity(employeeNumber, type, memo, changes, afterData, clientIp);
-
+        EmployeeHistory history = EmployeeHistoryMapper.toEntity(employeeNumber, type, memo, changes, afterData, clientIp);
 
         EmployeeHistory savedHistory = employeeHistoryRepository.save(history);
 
         return EmployeeHistoryMapper.toChangeLogDto(savedHistory);
-    }
-
-    public List<DiffDto> compareChanges(EmployeeDto beforeData, EmployeeDto afterData) {
-        List<DiffDto> changes = new ArrayList<>();
-        if (beforeData == null || afterData == null) {
-            return changes;
-        }
-
-        addDiffIfChanged(changes, "name", beforeData.getName(), afterData.getName());
-        addDiffIfChanged(changes, "email", beforeData.getEmail(), afterData.getEmail());
-        addDiffIfChanged(changes, "직함", beforeData.getPosition(), afterData.getPosition());
-        addDiffIfChanged(changes, "departmentId", beforeData.getDepartmentId(), afterData.getDepartmentId());
-        addDiffIfChanged(changes, "departmentName", beforeData.getDepartmentName(), afterData.getDepartmentName());
-        addDiffIfChanged(changes, "hireDate", beforeData.getHireDate(), afterData.getHireDate());
-        addDiffIfChanged(changes, "status", beforeData.getStatus(), afterData.getStatus());
-        // 프로필 이미지 비교는 주석 처리되어 있으므로 그대로 유지합니다.
-//        if (!Objects.equals(beforeData.getProfileImageId(), afterData.getProfileImageId())) {
-//            changes.add(new DiffDto("profileImageId", String.valueOf(beforeData.getProfileImageId()), String.valueOf(afterData.getProfileImageId())));
-//        }
-
-        return changes;
-    }
-
-    private static void addDiffIfChanged(List<DiffDto> changes, String propertyName, Object beforeValue, Object afterValue) {
-        String beforeStr = beforeValue != null ? beforeValue.toString() : null;
-        String afterStr = afterValue != null ? afterValue.toString() : null;
-        if (!Objects.equals(beforeStr, afterStr)) {
-            changes.add(new DiffDto(propertyName, beforeStr, afterStr));
-        }
     }
 
     @Override

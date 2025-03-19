@@ -7,6 +7,7 @@ import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeUpdateRequest;
 import com.sprint.example.sb01part2hrbankteam10.entity.Department;
 import com.sprint.example.sb01part2hrbankteam10.entity.Employee;
 import com.sprint.example.sb01part2hrbankteam10.entity.Employee.EmployeeStatus;
+import com.sprint.example.sb01part2hrbankteam10.entity.EmployeeHistory.ChangeType;
 import com.sprint.example.sb01part2hrbankteam10.entity.File;
 import com.sprint.example.sb01part2hrbankteam10.global.exception.RestApiException;
 import com.sprint.example.sb01part2hrbankteam10.global.exception.errorcode.EmployeeErrorCode;
@@ -14,6 +15,7 @@ import com.sprint.example.sb01part2hrbankteam10.mapper.EmployeeMapper;
 import com.sprint.example.sb01part2hrbankteam10.repository.DepartmentRepository;
 import com.sprint.example.sb01part2hrbankteam10.repository.EmployeeRepository;
 import com.sprint.example.sb01part2hrbankteam10.repository.FileRepository;
+import com.sprint.example.sb01part2hrbankteam10.service.EmployeeHistoryService;
 import com.sprint.example.sb01part2hrbankteam10.service.EmployeeService;
 import com.sprint.example.sb01part2hrbankteam10.storage.FileStorage;
 import java.math.BigInteger;
@@ -32,10 +34,11 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class EmployeeServiceImpl implements EmployeeService {
 
+  private final DepartmentRepository departmentRepository;
   private final EmployeeRepository employeeRepository;
   private final FileRepository fileRepository;
-  private final DepartmentRepository departmentRepository;
   private final FileStorage fileStorage;
+  private final EmployeeHistoryService employeeHistoryService;
 
   @Override
   @Transactional
@@ -71,11 +74,12 @@ public class EmployeeServiceImpl implements EmployeeService {
         .status(EmployeeStatus.ACTIVE)
         .build();
 
-    EmployeeDto employeeDto = EmployeeMapper.toDto(employeeRepository.save(newEmployee));
+    EmployeeDto before = EmployeeMapper.toDto(Employee.builder().build());
+    EmployeeDto after = EmployeeMapper.toDto(employeeRepository.save(newEmployee));
 
-    //EmployeeHistoryService.create(ChangeType.CREATED, request.getMemo(), null, employeeDto, clientIp);
+    employeeHistoryService.create(employeeNumber, ChangeType.CREATED, request.getMemo(),before, after, clientIp);
 
-    return employeeDto;
+    return after;
   }
 
   @Override
@@ -113,8 +117,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     EmployeeDto after = EmployeeMapper.toDto(employee);
-
-    // EmployeeHistoryService.create(ChangeType.UPDATE, request.getMemo(), before, after, clientIp);
+    employeeHistoryService.create(employee.getEmployeeNumber(), ChangeType.UPDATED, request.getMemo(),before, after, clientIp);
 
     return after;
   }
@@ -125,7 +128,7 @@ public class EmployeeServiceImpl implements EmployeeService {
   }
 
   @Override
-  public String deleteById(Integer id) {
+  public String deleteById(Integer id, String clientIp) {
     Employee employee = getByIdOrThrow(id);
     Integer previousProfileImageId = employee.getProfileImage().getId();
     employee.updateStatus(EmployeeStatus.RESIGNED);
@@ -134,20 +137,22 @@ public class EmployeeServiceImpl implements EmployeeService {
     fileRepository.deleteById(previousProfileImageId);
 
     EmployeeDto before = EmployeeMapper.toDto(employee);
-    // EmployeeHistoryService.create(ChangeType.DELETE, request.getMemo(), before, null, clientIp);
+    EmployeeDto after = EmployeeMapper.toDto(Employee.builder().build());
+
+    employeeHistoryService.create(employee.getEmployeeNumber(), ChangeType.UPDATED, null, before, after, clientIp);
 
     return "직원이 성공적으로 삭제되었습니다.";
   }
 
-  @Override
-  @Transactional(readOnly = true)
-  public CursorPageResponseDto<EmployeeDto> searchByQuery(
-      String nameOrEmail, String employeeNumber, String departmentName, String position,
-      LocalDate hireDateFrom, LocalDate hireDateTo, EmployeeStatus status, Integer idAfter,
-      String cursor, Integer size, Integer sortField, String sortDirection
-  ) {
-
-  }
+//  @Override
+//  @Transactional(readOnly = true)
+//  public CursorPageResponseDto<EmployeeDto> searchByQuery(
+//      String nameOrEmail, String employeeNumber, String departmentName, String position,
+//      LocalDate hireDateFrom, LocalDate hireDateTo, EmployeeStatus status, Integer idAfter,
+//      String cursor, Integer size, Integer sortField, String sortDirection
+//  ) {
+//
+//  }
 
   private boolean validateFile(MultipartFile multipartFile) {
     return multipartFile != null && !multipartFile.isEmpty();

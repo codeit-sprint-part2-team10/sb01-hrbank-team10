@@ -15,13 +15,13 @@ public interface EmployeeService {
   EmployeeDto update(Integer id, EmployeeUpdateRequest request, MultipartFile profile,
       String clientIp);
 
-  String deleteById(Integer id);
+  String deleteById(Integer id, String clientIp);
 
   EmployeeDto getById(Integer id);
 
-  CursorPageResponseDto<EmployeeDto> search(
-      String nameOrEmail, String employeeNumber, String departmentName, String position,
-      LocalDate hireDateFrom, LocalDate hireDateTo, EmployeeStatus status, Integer idAfter,
-      String cursor, Integer size, Integer sortField, String sortDirection
-  );
+//  CursorPageResponseDto<EmployeeDto> search(
+//      String nameOrEmail, String employeeNumber, String departmentName, String position,
+//      LocalDate hireDateFrom, LocalDate hireDateTo, EmployeeStatus status, Integer idAfter,
+//      String cursor, Integer size, Integer sortField, String sortDirection
+//  );
 }

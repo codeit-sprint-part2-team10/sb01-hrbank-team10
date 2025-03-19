@@ -79,12 +79,13 @@ public class EmployeeController {
 
   @DeleteMapping("/{id}")
   public ResponseEntity<RestApiResponse<Void>> deleteEmployee (
+      HttpServletRequest httpServletRequest,
       @PathVariable Integer id
   ) {
     return ResponseEntity.ok()
         .body(RestApiResponse.success(
             HttpStatus.OK,
-            employeeService.deleteById(id))
+            employeeService.deleteById(id, IpUtil.getClientIp(httpServletRequest)))
         );
   }
 

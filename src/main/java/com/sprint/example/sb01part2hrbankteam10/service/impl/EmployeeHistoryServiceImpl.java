@@ -5,10 +5,15 @@ import com.sprint.example.sb01part2hrbankteam10.dto.CursorPageResponseChangeLogD
 import com.sprint.example.sb01part2hrbankteam10.dto.DiffDto;
 import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeDto;
 import com.sprint.example.sb01part2hrbankteam10.entity.EmployeeHistory;
+import com.sprint.example.sb01part2hrbankteam10.global.exception.RestApiException;
+import com.sprint.example.sb01part2hrbankteam10.global.exception.errorcode.EmployeeErrorCode;
+import com.sprint.example.sb01part2hrbankteam10.global.exception.errorcode.EmployeeHistoryErrorCode;
+import com.sprint.example.sb01part2hrbankteam10.global.exception.errorcode.GlobalErrorCode;
 import com.sprint.example.sb01part2hrbankteam10.repository.EmployeeHistoryRepository;
 import com.sprint.example.sb01part2hrbankteam10.service.EmployeeHistoryService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -23,6 +28,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class EmployeeHistoryServiceImpl implements EmployeeHistoryService {
 
     private final EmployeeHistoryRepository employeeHistoryRepository;
@@ -111,6 +117,15 @@ public class EmployeeHistoryServiceImpl implements EmployeeHistoryService {
             String sortField,
             String sortDirection
     ) {
+        
+        if(!"at".equalsIgnoreCase(sortField) && !"ipAddress".equalsIgnoreCase(sortField)) {
+            log.error("지원하지 않는 정렬 필드입니다. sortField={}", sortField);
+            throw new RestApiException(
+                    EmployeeHistoryErrorCode.INVALID_SORT_FIELD,
+                    "지원하지 않는 정렬 필드입니다. sortField=" + sortField
+            );
+        }
+        
         // 1. 동적 조건 생성
         Specification<EmployeeHistory> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
@@ -202,7 +217,7 @@ public class EmployeeHistoryServiceImpl implements EmployeeHistoryService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<DiffDto> getChangeDetails(Integer id) {
+    public List<DiffDto> getChangeDiffs(Integer id) {
         EmployeeHistory history = employeeHistoryRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Employee history not found"));
 

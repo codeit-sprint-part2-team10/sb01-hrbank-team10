@@ -60,7 +60,7 @@ public class EmployeeHistoryController {
 
     @GetMapping("/{id}/diffs")
     public ResponseEntity<List<DiffDto>> getChangeDiffs(@PathVariable Integer id) {
-        List<DiffDto> diffList = employeeHistoryService.getChangeDetails(id);
+        List<DiffDto> diffList = employeeHistoryService.getChangeDiffs(id);
         return ResponseEntity.ok(diffList);
     }
 

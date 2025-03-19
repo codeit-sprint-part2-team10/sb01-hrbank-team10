@@ -14,7 +14,7 @@ CREATE TABLE backups
     id                SERIAL PRIMARY KEY,
     created_at        TIMESTAMPTZ  NOT NULL,
     file_id           INTEGER,
-    started_at        TIMESTAMPTZ  NOT NULL,
+    started_at        TIMESTAMPTZ,
     ended_at          TIMESTAMPTZ,
     worker_ip_address VARCHAR(255) NOT NULL,
     status            VARCHAR(20)  NOT NULL,

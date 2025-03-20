@@ -8,9 +8,7 @@ import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeDto;
 import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeSearchRequest;
 import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeTrendDto;
 import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeUpdateRequest;
-import com.sprint.example.sb01part2hrbankteam10.dto.response.EmployeeDashboardResponse;
 import com.sprint.example.sb01part2hrbankteam10.entity.Employee.EmployeeStatus;
-import com.sprint.example.sb01part2hrbankteam10.global.response.RestApiResponse;
 import com.sprint.example.sb01part2hrbankteam10.service.EmployeeService;
 import com.sprint.example.sb01part2hrbankteam10.service.EmployeeStatService;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,9 +16,7 @@ import com.sprint.example.sb01part2hrbankteam10.util.IpUtil;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -125,7 +121,7 @@ public class EmployeeController implements EmployeeDocs {
         .body(employeeStatusService.getDistribution(groupBy, Status));
   }
 
-  @GetMapping(value = "/status/trend")
+  @GetMapping(value = "/stats/trend")
   @Override
   public ResponseEntity<List<EmployeeTrendDto>> getEmployeeTrend(
       @RequestParam(required = false)

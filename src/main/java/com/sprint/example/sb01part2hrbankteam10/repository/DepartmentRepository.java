@@ -12,7 +12,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface DepartmentRepository extends JpaRepository<Department, Integer> {
 
-  Optional<Object> findByName(String name);
+  Optional<Department> findByName(String name);
+
+  Optional<Department> findByNameEquals(String name);
 
   boolean existsByName(String name);
 

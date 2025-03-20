@@ -40,22 +40,56 @@ public class DepartmentServiceImpl implements DepartmentService {
   @Transactional
   @Override
   public DepartmentDto create(DepartmentCreateRequest request) {
+    log.info("부서 생성 요청 시작: {}", request);
 
-    LocalDateTime establishedDate = parseLocalDateTime(request.getEstablishedDate());
+    try {
+      // 이름 앞뒤 공백 제거
+      String departmentName = request.getName();
+      log.info("부서명: '{}'", departmentName);
 
-    if (departmentRepository.existsByName(request.getName())) {
-      throw new RestApiException(DepartmentErrorCode.DEPARTMENT_IS_ALREADY_EXIST,
-          request.getName());
+      // 현재 DB에 있는 모든 부서명 로깅
+      List<String> existingDepartments = departmentRepository.findAll()
+          .stream()
+          .map(Department::getName)
+          .collect(Collectors.toList());
+      log.info("현재 존재하는 모든 부서명: {}", existingDepartments);
+
+      LocalDateTime establishedDate = parseLocalDateTime(request.getEstablishedDate());
+      log.info("설립일 파싱 완료: {}", establishedDate);
+
+      // 직접 DB 조회로 검증
+      Optional<Department> existingDept = departmentRepository.findByNameEquals(departmentName);
+      boolean exists = existingDept.isPresent();
+      log.info("부서명 '{}' 중복 확인 결과(직접 조회): {}", departmentName, exists);
+
+      // 기존 메서드도 함께 테스트
+      boolean existsByMethod = departmentRepository.existsByName(departmentName);
+      log.info("부서명 '{}' 중복 확인 결과(existsByName): {}", departmentName, existsByMethod);
+
+      if (exists) {
+        log.error("이미 존재하는 부서명: {}", departmentName);
+        throw new RestApiException(DepartmentErrorCode.DEPARTMENT_IS_ALREADY_EXIST,
+            departmentName);
+      }
+
+      Department department = Department.builder()
+          .name(departmentName)
+          .description(request.getDescription())
+          .establishedDate(establishedDate)
+          .build();
+      log.info("부서 엔티티 생성 완료: {}", department);
+
+      Department saved = departmentRepository.save(department);
+      log.info("부서 저장 완료: {}", saved);
+
+      return departmentMapper.toDto(saved);
+    } catch (RestApiException e) {
+      log.error("부서 생성 도중 RestApiException 발생: {}", e.getMessage());
+      throw e;
+    } catch (Exception e) {
+      log.error("부서 생성 중 예외 발생: {}", e.getMessage(), e);
+      throw e;
     }
-
-    Department department = Department.builder()
-        .name(request.getName())
-        .description(request.getDescription())
-        .establishedDate(establishedDate)
-        .build();
-
-    Department saved = departmentRepository.save(department);
-    return departmentMapper.toDto(saved);
   }
 
   @Transactional

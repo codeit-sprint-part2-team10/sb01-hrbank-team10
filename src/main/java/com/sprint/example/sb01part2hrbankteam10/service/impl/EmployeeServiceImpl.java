@@ -104,8 +104,10 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     Optional.ofNullable(request.getName()).ifPresent(employee::updateName);
     Optional.ofNullable(request.getEmail()).ifPresent(email -> {
-      validateEmail(email);
-      employee.updateEmail(email);
+      if (!employee.getEmail().equals(email)) {
+        validateEmail(email);
+        employee.updateEmail(email);
+      }
     });
     Optional.ofNullable(request.getPosition()).ifPresent(employee::updatePosition);
     Optional.ofNullable(request.getStatus()).ifPresent(employee::updateStatus);
@@ -125,11 +127,17 @@ public class EmployeeServiceImpl implements EmployeeService {
               .size(BigInteger.valueOf(profile.getSize()))
               .build()
       );
-      Integer previousProfileImageId = employee.getProfileImage().getId();
+
+      Integer previousProfileImageId = null;
+      if (employee.getProfileImage() != null) {
+        previousProfileImageId = employee.getProfileImage().getId();
+      }
       employee.updateProfileImage(newProfile);              // 프로필 업데이트
+      if (previousProfileImageId != null) {
+        fileRepository.deleteById(previousProfileImageId);  // 기존 프로필 데이터 삭제
+        fileStorage.deleteProfile(previousProfileImageId);  // 로컬 데이터 삭제
+      }
       fileStorage.saveProfile(newProfile.getId(), profile); // 로컬 저장
-      fileRepository.deleteById(previousProfileImageId);    // 기존 프로필 데이터 삭제
-      fileStorage.deleteProfile(previousProfileImageId);    // 로컬 데이터 삭제
     }
 
     EmployeeDto after = EmployeeMapper.toDto(employee);

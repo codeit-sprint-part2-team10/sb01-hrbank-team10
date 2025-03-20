@@ -1,5 +1,6 @@
 package com.sprint.example.sb01part2hrbankteam10.controller;
 
+import com.sprint.example.sb01part2hrbankteam10.controller.docs.BackupDocs;
 import com.sprint.example.sb01part2hrbankteam10.dto.BackupDto;
 import com.sprint.example.sb01part2hrbankteam10.entity.Backup;
 import com.sprint.example.sb01part2hrbankteam10.mapper.BackupMapper;
@@ -23,7 +24,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("api/backups")
 @RequiredArgsConstructor
-public class BackupController {
+public class BackupController implements BackupDocs {
 
     private final BackupService backupService;
     private final BackupRepository backupRepository;
@@ -31,12 +32,15 @@ public class BackupController {
     // 백업 요청 TODO 에러 코드
     @PostMapping
     public ResponseEntity<Integer> backup(HttpServletRequest request) {
+    @Override
+    public ResponseEntity<Integer> Backup(HttpServletRequest request) {
         Integer backupId = backupService.performBackup();
         return ResponseEntity.status(HttpStatus.OK).body(backupId);
     }
 
     // 백업 상태로 가장 최근 백업 얻기 TODO 에러 코드
     @GetMapping("/latest")
+    @Override
     public ResponseEntity<BackupDto> getLastBackup(@RequestParam Backup.BackupStatus status){
         Backup lastBackup = backupRepository.findFirstByStatusOrderByStartedAtDesc(status);
         BackupDto lastBackupDto = BackupMapper.toDto(lastBackup);
@@ -45,6 +49,7 @@ public class BackupController {
 
     // 백업 목록 조회 - TODO 에러 코드
     @GetMapping
+    @Override
     public ResponseEntity<Map<String, Object>> getBackupList(
             @RequestParam(required = false) String worker,
             @RequestParam(required = false) Backup.BackupStatus status,
@@ -54,7 +59,6 @@ public class BackupController {
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "startedAt") String sortField,
             @RequestParam(defaultValue = "DESC") Sort.Direction sortDirection) {
-
 
         Pageable pageable = PageRequest.of(0, size, Sort.by(sortDirection, sortField));
         Page<BackupDto> backupPage = backupService.getBackupList(worker, status, startedAtFrom, startedAtTo, idAfter, null, size, sortField, sortDirection);

@@ -1,5 +1,6 @@
 package com.sprint.example.sb01part2hrbankteam10.controller;
 
+import com.sprint.example.sb01part2hrbankteam10.controller.docs.FileDocs;
 import com.sprint.example.sb01part2hrbankteam10.entity.File;
 import com.sprint.example.sb01part2hrbankteam10.global.exception.RestApiException;
 import com.sprint.example.sb01part2hrbankteam10.global.exception.errorcode.FileErrorCode;
@@ -17,12 +18,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("api/files")
 @RequiredArgsConstructor
-public class FileController {
+public class FileController implements FileDocs {
 
   private final FileStorage fileStorage;
   private final FileRepository fileRepository;
 
   @GetMapping("/{id}/download")
+  @Override
   public ResponseEntity<Resource> download(@PathVariable(value = "id") Integer fileId) {
     String contentType = fileRepository.findById(fileId)
         .map(File::getContentType)

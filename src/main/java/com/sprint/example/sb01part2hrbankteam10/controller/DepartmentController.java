@@ -1,5 +1,6 @@
 package com.sprint.example.sb01part2hrbankteam10.controller;
 
+import com.sprint.example.sb01part2hrbankteam10.controller.docs.DepartmentDocs;
 import com.sprint.example.sb01part2hrbankteam10.dto.CursorPageResponseDto;
 import com.sprint.example.sb01part2hrbankteam10.dto.DepartmentCreateRequest;
 import com.sprint.example.sb01part2hrbankteam10.dto.DepartmentDto;
@@ -25,12 +26,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/departments")
-public class DepartmentController {
+public class DepartmentController implements DepartmentDocs {
 
   private final DepartmentService departmentService;
 
   // 부서 생성
   @PostMapping
+  @Override
   public ResponseEntity<DepartmentDto> createDepartment(
       @Valid @RequestBody DepartmentCreateRequest request) {
 
@@ -41,6 +43,7 @@ public class DepartmentController {
 
   // 부서 수정
   @PatchMapping("/{id}")
+  @Override
   public ResponseEntity<DepartmentDto> updateDepartment(
       @PathVariable Integer id,
       @Valid @RequestBody DepartmentUpdateRequest request) {
@@ -52,6 +55,7 @@ public class DepartmentController {
 
   // 부서 삭제
   @DeleteMapping("/{id}")
+  @Override
   public ResponseEntity<String> deleteDepartment(@PathVariable Integer id) {
     return ResponseEntity.ok()
         .body(departmentService.delete(id));
@@ -59,6 +63,7 @@ public class DepartmentController {
 
   // 부서 상세 조회
   @GetMapping("/{id}")
+  @Override
   public ResponseEntity<DepartmentDto> getDepartment(@PathVariable Integer id) {
     DepartmentDto department = departmentService.find(id);
 
@@ -68,6 +73,7 @@ public class DepartmentController {
 
   // 부서 목록 조회
   @GetMapping
+  @Override
   public ResponseEntity<CursorPageResponseDto<DepartmentResponseDto>> getDepartments(
       @RequestParam(required = false) String nameOrDescription,
       @RequestParam(required = false) Integer idAfter,

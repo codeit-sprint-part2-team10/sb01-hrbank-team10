@@ -24,6 +24,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -345,24 +346,54 @@ public class BackupServiceImpl implements BackupService {
         throw new IllegalArgumentException("커서 형식이 잘못됐습니다.");
       }
     }
+    final Integer finalIdAfter = idAfter;
 
-    // Pageable 정의
-    Pageable pageable = PageRequest.of(0, size);
+    // 커서 기반 페이징을 위한 Pageable 객체 (페이지 번호는 항상 0)
+    Pageable basePageable = PageRequest.of(0, size);
 
-    // 정렬 조건에 따라 메서드 선택
-    if ("startedAt".equals(sortField)) {
-      if (sortDirection == Sort.Direction.ASC) {
-        return backupRepository.findBackupsOrderByStartedAtAsc(
-                workerIpAddress, status, startedAtFrom, startedAtTo, idAfter, pageable);
-      } else {
-        return backupRepository.findBackupsOrderByStartedAtDesc(
-                workerIpAddress, status, startedAtFrom, startedAtTo, idAfter, pageable);
-      }
+    // Specification 생성
+    Specification<Backup> spec = Specification.where(null);
+
+    if (workerIpAddress != null) {
+      spec = spec.and((root, query, cb) -> cb.equal(root.get("workerIpAddress"), workerIpAddress));
     }
 
-    // 기본 정렬 (startedAt Desc)
-    return backupRepository.findBackupsOrderByStartedAtDesc(
-            workerIpAddress, status, startedAtFrom, startedAtTo, idAfter, pageable);
+    if (status != null) {
+      spec = spec.and((root, query, cb) -> cb.equal(root.get("status"), status));
+    }
+
+    if (startedAtFrom != null && startedAtTo != null) {
+      spec = spec.and((root, query, cb) -> cb.between(root.get("startedAt"), startedAtFrom, startedAtTo));
+    }
+
+    if (idAfter != null) {
+      spec = spec.and((root, query, cb) -> cb.greaterThan(root.get("id"), finalIdAfter));
+    }
+
+    // 정렬 설정
+    Sort sort;
+    if ("startedAt".equals(sortField)) {
+      sort = Sort.by(sortDirection, "startedAt");
+    } else if ("id".equals(sortField)) {
+      sort = Sort.by(sortDirection, "id");
+    } else {
+      // 기본 정렬
+      sort = Sort.by(Sort.Direction.DESC, "startedAt");
+    }
+
+    // 페이징 설정
+    Pageable pageable = PageRequest.of(basePageable.getPageNumber(), basePageable.getPageSize(), sort);
+
+    // 결과 조회
+    Page<Backup> backupPage = backupRepository.findAll(spec, pageable);
+
+    // DTO 변환 로직
+    return backupPage.map(backup -> BackupDto.builder()
+            .id(backup.getId())
+            .workerIpAddress(backup.getWorkerIpAddress())
+            .status(backup.getStatus())
+            .startedAt(backup.getStartedAt())
+            .build());
   }
 
 }

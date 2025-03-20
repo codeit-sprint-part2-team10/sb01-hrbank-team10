@@ -37,6 +37,7 @@ public class EmployeeHistoryServiceImpl implements EmployeeHistoryService {
                                String memo, EmployeeCreateRequest changes, EmployeeDto afterData, String clientIp) {
 
         EmployeeHistory history = EmployeeHistoryMapper.toEntity(employeeNumber, type, memo, changes, afterData, clientIp);
+
         EmployeeHistory savedHistory = employeeHistoryRepository.save(history);
 
         return EmployeeHistoryMapper.toChangeLogDto(savedHistory);

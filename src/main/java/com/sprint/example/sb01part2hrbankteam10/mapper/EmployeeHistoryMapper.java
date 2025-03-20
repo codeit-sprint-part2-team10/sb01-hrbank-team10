@@ -13,15 +13,11 @@ public class EmployeeHistoryMapper {
 
     public static EmployeeHistory toEntity(String employeeNumber, EmployeeHistory.ChangeType type, String memo,
                                            EmployeeCreateRequest changes, EmployeeDto afterData, String clientIp) {
-        Map<String, Object> changedFields = new HashMap<>();
 
-        if(changes != null) {
-            changedFields.put("name", changes.getName());
-            changedFields.put("email", changes.getEmail());
-            changedFields.put("departmentId", changes.getDepartmentId());
-            changedFields.put("position", changes.getPosition());
-            changedFields.put("hireDate", changes.getHireDate());
-        }
+        List<DiffDto> diffs = compareChanges(null, afterData);
+
+        Map<String, Object> changedFields = diffs.stream()
+                .collect(Collectors.toMap(DiffDto::getPropertyName, EmployeeHistoryMapper::toDetailMap));
 
         return EmployeeHistory.builder()
                 .employeeNumber(employeeNumber)
@@ -31,16 +27,27 @@ public class EmployeeHistoryMapper {
                 .ipAddress(clientIp)
                 .changedFields(changedFields)
                 .build();
+//        Map<String, Object> changedFields = new HashMap<>();
+//
+//        if(changes != null) {
+//            changedFields.put("name", changes.getName());
+//            changedFields.put("email", changes.getEmail());
+//            changedFields.put("departmentId", changes.getDepartmentId());
+//            changedFields.put("position", changes.getPosition());
+//            changedFields.put("hireDate", changes.getHireDate());
+//        }
+//
+//        return EmployeeHistory.builder()
+//                .employeeNumber(employeeNumber)
+//                .type(type)
+//                .memo(memo)
+//                .modifiedAt(LocalDateTime.now())
+//                .ipAddress(clientIp)
+//                .changedFields(changedFields)
+//                .build();
     }
 
-    private static Map<String, Object> toDetailMap(DiffDto diff) {
-        Map<String, Object> detailMap = new HashMap<>();
-        detailMap.put("before", diff.getBefore());
-        detailMap.put("after", diff.getAfter());
-        return detailMap;
-    }
-
-    private static List<DiffDto> compareChanges(EmployeeDto beforeData, EmployeeDto afterData) {
+    public static List<DiffDto> compareChanges(EmployeeDto beforeData, EmployeeDto afterData) {
         List<DiffDto> changes = new ArrayList<>();
         if (beforeData == null || afterData == null) {
             return changes;
@@ -68,6 +75,17 @@ public class EmployeeHistoryMapper {
             changes.add(new DiffDto(propertyName, beforeStr, afterStr));
         }
     }
+
+    public static Map<String, Object> toDetailMap(DiffDto diff) {
+        Map<String, Object> detailMap = new HashMap<>();
+        detailMap.put("before", diff.getBefore());
+        detailMap.put("after", diff.getAfter());
+        return detailMap;
+    }
+
+
+
+
 
     public static ChangeLogDto toChangeLogDto(EmployeeHistory employeeHistory) {
         return ChangeLogDto.fromEntity(employeeHistory);

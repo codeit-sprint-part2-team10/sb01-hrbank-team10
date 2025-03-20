@@ -56,7 +56,7 @@ public class EmployeeSpecification {
 
   public static Specification<Employee> likeDepartmentName(String departmentName) {
     return (root, query, criteriaBuilder)
-        -> criteriaBuilder.like(root.get("departmentName"), '%'+ departmentName + '%');
+        -> criteriaBuilder.like(root.get("department").get("name"), '%'+ departmentName + '%');
   }
 
   public static Specification<Employee> likePosition(String position) {

@@ -1,18 +1,20 @@
 package com.sprint.example.sb01part2hrbankteam10.repository;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import com.sprint.example.sb01part2hrbankteam10.entity.Backup;
 import com.sprint.example.sb01part2hrbankteam10.entity.Backup.BackupStatus;
 import com.sprint.example.sb01part2hrbankteam10.entity.File;
 import jakarta.transaction.Transactional;
-import java.math.BigInteger;
-import java.net.InetAddress;
-import java.time.LocalDateTime;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+
+import java.math.BigInteger;
+import java.net.InetAddress;
+import java.time.LocalDateTime;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE) // 지금 설정된 실제 데이터 베이스를 사용하도록 설정
@@ -70,7 +72,6 @@ class BackupRepositoryTest {
     assertEquals(backupFileNotNull.getEndedAt(), resultCreateFileNotNull.getEndedAt());
     assertEquals(backupFileNotNull.getWorkerIpAddress(), resultCreateFileNotNull.getWorkerIpAddress());
     assertEquals(backupFileNotNull.getStatus(), resultCreateFileNotNull.getStatus());
-    assertEquals(backupFileNotNull.getBatchDoneAt(), resultCreateFileNotNull.getBatchDoneAt());
 
     // 파일이 널일 때
     assertEquals(backupFileIsNull.getFile(), resultCreateFileIsNull.getFile());
@@ -78,7 +79,6 @@ class BackupRepositoryTest {
     assertEquals(backupFileIsNull.getEndedAt(), resultCreateFileIsNull.getEndedAt());
     assertEquals(backupFileIsNull.getWorkerIpAddress(), resultCreateFileIsNull.getWorkerIpAddress());
     assertEquals(backupFileIsNull.getStatus(), resultCreateFileIsNull.getStatus());
-    assertEquals(backupFileIsNull.getBatchDoneAt(), resultCreateFileIsNull.getBatchDoneAt());
   }
 
   @Test

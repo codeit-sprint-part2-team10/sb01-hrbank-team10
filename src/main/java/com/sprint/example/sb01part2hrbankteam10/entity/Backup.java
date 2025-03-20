@@ -29,7 +29,7 @@ public class Backup {
   @JoinColumn(name = "file_id")
   private File file;
 
-  @Column(name = "started_at", columnDefinition = "timestamp with time zone") // TODO
+  @Column(name = "started_at", columnDefinition = "timestamp with time zone")
   private LocalDateTime startedAt;
 
   @Column(name = "ended_at", columnDefinition = "timestamp with time zone")
@@ -42,9 +42,6 @@ public class Backup {
   @Column(name = "status", nullable = false)
   private BackupStatus status;
 
-  @Column(name = "batch_done_at", columnDefinition = "timestamp with time zone")
-  private LocalDateTime batchDoneAt;
-
   @Builder
   public Backup(File file, LocalDateTime startedAt, LocalDateTime endedAt, String workerIpAddress,
       BackupStatus status, LocalDateTime batchDoneAt) {
@@ -53,7 +50,6 @@ public class Backup {
     this.endedAt = endedAt;
     this.workerIpAddress = workerIpAddress;
     this.status = status;
-    this.batchDoneAt = batchDoneAt;
   }
 
   public enum BackupStatus {

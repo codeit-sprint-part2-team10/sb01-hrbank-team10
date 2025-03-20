@@ -2,6 +2,7 @@ package com.sprint.example.sb01part2hrbankteam10.controller;
 
 import com.sprint.example.sb01part2hrbankteam10.dto.BackupDto;
 import com.sprint.example.sb01part2hrbankteam10.entity.Backup;
+import com.sprint.example.sb01part2hrbankteam10.mapper.BackupMapper;
 import com.sprint.example.sb01part2hrbankteam10.repository.BackupRepository;
 import com.sprint.example.sb01part2hrbankteam10.service.BackupService;
 import com.sprint.example.sb01part2hrbankteam10.util.IpUtil;
@@ -37,13 +38,14 @@ public class BackupController {
 
     // 백업 상태로 가장 최근 백업 얻기 TODO 에러 코드
     @GetMapping("/latest")
-    public ResponseEntity<BackupDto> getLastBackup(Backup.BackupStatus status){
-        BackupDto lastBackupDto = backupRepository.findLastBackupByStatus(status);
+    public ResponseEntity<BackupDto> getLastBackup(@RequestParam Backup.BackupStatus status){
+        Backup lastBackup = backupRepository.findFirstByStatusOrderByStartedAtDesc(status);
+        BackupDto lastBackupDto = BackupMapper.toDto(lastBackup);
         return ResponseEntity.status(HttpStatus.OK).body(lastBackupDto);
     }
 
     // 백업 목록 조회 - TODO 에러 코드
-    @GetMapping("/api/backups")
+    @GetMapping
     public ResponseEntity<Map<String, Object>> getBackupList(
             @RequestParam(required = false) String worker,
             @RequestParam(required = false) Backup.BackupStatus status,

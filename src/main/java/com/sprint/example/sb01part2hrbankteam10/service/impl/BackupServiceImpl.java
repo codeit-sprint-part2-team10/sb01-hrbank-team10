@@ -8,6 +8,7 @@ import com.sprint.example.sb01part2hrbankteam10.entity.Backup.BackupStatus;
 import com.sprint.example.sb01part2hrbankteam10.entity.Employee;
 import com.sprint.example.sb01part2hrbankteam10.global.exception.RestApiException;
 import com.sprint.example.sb01part2hrbankteam10.global.exception.errorcode.BackupErrorCode;
+import com.sprint.example.sb01part2hrbankteam10.global.exception.errorcode.FileErrorCode;
 import com.sprint.example.sb01part2hrbankteam10.mapper.EmployeeMapper;
 import com.sprint.example.sb01part2hrbankteam10.repository.BackupRepository;
 import com.sprint.example.sb01part2hrbankteam10.repository.EmployeeHistoryRepository;
@@ -16,7 +17,6 @@ import com.sprint.example.sb01part2hrbankteam10.repository.FileRepository;
 import com.sprint.example.sb01part2hrbankteam10.service.BackupService;
 import com.sprint.example.sb01part2hrbankteam10.storage.FileStorage;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -27,10 +27,12 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -42,7 +44,6 @@ import java.util.stream.Collectors;
 import static org.apache.commons.lang3.StringEscapeUtils.escapeCsv;
 
 // ID,직원번호,이름,이메일,부서,직급,입사일,상태
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BackupServiceImpl implements BackupService {
@@ -59,13 +60,13 @@ public class BackupServiceImpl implements BackupService {
 
     // 로직: if 백업 불필요 -> 건너뜀 상태로 배치이력 저장하고 프로세스 종료
     if (!isBackupNeeded()) {
-      Backup backupHistory = createBackupHistory(workerIpAddress, BackupStatus.SKIPPED, null, null);
+      Backup backupHistory = createBackupHistory(workerIpAddress, BackupStatus.SKIPPED, null, null, null);
       return backupRepository.save(backupHistory).getId();
     }
 
     // 진행중 상태로 배치이력 저장, 작업자는 요청자의 ip 주소
     Backup atStartBackupHistory = createBackupHistory(workerIpAddress, BackupStatus.IN_PROGRESS,
-            LocalDateTime.now(), null);
+            LocalDateTime.now(), null, null);
     backupRepository.save(atStartBackupHistory);
 
     File backupFile = null;
@@ -87,22 +88,47 @@ public class BackupServiceImpl implements BackupService {
         throw new RestApiException(BackupErrorCode.BACKUP_FILE_CREATION_FAILED, "파일 생성에 실패했습니다.");
       }
 
-      // 파일 저장
-      Integer fileId = fileRepository.findByName(backupFile.getName());
-      fileStorage.saveBackup(fileId, (MultipartFile) backupFile);  // MultipartFile이 아니라 File로 전달
+      // 파일을 MultipartFile로 변환
+      MultipartFile backUpMultipartFile = convertFileToMultipartFile(backupFile);
+
+      // 파일 정보를 먼저 DB에 저장 후 ID를 가져옴
+      BigInteger fileSize = BigInteger.valueOf(backupFile.length());
+      com.sprint.example.sb01part2hrbankteam10.entity.File fileEntity = com.sprint.example.sb01part2hrbankteam10.entity.File.builder()
+              .name(backupFile.getName())
+              .contentType("text/csv")
+              .size(fileSize)
+              .build();
+
+      // 저장하고 ID 반환받기
+      Integer fileId = fileRepository.save(fileEntity).getId();
+      com.sprint.example.sb01part2hrbankteam10.entity.File savedFile = fileRepository.findById(fileId)
+              .orElseThrow(() -> new RestApiException(FileErrorCode.FILE_NOT_FOUND, "파일을 찾을 수 없습니다."));
+
+      // 확실히 ID가 있는지 확인
+      if (fileId == null) {
+        throw new RestApiException(BackupErrorCode.BACKUP_FILE_CREATION_FAILED, "파일 ID를 생성할 수 없습니다.");
+      }
+
+      // 그 후에 파일 저장
+      fileStorage.saveBackup(fileId, backUpMultipartFile);
 
       // 백업 성공 -> 백업이력 완료로 수정
       Backup completedBackupHistory = createBackupHistory(workerIpAddress, BackupStatus.COMPLETED,
-              atStartBackupHistory.getStartedAt(), LocalDateTime.now());
+              atStartBackupHistory.getStartedAt(), LocalDateTime.now(), savedFile);
       return backupRepository.save(completedBackupHistory).getId();
 
     } catch (Exception e) {
-      log.error("Error occurred while processing the request", e);
       // 저장하던 파일 삭제, 에러로그 .log 파일로 저장, 백업이력 실패로 수정
-      logError(e);
+      MultipartFile file = logError(e);
+      com.sprint.example.sb01part2hrbankteam10.entity.File savedLogFile = com.sprint.example.sb01part2hrbankteam10.entity.File.builder()
+              .name(file.getName())
+              .contentType(file.getContentType())
+              .size(BigInteger.valueOf(file.getSize()))
+              .build();
+
 
       Backup failedBackupHistory = createBackupHistory(workerIpAddress, BackupStatus.FAILED,
-              atStartBackupHistory.getStartedAt(), null);
+              atStartBackupHistory.getStartedAt(), null, savedLogFile);
       backupRepository.save(failedBackupHistory);
 
       // 파일이 생성되었을 경우에만 삭제
@@ -119,7 +145,9 @@ public class BackupServiceImpl implements BackupService {
 
   // 백업 여부 결정 로직: 가장 최근 완료된 배치 작업시간 < 직원 데이터 변경 시간 -> 백업 필요
   private boolean isBackupNeeded() {
+
     LocalDateTime lastBackupTime = backupRepository.findLastCompletedBackupAt();
+
     if (lastBackupTime == null) {
       lastBackupTime = LocalDateTime.MIN;
     }
@@ -132,12 +160,13 @@ public class BackupServiceImpl implements BackupService {
     return lastBackupTime.isBefore(lastEmployeeUpdate);
   }
 
-  private Backup createBackupHistory(String workerIpAddress, BackupStatus status, LocalDateTime startedAt, LocalDateTime endedAt) {
+  private Backup createBackupHistory(String workerIpAddress, BackupStatus status, LocalDateTime startedAt, LocalDateTime endedAt, com.sprint.example.sb01part2hrbankteam10.entity.File file) {
     return Backup.builder()
             .workerIpAddress(workerIpAddress)
             .status(status)
             .startedAt(startedAt)
             .endedAt(endedAt)
+            .file(file)
             .build();
   }
 
@@ -199,15 +228,57 @@ public class BackupServiceImpl implements BackupService {
     }
   }
 
+  public MultipartFile convertFileToMultipartFile(File file) throws IOException {
+    FileInputStream inputStream = new FileInputStream(file);
+    return new MockMultipartFile(
+            "file", // 파라미터 이름 (폼에서 사용하는 이름)
+            file.getName(), // 파일 이름
+            "text/csv", // CSV 파일 MIME 타입
+            inputStream); // 파일의 InputStream
+  }
 
-  private void logError(Exception e) {
-    try (FileWriter fileWriter = new FileWriter("backup_error.log", true);
+
+  private MultipartFile logError(Exception e) {
+    File logFile = new File("backup_error.log");
+
+    try (FileWriter fileWriter = new FileWriter(logFile, true);
          BufferedWriter bufferedWriter = new BufferedWriter(fileWriter)) {
+
       bufferedWriter.write(LocalDateTime.now() + " : " + e.getMessage());
       bufferedWriter.newLine();
     } catch (IOException ex) {
       ex.printStackTrace();
     }
+
+    if (logFile.exists()) {
+      try {
+        // File을 MultipartFile로 변환하는 방법
+        MultipartFile multipartFile = new MockMultipartFile(
+                logFile.getName(),                // 파일 이름
+                logFile.getName(),                // 원본 파일 이름
+                "text/plain",                     // MIME 타입
+                new FileInputStream(logFile)      // 파일 내용
+        );
+
+        // 파일 DB에 저장
+        BigInteger fileSize = BigInteger.valueOf(logFile.length());
+        com.sprint.example.sb01part2hrbankteam10.entity.File file = com.sprint.example.sb01part2hrbankteam10.entity.File.builder()
+                .name(logFile.getName())
+                .contentType("text/plain")
+                .size(fileSize)
+                .build();
+
+        Integer fileId = fileRepository.save(file).getId();
+
+        // 변환된 MultipartFile을 사용하여 저장
+        fileStorage.saveBackup(fileId, multipartFile);
+        return multipartFile;
+
+      } catch (IOException ioException) {
+        ioException.printStackTrace();
+      }
+    }
+    return null;
   }
 
 

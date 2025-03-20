@@ -3,24 +3,20 @@ package com.sprint.example.sb01part2hrbankteam10.repository;
 import com.sprint.example.sb01part2hrbankteam10.dto.BackupDto;
 import com.sprint.example.sb01part2hrbankteam10.entity.Backup;
 import org.springframework.data.domain.Page;
-import java.time.LocalDateTime;
-import java.util.Optional;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Repository
 public interface BackupRepository extends JpaRepository<Backup, Integer> {
 
   // 특정 상태의 가장 최근 백업 가져오기
-  @Query("SELECT new com.sprint.example.sb01part2hrbankteam10.dto.BackupDto(b.id, b.workerIpAddress, b.startedAt, b.endedAt, b.status, b.file.id) " +
-          "FROM Backup b WHERE b.status = :status " +
-          "ORDER BY b.startedAt DESC")
-  BackupDto findLastBackupByStatus(@Param("status") Backup.BackupStatus status);
+  Backup findFirstByStatusOrderByStartedAtDesc(@Param("status") Backup.BackupStatus status);
 
   // 백업 목록 조회 (필터링 및 정렬 포함)
   @Query("SELECT new com.sprint.example.sb01part2hrbankteam10.dto.BackupDto(b.id, b.workerIpAddress, b.startedAt, b.endedAt, b.status, b.file.id) " +

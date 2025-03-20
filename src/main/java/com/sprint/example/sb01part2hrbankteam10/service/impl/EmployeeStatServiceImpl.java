@@ -8,24 +8,22 @@ import com.sprint.example.sb01part2hrbankteam10.global.exception.RestApiExceptio
 import com.sprint.example.sb01part2hrbankteam10.global.exception.errorcode.DepartmentErrorCode;
 import com.sprint.example.sb01part2hrbankteam10.repository.BackupRepository;
 import com.sprint.example.sb01part2hrbankteam10.repository.DashboardRepository;
-import com.sprint.example.sb01part2hrbankteam10.repository.EmployeeRepository;
-import com.sprint.example.sb01part2hrbankteam10.service.EmployeeStatusService;
+import com.sprint.example.sb01part2hrbankteam10.service.EmployeeStatService;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.HashMap;
 import lombok.RequiredArgsConstructor;
-import org.springframework.format.datetime.DateFormatter;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class EmployeeStatusServiceImpl implements EmployeeStatusService {
+public class EmployeeStatServiceImpl implements EmployeeStatService {
 
   private final DashboardRepository dashboardRepository;
   private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE; // YYYY-MM-DD
@@ -34,27 +32,14 @@ public class EmployeeStatusServiceImpl implements EmployeeStatusService {
   @Override
   @Transactional(readOnly = true)
   public List<EmployeeDistributionDto> getEmployeeDistribution(String groupBy, String status) {
-    groupBy = groupBy == null || groupBy.isEmpty() ? "departments" : groupBy;
-    status = status == null || status.isEmpty() ? "ACTIVE" : status.toUpperCase();
-
-    if (!"ACTIVE".equals(status) && !"RESIGNED".equals(status) && !"ON_LEAVE".equals(status)) {
-      throw new RestApiException(DepartmentErrorCode.DEPARTMENT_STATUS_NOT_VALID, status);
-    }
-
     List<Object[]> results = dashboardRepository.findEmployeeDistribution(groupBy, status);
+
     return results.stream()
-        .map(row -> {
-          String groupKey = (String) row[0];
-          Integer count = ((Number) row[1]).intValue();
-          Double percentage = ((Number) row[2]).doubleValue();
-          return EmployeeDistributionDto.builder()
-              .groupKey(groupKey)
-              .count(count)
-              .percentage(percentage)
-              .build();
-        })
-        .sorted(Comparator.comparing(EmployeeDistributionDto::getPercentage,
-            Comparator.reverseOrder())) // 퍼센티지 내림차순 정렬
+        .map(result -> EmployeeDistributionDto.builder()
+            .groupKey((String) result[0])
+            .count(((Number) result[1]).intValue())
+            .percentage(((Number) result[2]).doubleValue())
+            .build())
         .collect(Collectors.toList());
   }
 
@@ -122,7 +107,7 @@ public class EmployeeStatusServiceImpl implements EmployeeStatusService {
     LocalDateTime recentUpdateToDate = LocalDate.now().atTime(23, 59, 59);
     int recentUpdates = countEmployeesUpdatedInRange(recentUpdateFromDate, recentUpdateToDate);
 
-    // 이번 달 입사 수 (2025년 3월 입사자)
+    // 이번 달 입사 수
     LocalDateTime thisMonthStart = LocalDate.now().withDayOfMonth(1).atStartOfDay();
     LocalDateTime thisMonthEnd = LocalDate.now().atTime(23, 59, 59);
     int thisMonthHires = dashboardRepository.countEmployeesByDateRange(thisMonthStart,

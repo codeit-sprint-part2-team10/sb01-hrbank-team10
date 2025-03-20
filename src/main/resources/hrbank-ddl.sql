@@ -18,7 +18,6 @@ CREATE TABLE backups
     ended_at          TIMESTAMPTZ,
     worker_ip_address VARCHAR(255) NOT NULL,
     status            VARCHAR(20)  NOT NULL,
-    batch_done_at     TIMESTAMPTZ,
     CONSTRAINT fk_file FOREIGN KEY (file_id) REFERENCES files (id) ON DELETE CASCADE
 );
 

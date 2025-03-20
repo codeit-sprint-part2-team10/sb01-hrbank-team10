@@ -2,6 +2,7 @@ package com.sprint.example.sb01part2hrbankteam10.repository;
 
 import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeTrendDto;
 import com.sprint.example.sb01part2hrbankteam10.entity.Employee;
+import com.sprint.example.sb01part2hrbankteam10.entity.Employee.EmployeeStatus;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -36,7 +37,7 @@ public interface DashboardRepository extends JpaRepository<Employee, Integer> {
           "GROUP BY name, total_count",
       nativeQuery = true)
   List<Object[]> findEmployeeDistribution(@Param("groupBy") String groupBy,
-      @Param("status") String status);
+      @Param("status") EmployeeStatus status);
 
   /**
    * 직원 추이 조회

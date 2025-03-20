@@ -3,13 +3,10 @@ package com.sprint.example.sb01part2hrbankteam10.service.impl;
 import com.sprint.example.sb01part2hrbankteam10.dto.*;
 import com.sprint.example.sb01part2hrbankteam10.entity.EmployeeHistory;
 import com.sprint.example.sb01part2hrbankteam10.global.exception.RestApiException;
-import com.sprint.example.sb01part2hrbankteam10.global.exception.errorcode.EmployeeErrorCode;
 import com.sprint.example.sb01part2hrbankteam10.global.exception.errorcode.EmployeeHistoryErrorCode;
-import com.sprint.example.sb01part2hrbankteam10.global.exception.errorcode.GlobalErrorCode;
 import com.sprint.example.sb01part2hrbankteam10.mapper.EmployeeHistoryMapper;
 import com.sprint.example.sb01part2hrbankteam10.repository.EmployeeHistoryRepository;
 import com.sprint.example.sb01part2hrbankteam10.service.EmployeeHistoryService;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -34,12 +31,11 @@ public class EmployeeHistoryServiceImpl implements EmployeeHistoryService {
     @Transactional
     @Override
     public ChangeLogDto create(String employeeNumber, EmployeeHistory.ChangeType type,
-                               String memo, EmployeeCreateRequest changes, EmployeeDto afterData, String clientIp) {
+        String memo, EmployeeDto beforeDate, EmployeeDto afterData, String clientIp) {
 
-        EmployeeHistory history = EmployeeHistoryMapper.toEntity(employeeNumber, type, memo, changes, afterData, clientIp);
+        EmployeeHistory history = EmployeeHistoryMapper.toEntity(employeeNumber, type, memo, beforeDate, afterData, clientIp);
 
         EmployeeHistory savedHistory = employeeHistoryRepository.save(history);
-
         return EmployeeHistoryMapper.toChangeLogDto(savedHistory);
     }
 

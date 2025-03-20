@@ -2,7 +2,6 @@ package com.sprint.example.sb01part2hrbankteam10.service;
 
 import com.sprint.example.sb01part2hrbankteam10.dto.*;
 import com.sprint.example.sb01part2hrbankteam10.entity.EmployeeHistory;
-import jakarta.servlet.http.HttpServletRequest;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -10,7 +9,7 @@ import java.util.List;
 public interface EmployeeHistoryService {
 
     ChangeLogDto create(String employeeNumber, EmployeeHistory.ChangeType type,
-                        String memo, EmployeeCreateRequest changes, EmployeeDto afterData, String clientIp);
+        String memo, EmployeeDto beforeDate, EmployeeDto afterData, String clientIp);
 
     CursorPageResponseChangeLogDto getEmployeeHistoriesByCursor(
             String employeeNumber,

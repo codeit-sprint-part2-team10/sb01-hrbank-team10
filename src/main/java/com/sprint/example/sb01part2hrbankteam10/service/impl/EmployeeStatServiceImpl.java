@@ -4,10 +4,13 @@ import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeDistributionDto;
 import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeTrendDto;
 import com.sprint.example.sb01part2hrbankteam10.dto.response.EmployeeDashboardResponse;
 import com.sprint.example.sb01part2hrbankteam10.entity.Employee;
+import com.sprint.example.sb01part2hrbankteam10.entity.Employee.EmployeeStatus;
 import com.sprint.example.sb01part2hrbankteam10.global.exception.RestApiException;
 import com.sprint.example.sb01part2hrbankteam10.global.exception.errorcode.DepartmentErrorCode;
 import com.sprint.example.sb01part2hrbankteam10.repository.BackupRepository;
 import com.sprint.example.sb01part2hrbankteam10.repository.DashboardRepository;
+import com.sprint.example.sb01part2hrbankteam10.repository.EmployeeRepository;
+import com.sprint.example.sb01part2hrbankteam10.repository.specification.EmployeeSpecification;
 import com.sprint.example.sb01part2hrbankteam10.service.EmployeeStatService;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -18,42 +21,43 @@ import java.util.stream.Collectors;
 import java.util.Map;
 import java.util.HashMap;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class EmployeeStatServiceImpl implements EmployeeStatService {
 
+  private final EmployeeRepository employeeRepository;
   private final DashboardRepository dashboardRepository;
   private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE; // YYYY-MM-DD
   private final BackupRepository backupRepository;
 
   @Override
   @Transactional(readOnly = true)
-  public List<EmployeeDistributionDto> getEmployeeDistribution(String groupBy, String status) {
-    List<Object[]> results = dashboardRepository.findEmployeeDistribution(groupBy, status);
+  public List<EmployeeDistributionDto> getDistribution(String groupBy, EmployeeStatus status) {
 
-    return results.stream()
-        .map(result -> EmployeeDistributionDto.builder()
-            .groupKey((String) result[0])
-            .count(((Number) result[1]).intValue())
-            .percentage(((Number) result[2]).doubleValue())
-            .build())
-        .collect(Collectors.toList());
+    if (groupBy.equals("position")) {
+      return employeeRepository.findGroupByPosition(groupBy, status);
+
+    } else {
+      return employeeRepository.findGroupByDepartment(groupBy, status);
+    }
+
   }
 
   @Override
   @Transactional(readOnly = true)
-  public List<EmployeeTrendDto> getEmployeeTrend(LocalDateTime from, LocalDateTime to,
-      String unit) {
+  public List<EmployeeTrendDto> getTrend(LocalDateTime from, LocalDateTime to, String unit) {
     if (from == null) {
       from = LocalDateTime.now().minusYears(1); // 최근 12개월 전
     }
     if (to == null) {
       to = LocalDateTime.now(); // 현재
     }
-    unit = unit == null || unit.isEmpty() ? "month" : unit.toLowerCase();
 
     if (!List.of("day", "week", "month", "quarter", "year").contains(unit)) {
       throw new RestApiException(DepartmentErrorCode.DEPARTMENT_STATUS_NOT_VALID, unit);
@@ -63,102 +67,70 @@ public class EmployeeStatServiceImpl implements EmployeeStatService {
 
     // Object[]를 EmployeeTrendDto로 변환 및 change, changeRate 계산
     List<EmployeeTrendDto> result = new ArrayList<>();
-    for (int i = 0; i < trends.size(); i++) {
-      Object[] row = trends.get(i);
-      String dateStr = (String) row[0]; // period
-      Integer count = ((Number) row[1]).intValue(); // count
-      Integer change = (i > 0) ? (count - ((Number) trends.get(i - 1)[1]).intValue()) : 0;
-      Double changeRate = (i > 0 && ((Number) trends.get(i - 1)[1]).intValue() != 0)
-          ? round(((double) (count - ((Number) trends.get(i - 1)[1]).intValue()) * 100)
-          / ((Number) trends.get(i - 1)[1]).intValue(), 2)
-          : 0.0;
-
-      result.add(new EmployeeTrendDto(
-          dateStr,
-          count,
-          change,
-          changeRate
-      ));
-    }
+//    for (int i = 0; i < trends.size(); i++) {
+//      Object[] row = trends.get(i);
+//      String dateStr = (String) row[0]; // period
+//      Integer count = ((Number) row[1]).intValue(); // count
+//      Integer change = (i > 0) ? (count - ((Number) trends.get(i - 1)[1]).intValue()) : 0;
+//      Double changeRate = (i > 0 && ((Number) trends.get(i - 1)[1]).intValue() != 0)
+//          ? round(((double) (count - ((Number) trends.get(i - 1)[1]).intValue()) * 100)
+//          / ((Number) trends.get(i - 1)[1]).intValue(), 2)
+//          : 0.0;
+//
+//      result.add(new EmployeeTrendDto(
+//          dateStr,
+//          count,
+//          change,
+//          changeRate
+//      ));
+//    }
 
     return result;
   }
 
   @Override
   @Transactional(readOnly = true)
-  public EmployeeDashboardResponse getEmployeeDashboard(String status, LocalDate fromDate,
+  public Long getCount(EmployeeStatus status, LocalDate fromDate,
       LocalDate toDate) {
 
-    // 기본값 설정
-    if (toDate == null) {
-      toDate = LocalDate.now();
-    }
-
     LocalDateTime fromDateTime = fromDate != null ? fromDate.atStartOfDay() : null;
-    LocalDateTime toDateTime = toDate.atTime(23, 59, 59);
+    LocalDateTime toDateTime = toDate != null ? toDate.atStartOfDay() : LocalDateTime.now();
 
-    // 총 직원 수
-    Employee.EmployeeStatus statusEnum =
-        status != null ? Employee.EmployeeStatus.valueOf(status) : null;
-    int totalEmployees = countEmployeesWithConditions(statusEnum, fromDateTime, toDateTime);
+    log.info("status: {}, fromDate: {}, toDate: {}", status, fromDateTime, toDateTime);
+    Specification<Employee> specification = getCountSpecification(status, fromDateTime, toDateTime);
 
-    // 최근 업데이트 수정 수
-    LocalDateTime recentUpdateFromDate = LocalDate.now().minusDays(30).atStartOfDay();
-    LocalDateTime recentUpdateToDate = LocalDate.now().atTime(23, 59, 59);
-    int recentUpdates = countEmployeesUpdatedInRange(recentUpdateFromDate, recentUpdateToDate);
-
-    // 이번 달 입사 수
-    LocalDateTime thisMonthStart = LocalDate.now().withDayOfMonth(1).atStartOfDay();
-    LocalDateTime thisMonthEnd = LocalDate.now().atTime(23, 59, 59);
-    int thisMonthHires = dashboardRepository.countEmployeesByDateRange(thisMonthStart,
-        thisMonthEnd);
-
-    // 마지막 백업 수
-    int lastBackupCount = getLastBackupCount();
-
-    return new EmployeeDashboardResponse(
-        totalEmployees,
-        recentUpdates,
-        thisMonthHires,
-        lastBackupCount
-    );
+    return employeeRepository.count(specification);
   }
 
-  private int countEmployeesWithConditions(Employee.EmployeeStatus status, LocalDateTime fromDate,
+
+  private Specification<Employee> getCountSpecification(EmployeeStatus status, LocalDateTime fromDate,
       LocalDateTime toDate) {
-    if (status == null && fromDate == null && toDate == null) {
-      return dashboardRepository.countEmployees();
+
+    Specification<Employee> spec = ((root, query, criteriaBuilder) -> null);
+
+    if (status != null) {
+      spec = spec.and(EmployeeSpecification.equalStatus(status));
     }
-    if (status != null && fromDate == null && toDate == null) {
-      return dashboardRepository.countEmployeesByStatus(status);
+
+    if (fromDate != null) {
+      spec = spec.and(EmployeeSpecification.equalOrGreaterThanHireDateFrom(fromDate));
     }
-    if (status != null && fromDate == null && toDate != null) {
-      return dashboardRepository.countEmployeesByStatusAndToDate(status, toDate);
+
+    if (toDate != null) {
+      spec = spec.and(EmployeeSpecification.lessThanHireDate(toDate));
     }
-    if (status != null && fromDate != null && toDate == null) {
-      return dashboardRepository.countEmployeesByStatusAndFromDate(status, fromDate);
-    }
-    if (status == null && fromDate != null && toDate != null) {
-      return dashboardRepository.countEmployeesByDateRange(fromDate, toDate);
-    }
-    if (status != null && fromDate != null && toDate != null) {
-      return dashboardRepository.countEmployeesByAllConditions(status, fromDate, toDate);
-    }
-    if (status == null && fromDate != null && toDate != null) {
-      return dashboardRepository.countEmployeesByDateRange(fromDate, toDate);
-    }
-    return dashboardRepository.countEmployees();
+
+    return spec;
   }
 
-  private int countEmployeesUpdatedInRange(LocalDateTime fromDate, LocalDateTime toDate) {
-    return dashboardRepository.countEmployeesUpdatedInRange(fromDate, toDate);
-  }
+  private Specification<Employee> getDistributionSpecification(String groupBy, EmployeeStatus status) {
+    Specification<Employee> spec = ((root, query, criteriaBuilder) -> null);
 
-  private int getLastBackupCount() {
-    return backupRepository.findLastCompletedBackup()
-        .map(backup -> dashboardRepository.countEmployeesUpdatedInRange(
-            backup.getCreatedAt(), LocalDateTime.now()))
-        .orElse(0);
+    if (status != null) {
+      spec = spec.and(EmployeeSpecification.equalStatus(status));
+    }
+
+    return spec;
   }
 
   private Double round(Double value, int places) {
@@ -168,5 +140,4 @@ public class EmployeeStatServiceImpl implements EmployeeStatService {
     double scale = Math.pow(10, places);
     return Math.round(value * scale) / scale;
   }
-
 }

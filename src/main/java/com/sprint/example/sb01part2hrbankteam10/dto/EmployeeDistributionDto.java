@@ -10,6 +10,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class EmployeeDistributionDto {
   private String groupKey;
-  private Integer count;
+  private Long count;
   private Double percentage;
+
+//  public EmployeeDistributionDto(String groupKey, Long count) {
+//    this.groupKey = groupKey;
+//    this.count = count;
+//  }
 }

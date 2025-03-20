@@ -5,7 +5,6 @@ import com.sprint.example.sb01part2hrbankteam10.dto.DepartmentCreateRequest;
 import com.sprint.example.sb01part2hrbankteam10.dto.DepartmentDto;
 import com.sprint.example.sb01part2hrbankteam10.dto.DepartmentResponseDto;
 import com.sprint.example.sb01part2hrbankteam10.dto.DepartmentUpdateRequest;
-import com.sprint.example.sb01part2hrbankteam10.global.response.RestApiResponse;
 import com.sprint.example.sb01part2hrbankteam10.service.DepartmentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +36,7 @@ public class DepartmentController {
 
     DepartmentDto department = departmentService.create(request);
     return ResponseEntity.status(HttpStatus.CREATED)
-        .body(departmentService.create(request));
+        .body(department);
   }
 
   // 부서 수정

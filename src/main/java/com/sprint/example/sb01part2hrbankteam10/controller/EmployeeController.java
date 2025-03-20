@@ -112,13 +112,10 @@ public class EmployeeController {
   @GetMapping("/stats/distribution")
   public ResponseEntity<List<EmployeeDistributionDto>> getDistribution(
       @RequestParam(defaultValue = "department") String groupBy,
-      @RequestParam(defaultValue = "ACTIVE") String Status) {
-
-    List<EmployeeDistributionDto> distribution = employeeStatusService.getEmployeeDistribution(
-        groupBy, Status);
+      @RequestParam(defaultValue = "ACTIVE") EmployeeStatus Status) {
 
     return ResponseEntity.ok()
-        .body(distribution);
+        .body(employeeStatusService.getDistribution(groupBy, Status));
   }
 
   @GetMapping(value = "/status/trend")
@@ -129,30 +126,17 @@ public class EmployeeController {
       @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDateTime to,
       @RequestParam(defaultValue = "month") String unit) {
 
-    List<EmployeeTrendDto> trend = employeeStatusService.getEmployeeTrend(from, to, unit);
-
     return ResponseEntity.ok()
-        .body(trend);
+        .body(employeeStatusService.getTrend(from, to, unit));
   }
 
-
-
   @GetMapping("/count")
-  public ResponseEntity<String> getEmployeeDashboard(
-      @RequestParam(required = false) String status,
+  public ResponseEntity<Long> getEmployeeCount(
+      @RequestParam(required = false) EmployeeStatus status,
       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate) {
 
-    EmployeeDashboardResponse response = employeeStatusService.getEmployeeDashboard(status, fromDate, toDate);
-
-    String formattedResponse = String.format(
-        "총 직원 수: %d, 최근 업데이트: %d, 이번 달 입사자: %d, 마지막 백업 수: %d",
-        response.getTotalEmployees(),
-        response.getRecentUpdates(),
-        response.getThisMonthHires(),
-        response.getLastBackupCount()
-    );
-
-    return ResponseEntity.ok().body(formattedResponse);
+    return ResponseEntity.ok()
+        .body(employeeStatusService.getCount(status, fromDate, toDate));
   }
 }

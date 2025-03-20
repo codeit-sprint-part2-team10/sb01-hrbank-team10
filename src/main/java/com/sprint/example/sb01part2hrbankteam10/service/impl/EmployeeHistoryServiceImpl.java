@@ -148,74 +148,10 @@ public class EmployeeHistoryServiceImpl implements EmployeeHistoryService {
         return EmployeeHistoryMapper.toDiffList(history);
     }
 
-    @Override
-    @Transactional(readOnly = true)
-    public Long countEmployeeHistories(String employeeNumber,
-                                       String type,
-                                       String memo,
-                                       String ipAddress,
-                                       LocalDateTime atFrom,
-                                       LocalDateTime atTo,
-                                       Integer idAfter,
-                                       int size,
-                                       String sortField,
-                                       String sortDirection) {
+@Override
+@Transactional(readOnly = true)
+public Long countEmployeeHistories(LocalDateTime fromDate, LocalDateTime toDate) {
+    return employeeHistoryRepository.countByModifiedAtBetween(fromDate, toDate);
+}
 
-        if(atFrom != null && atTo != null && atFrom.isAfter(atTo)) {
-            throw new RestApiException(
-                    EmployeeHistoryErrorCode.INVALID_DATE_RANGE,
-                    "유효하지 않은 날짜 범위입니다. 시작 일시가 종료 일시보다 이후일 수 없습니다."
-            );
-        }
-
-        final LocalDateTime finalAtFrom;
-        final LocalDateTime finalAtTo;
-
-        if(atFrom == null || atTo == null) {
-            finalAtTo = LocalDateTime.now();
-            finalAtFrom = finalAtTo.minusDays(7);
-        } else {
-            finalAtFrom = atFrom;
-            finalAtTo = atTo;
-        }
-
-        Specification<EmployeeHistory> spec = (root, query, cb) -> {
-            List<Predicate> predicates = new ArrayList<>();
-
-            if(employeeNumber != null && !employeeNumber.isEmpty()) {
-                predicates.add(cb.like(root.get("employeeNumber"), "%" + employeeNumber + "%"));
-            }
-            if(type != null && !type.isEmpty()) {
-                try{
-                    EmployeeHistory.ChangeType ct = EmployeeHistory.ChangeType.valueOf(type);
-                    predicates.add(cb.equal(root.get("type"), ct));
-                } catch (IllegalArgumentException e) {
-
-                }
-            }
-            if(memo != null && !memo.isEmpty()) {
-                predicates.add(cb.like(root.get("memo"), "%" + memo + "%"));
-            }
-            if(ipAddress != null && !ipAddress.isEmpty()) {
-                predicates.add(cb.like(root.get("ipAddress"), "%" + ipAddress + "%"));
-            }
-            if(finalAtFrom != null) {
-                predicates.add(cb.greaterThanOrEqualTo(root.get("modifiedAt"), finalAtFrom));
-            }
-            if(finalAtTo != null) {
-                predicates.add(cb.lessThanOrEqualTo(root.get("modifiedAt"), finalAtTo));
-            }
-            if(idAfter != null) {
-                if("desc".equalsIgnoreCase(sortDirection)) {
-                    predicates.add(cb.lessThan(root.get("id"), idAfter));
-                } else {
-                    predicates.add(cb.greaterThan(root.get("id"), idAfter));
-                }
-            }
-
-            return cb.and(predicates.toArray(new Predicate[0]));
-        };
-
-        return employeeHistoryRepository.count(spec);
-    }
 }

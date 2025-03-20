@@ -2,9 +2,12 @@ package com.sprint.example.sb01part2hrbankteam10.controller.docs;
 
 import com.sprint.example.sb01part2hrbankteam10.dto.ChangeLogDto;
 import com.sprint.example.sb01part2hrbankteam10.dto.CursorPageResponseChangeLogDto;
+import com.sprint.example.sb01part2hrbankteam10.dto.DiffDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -12,9 +15,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Tag(name = "Employee History", description = "직원 정보 수정 이력 관리 API")
 public interface EmployeeHistoryDocs {
@@ -24,10 +29,14 @@ public interface EmployeeHistoryDocs {
             @ApiResponse(
                     responseCode = "200", description = "조회 성공",
                     content = @Content(schema = @Schema(implementation = CursorPageResponseChangeLogDto.class))
-            )
+            ),
             @ApiResponse(
                     responseCode = "400", description = "잘못된 요청 또는 지원하지 않는 정렬 필드",
-                    content = @Content(schema = @Schema(implementation = ))
+                    content = @Content(examples = @ExampleObject(value = ""))
+            ),
+            @ApiResponse(
+                    responseCode = "500", description = "서버 오류",
+                    content =@Content(examples = @ExampleObject(value = ""))
             )
     })
     @GetMapping
@@ -47,8 +56,26 @@ public interface EmployeeHistoryDocs {
     @Operation(summary = "직원 정보 수정 이력 상세 조회", description = "직원 정보 수정 이력의 상세 정보를 조회합니다. 변경 상세 내용이 포함됩니다.")
     @ApiResponses(value = {
             @ApiResponse(
-                    responseCode = "200"
+                    responseCode = "200", description = "조회 성공",
+                    content = @Content(array = @ArraySchema(schema = @Schema(implementation = DiffDto.class)))
+            ),
+            @ApiResponse(
+                    responseCode = "404", description = "이력을 찾을 수 없음",
+                    content = @Content(examples = @ExampleObject(value = ""))
             )
     })
+    @GetMapping("/{id}/diffs")
+    ResponseEntity<List<DiffDto>> getChangeDiffs(
+            @Parameter(description = "이력 ID") @PathVariable Integer id
+    );
+
+//    @Operation(summary = "수정 이력 건수 조회", description = "직원 정보 수정 이력 건수를 조회합니다. 파라미터를 제공하지 않으면 최근 일주일 데이터를 반환합니다.")
+//    @ApiResponses(value = {
+//            @ApiResponse(
+//                    responseCode = "200", description = "조회 성공",
+//                    content = @Content(schema = @Schema(implementation = Long.class))
+//            )
+//    })
+//
 
 }

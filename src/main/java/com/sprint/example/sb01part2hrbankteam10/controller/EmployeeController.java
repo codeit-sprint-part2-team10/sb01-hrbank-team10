@@ -114,11 +114,8 @@ public class EmployeeController {
       @RequestParam(defaultValue = "department") String groupBy,
       @RequestParam(defaultValue = "ACTIVE") EmployeeStatus Status) {
 
-    List<EmployeeDistributionDto> distribution = employeeStatusService.getEmployeeDistribution(
-        groupBy, Status);
-
     return ResponseEntity.ok()
-        .body(distribution);
+        .body(employeeStatusService.getDistribution(groupBy, Status));
   }
 
   @GetMapping(value = "/status/trend")
@@ -129,13 +126,9 @@ public class EmployeeController {
       @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDateTime to,
       @RequestParam(defaultValue = "month") String unit) {
 
-    List<EmployeeTrendDto> trend = employeeStatusService.getEmployeeTrend(from, to, unit);
-
     return ResponseEntity.ok()
-        .body(trend);
+        .body(employeeStatusService.getTrend(from, to, unit));
   }
-
-
 
   @GetMapping("/count")
   public ResponseEntity<Long> getEmployeeCount(
@@ -143,8 +136,7 @@ public class EmployeeController {
       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate) {
 
-    Long employeeCount = employeeStatusService.getEmployeeDashboard(status, fromDate, toDate);
-
-    return ResponseEntity.ok().body(employeeCount);
+    return ResponseEntity.ok()
+        .body(employeeStatusService.getCount(status, fromDate, toDate));
   }
 }

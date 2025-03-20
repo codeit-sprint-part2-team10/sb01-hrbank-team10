@@ -9,9 +9,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface EmployeeStatService {
-  List<EmployeeDistributionDto> getEmployeeDistribution(String groupBy, EmployeeStatus status);
+  List<EmployeeDistributionDto> getDistribution(String groupBy, EmployeeStatus status);
 
-  List<EmployeeTrendDto> getEmployeeTrend(LocalDateTime from, LocalDateTime to, String unit);
+  List<EmployeeTrendDto> getTrend(LocalDateTime from, LocalDateTime to, String unit);
 
-  Long getEmployeeDashboard(EmployeeStatus status, LocalDate fromDate, LocalDate toDate);
+  Long getCount(EmployeeStatus status, LocalDate fromDate, LocalDate toDate);
 }

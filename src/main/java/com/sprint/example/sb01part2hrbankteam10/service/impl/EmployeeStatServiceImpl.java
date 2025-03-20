@@ -38,7 +38,7 @@ public class EmployeeStatServiceImpl implements EmployeeStatService {
 
   @Override
   @Transactional(readOnly = true)
-  public List<EmployeeDistributionDto> getEmployeeDistribution(String groupBy, EmployeeStatus status) {
+  public List<EmployeeDistributionDto> getDistribution(String groupBy, EmployeeStatus status) {
 
     if (groupBy.equals("position")) {
       return employeeRepository.findGroupByPosition(groupBy, status);
@@ -51,15 +51,13 @@ public class EmployeeStatServiceImpl implements EmployeeStatService {
 
   @Override
   @Transactional(readOnly = true)
-  public List<EmployeeTrendDto> getEmployeeTrend(LocalDateTime from, LocalDateTime to,
-      String unit) {
+  public List<EmployeeTrendDto> getTrend(LocalDateTime from, LocalDateTime to, String unit) {
     if (from == null) {
       from = LocalDateTime.now().minusYears(1); // 최근 12개월 전
     }
     if (to == null) {
       to = LocalDateTime.now(); // 현재
     }
-    unit = unit == null || unit.isEmpty() ? "month" : unit.toLowerCase();
 
     if (!List.of("day", "week", "month", "quarter", "year").contains(unit)) {
       throw new RestApiException(DepartmentErrorCode.DEPARTMENT_STATUS_NOT_VALID, unit);
@@ -69,30 +67,30 @@ public class EmployeeStatServiceImpl implements EmployeeStatService {
 
     // Object[]를 EmployeeTrendDto로 변환 및 change, changeRate 계산
     List<EmployeeTrendDto> result = new ArrayList<>();
-    for (int i = 0; i < trends.size(); i++) {
-      Object[] row = trends.get(i);
-      String dateStr = (String) row[0]; // period
-      Integer count = ((Number) row[1]).intValue(); // count
-      Integer change = (i > 0) ? (count - ((Number) trends.get(i - 1)[1]).intValue()) : 0;
-      Double changeRate = (i > 0 && ((Number) trends.get(i - 1)[1]).intValue() != 0)
-          ? round(((double) (count - ((Number) trends.get(i - 1)[1]).intValue()) * 100)
-          / ((Number) trends.get(i - 1)[1]).intValue(), 2)
-          : 0.0;
-
-      result.add(new EmployeeTrendDto(
-          dateStr,
-          count,
-          change,
-          changeRate
-      ));
-    }
+//    for (int i = 0; i < trends.size(); i++) {
+//      Object[] row = trends.get(i);
+//      String dateStr = (String) row[0]; // period
+//      Integer count = ((Number) row[1]).intValue(); // count
+//      Integer change = (i > 0) ? (count - ((Number) trends.get(i - 1)[1]).intValue()) : 0;
+//      Double changeRate = (i > 0 && ((Number) trends.get(i - 1)[1]).intValue() != 0)
+//          ? round(((double) (count - ((Number) trends.get(i - 1)[1]).intValue()) * 100)
+//          / ((Number) trends.get(i - 1)[1]).intValue(), 2)
+//          : 0.0;
+//
+//      result.add(new EmployeeTrendDto(
+//          dateStr,
+//          count,
+//          change,
+//          changeRate
+//      ));
+//    }
 
     return result;
   }
 
   @Override
   @Transactional(readOnly = true)
-  public Long getEmployeeDashboard(EmployeeStatus status, LocalDate fromDate,
+  public Long getCount(EmployeeStatus status, LocalDate fromDate,
       LocalDate toDate) {
 
     LocalDateTime fromDateTime = fromDate != null ? fromDate.atStartOfDay() : null;

@@ -59,24 +59,26 @@ public class DepartmentServiceImpl implements DepartmentService {
   }
 
   @Transactional
-  @Override
   public DepartmentDto update(Integer id, DepartmentUpdateRequest request) {
-    Department findDepartment = departmentRepository.findById(id)
+    // 1. 부서 존재 확인
+    Department department = departmentRepository.findById(id)
         .orElseThrow(() -> new RestApiException(DepartmentErrorCode.DEPARTMENT_NOT_FOUND,
             id.toString()));
 
-    Optional.ofNullable(request.getName()).ifPresent(name -> {
-      if (!name.equals(findDepartment.getName()) && departmentRepository.existsByName(name)) {
-        throw new RestApiException(DepartmentErrorCode.DUPLICATION_NAME, name);
-      }
-    });
+    // 2. 중복 이름 확인 (같은 이름으로 업데이트하려는 경우 제외)
+    if (!department.getName().equals(request.getName()) &&
+        departmentRepository.existsByName(request.getName())) {
+      throw new RestApiException(DepartmentErrorCode.DEPARTMENT_NOT_ORDER_VALID, id.toString());
+    }
 
-    departmentUpdateMapper.updateDepartmentFromRequest(request, findDepartment);
+    // 3. 부서 정보 업데이트
+    department.setName(request.getName());
+    department.setDescription(request.getDescription());
 
-    Department savedDepartment = departmentRepository.save(findDepartment);
-    return departmentMapper.toDto(savedDepartment);
+    // 4. 저장 및 반환
+    Department updatedDepartment = departmentRepository.save(department);
+    return departmentMapper.toDto(updatedDepartment);
   }
-
   @Transactional
   @Override
   public String delete(Integer id) {

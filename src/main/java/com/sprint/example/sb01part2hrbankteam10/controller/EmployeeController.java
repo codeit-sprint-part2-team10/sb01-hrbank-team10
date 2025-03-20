@@ -11,13 +11,15 @@ import com.sprint.example.sb01part2hrbankteam10.dto.response.EmployeeDashboardRe
 import com.sprint.example.sb01part2hrbankteam10.entity.Employee.EmployeeStatus;
 import com.sprint.example.sb01part2hrbankteam10.global.response.RestApiResponse;
 import com.sprint.example.sb01part2hrbankteam10.service.EmployeeService;
-import com.sprint.example.sb01part2hrbankteam10.service.EmployeeStatusService;
+import com.sprint.example.sb01part2hrbankteam10.service.EmployeeStatService;
 import jakarta.servlet.http.HttpServletRequest;
 import com.sprint.example.sb01part2hrbankteam10.util.IpUtil;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -41,7 +43,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class EmployeeController {
 
   private final EmployeeService employeeService;
-  private final EmployeeStatusService employeeStatusService;
+  private final EmployeeStatService employeeStatusService;
 
 
   @PostMapping
@@ -108,18 +110,19 @@ public class EmployeeController {
   }
 
   @GetMapping("/stats/distribution")
-  public ResponseEntity<RestApiResponse<List<EmployeeDistributionDto>>> getDistribution(
+  public ResponseEntity<List<EmployeeDistributionDto>> getDistribution(
       @RequestParam(defaultValue = "department") String groupBy,
       @RequestParam(defaultValue = "ACTIVE") String Status) {
 
     List<EmployeeDistributionDto> distribution = employeeStatusService.getEmployeeDistribution(
         groupBy, Status);
 
-    return ResponseEntity.status(HttpStatus.OK).body(RestApiResponse.success(HttpStatus.OK, distribution));
+    return ResponseEntity.ok()
+        .body(distribution);
   }
 
-  @GetMapping(value = "/stats/trend")
-  public ResponseEntity<RestApiResponse<List<EmployeeTrendDto>>> getEmployeeTrend(
+  @GetMapping(value = "/status/trend")
+  public ResponseEntity<List<EmployeeTrendDto>> getEmployeeTrend(
       @RequestParam(required = false)
       @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDateTime from,
       @RequestParam(required = false)
@@ -128,20 +131,28 @@ public class EmployeeController {
 
     List<EmployeeTrendDto> trend = employeeStatusService.getEmployeeTrend(from, to, unit);
 
-    return ResponseEntity.status(HttpStatus.OK)
-        .body(RestApiResponse.success(HttpStatus.OK, trend));
+    return ResponseEntity.ok()
+        .body(trend);
   }
 
+
+
   @GetMapping("/count")
-  public ResponseEntity<EmployeeDashboardResponse> getEmployeeDashboard(
+  public ResponseEntity<String> getEmployeeDashboard(
       @RequestParam(required = false) String status,
       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,
       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate toDate) {
 
-    EmployeeDashboardResponse response = employeeStatusService.getEmployeeDashboard(status, fromDate,
-        toDate);
-    return ResponseEntity.ok()
-        .body(response);
+    EmployeeDashboardResponse response = employeeStatusService.getEmployeeDashboard(status, fromDate, toDate);
 
+    String formattedResponse = String.format(
+        "총 직원 수: %d, 최근 업데이트: %d, 이번 달 입사자: %d, 마지막 백업 수: %d",
+        response.getTotalEmployees(),
+        response.getRecentUpdates(),
+        response.getThisMonthHires(),
+        response.getLastBackupCount()
+    );
+
+    return ResponseEntity.ok().body(formattedResponse);
   }
 }

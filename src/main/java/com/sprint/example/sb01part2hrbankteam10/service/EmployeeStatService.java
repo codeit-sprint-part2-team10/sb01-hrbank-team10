@@ -7,7 +7,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public interface  EmployeeStatusService {
+public interface EmployeeStatService {
   List<EmployeeDistributionDto> getEmployeeDistribution(String groupBy, String status);
 
   List<EmployeeTrendDto> getEmployeeTrend(LocalDateTime from, LocalDateTime to, String unit);

@@ -27,35 +27,19 @@ public class EmployeeHistoryMapper {
                 .ipAddress(clientIp)
                 .changedFields(changedFields)
                 .build();
-//        Map<String, Object> changedFields = new HashMap<>();
-//
-//        if(changes != null) {
-//            changedFields.put("name", changes.getName());
-//            changedFields.put("email", changes.getEmail());
-//            changedFields.put("departmentId", changes.getDepartmentId());
-//            changedFields.put("position", changes.getPosition());
-//            changedFields.put("hireDate", changes.getHireDate());
-//        }
-//
-//        return EmployeeHistory.builder()
-//                .employeeNumber(employeeNumber)
-//                .type(type)
-//                .memo(memo)
-//                .modifiedAt(LocalDateTime.now())
-//                .ipAddress(clientIp)
-//                .changedFields(changedFields)
-//                .build();
     }
 
     public static List<DiffDto> compareChanges(EmployeeDto beforeData, EmployeeDto afterData) {
         List<DiffDto> changes = new ArrayList<>();
-        if (beforeData == null || afterData == null) {
-            return changes;
+        if (beforeData == null) {
+            beforeData = EmployeeDto.builder().build();
+        } else if (afterData == null) {
+            afterData = EmployeeDto.builder().build();
         }
 
         addDiffIfChanged(changes, "name", beforeData.getName(), afterData.getName());
         addDiffIfChanged(changes, "email", beforeData.getEmail(), afterData.getEmail());
-        addDiffIfChanged(changes, "직함", beforeData.getPosition(), afterData.getPosition());
+        addDiffIfChanged(changes, "position", beforeData.getPosition(), afterData.getPosition());
         addDiffIfChanged(changes, "departmentId", beforeData.getDepartmentId(), afterData.getDepartmentId());
         addDiffIfChanged(changes, "departmentName", beforeData.getDepartmentName(), afterData.getDepartmentName());
         addDiffIfChanged(changes, "hireDate", beforeData.getHireDate(), afterData.getHireDate());

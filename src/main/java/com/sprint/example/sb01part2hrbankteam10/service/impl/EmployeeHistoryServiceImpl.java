@@ -33,7 +33,12 @@ public class EmployeeHistoryServiceImpl implements EmployeeHistoryService {
     public ChangeLogDto create(String employeeNumber, EmployeeHistory.ChangeType type,
         String memo, EmployeeDto beforeDate, EmployeeDto afterData, String clientIp) {
 
+        log.info("Before Data: {}", beforeDate);
+        log.info("After Data: {}", afterData);
+
         EmployeeHistory history = EmployeeHistoryMapper.toEntity(employeeNumber, type, memo, beforeDate, afterData, clientIp);
+
+        log.info("Changed Fields: {}", history.getChangedFields());
 
         EmployeeHistory savedHistory = employeeHistoryRepository.save(history);
         return EmployeeHistoryMapper.toChangeLogDto(savedHistory);

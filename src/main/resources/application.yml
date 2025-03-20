@@ -36,3 +36,8 @@ springdoc:
     filter: true
     show-extensions: true
 
+backup:
+  schedule:
+    rate: 3600000  # 1시간(3600000ms)마다 실행
+  worker:
+    identifier:SYSTEM

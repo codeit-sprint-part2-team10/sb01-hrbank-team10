@@ -28,7 +28,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -56,10 +55,8 @@ public class BackupServiceImpl implements BackupService {
   private final EmployeeHistoryRepository employeeHistoryRepository;
   private final ModelMapper modelMapper;
 
-  @Scheduled(fixedRateString = "${backup.schedule.rate}")
   @Override
-  public Integer performBackup() {
-    final String workerIpAddress = "SYSTEM";
+  public Integer performBackup(String workerIpAddress) {
 
     // 로직: if 백업 불필요 -> 건너뜀 상태로 배치이력 저장하고 프로세스 종료
     if (!isBackupNeeded()) {
@@ -284,7 +281,7 @@ public class BackupServiceImpl implements BackupService {
         ioException.printStackTrace();
       }
     }
-    return null;
+  return null;
   }
 
 

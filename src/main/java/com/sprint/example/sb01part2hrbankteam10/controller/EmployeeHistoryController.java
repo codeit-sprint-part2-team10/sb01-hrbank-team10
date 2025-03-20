@@ -66,29 +66,17 @@ public class EmployeeHistoryController {
 
     @GetMapping("/count")
     public ResponseEntity<Long> countEmployeeHistories(
-            @RequestParam(required = false) String employeeNumber,
-            @RequestParam(required = false) String type,
-            @RequestParam(required = false) String memo,
-            @RequestParam(required = false) String ipAddress,
             @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-            LocalDateTime atFrom,
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fromDate,
             @RequestParam(required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
-            LocalDateTime atTo
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime toDate
     ) {
-        Long count = employeeHistoryService.countEmployeeHistories(
-                employeeNumber,
-                type,
-                memo,
-                ipAddress,
-                atFrom,
-                atTo,
-                null,
-                10,
-                "modifiedAt",
-                "desc"
-        );
+
+        LocalDateTime defaultFromDate = (fromDate != null) ? fromDate : LocalDateTime.now().minusDays(7);
+        LocalDateTime defaultToDate = (toDate != null) ? toDate : LocalDateTime.now();
+
+        Long count = employeeHistoryService.countEmployeeHistories(defaultFromDate, defaultToDate);
+
         return ResponseEntity.ok(count);
     }
 }

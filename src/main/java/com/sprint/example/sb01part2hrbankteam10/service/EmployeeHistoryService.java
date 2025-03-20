@@ -26,15 +26,6 @@ public interface EmployeeHistoryService {
 
     List<DiffDto> getChangeDiffs(Integer id);
 
-    Long countEmployeeHistories(String employeeNumber,
-                                String type,
-                                String memo,
-                                String ipAddress,
-                                LocalDateTime atFrom,
-                                LocalDateTime atTo,
-                                Integer idAfter,
-                                int size,
-                                String sortField,
-                                String sortDirection);
+    Long countEmployeeHistories(LocalDateTime fromDate, LocalDateTime toDate);
 
 }

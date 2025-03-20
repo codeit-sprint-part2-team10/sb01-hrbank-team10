@@ -12,4 +12,6 @@ import java.time.LocalDateTime;
 public interface EmployeeHistoryRepository extends JpaRepository<EmployeeHistory, Integer>, JpaSpecificationExecutor<EmployeeHistory>{
   @Query("SELECT MAX(e.modifiedAt) FROM EmployeeHistory e")
   LocalDateTime findLastModifiedAt();
+
+  Long countByModifiedAtBetween(LocalDateTime fromDate, LocalDateTime toDate);
 }

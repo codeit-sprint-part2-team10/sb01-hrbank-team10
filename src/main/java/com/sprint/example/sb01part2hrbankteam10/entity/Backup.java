@@ -1,25 +1,14 @@
 package com.sprint.example.sb01part2hrbankteam10.entity;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EntityListeners;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
-import java.time.LocalDateTime;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "backups")
@@ -40,7 +29,7 @@ public class Backup {
   @JoinColumn(name = "file_id")
   private File file;
 
-  @Column(name = "started_at", columnDefinition = "timestamp with time zone", nullable = false)
+  @Column(name = "started_at", columnDefinition = "timestamp with time zone") // TODO
   private LocalDateTime startedAt;
 
   @Column(name = "ended_at", columnDefinition = "timestamp with time zone")

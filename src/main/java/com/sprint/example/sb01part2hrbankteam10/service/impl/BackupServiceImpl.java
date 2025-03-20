@@ -16,18 +16,22 @@ import com.sprint.example.sb01part2hrbankteam10.repository.FileRepository;
 import com.sprint.example.sb01part2hrbankteam10.service.BackupService;
 import com.sprint.example.sb01part2hrbankteam10.storage.FileStorage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -35,7 +39,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static org.apache.commons.lang3.StringEscapeUtils.escapeCsv;
+
 // ID,직원번호,이름,이메일,부서,직급,입사일,상태
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BackupServiceImpl implements BackupService {
@@ -47,14 +54,12 @@ public class BackupServiceImpl implements BackupService {
   private final EmployeeHistoryRepository employeeHistoryRepository;
   private final ModelMapper modelMapper;
 
-  // 백업 메서드
   @Override
   public Integer performBackup(String workerIpAddress) {
 
     // 로직: if 백업 불필요 -> 건너뜀 상태로 배치이력 저장하고 프로세스 종료
     if (!isBackupNeeded()) {
-      Backup backupHistory = createBackupHistory(workerIpAddress, BackupStatus.SKIPPED, null,
-              null);
+      Backup backupHistory = createBackupHistory(workerIpAddress, BackupStatus.SKIPPED, null, null);
       return backupRepository.save(backupHistory).getId();
     }
 
@@ -70,11 +75,21 @@ public class BackupServiceImpl implements BackupService {
       List<EmployeeForBackupDto> backupContent = fetchEmployeeData();
 
       // 전체 직원 정보를 CSV 파일로 저장 = 스트리밍/버퍼
-      backupFile = convertBackupToCsvFile(backupContent);
+      ResponseEntity<Resource> response = convertBackupToCsvFile(backupContent);
+
+      // 파일을 MultipartFile로 변환 (파일이 생성되었을 경우만)
+      if (response.getBody() instanceof FileSystemResource) {
+        backupFile = ((FileSystemResource) response.getBody()).getFile();
+      }
+
+      // 백업 파일이 생성되지 않으면 에러 처리
+      if (backupFile == null || !backupFile.exists()) {
+        throw new RestApiException(BackupErrorCode.BACKUP_FILE_CREATION_FAILED, "파일 생성에 실패했습니다.");
+      }
 
       // 파일 저장
       Integer fileId = fileRepository.findByName(backupFile.getName());
-      fileStorage.saveBackup(fileId, (MultipartFile) backupFile);
+      fileStorage.saveBackup(fileId, (MultipartFile) backupFile);  // MultipartFile이 아니라 File로 전달
 
       // 백업 성공 -> 백업이력 완료로 수정
       Backup completedBackupHistory = createBackupHistory(workerIpAddress, BackupStatus.COMPLETED,
@@ -82,6 +97,7 @@ public class BackupServiceImpl implements BackupService {
       return backupRepository.save(completedBackupHistory).getId();
 
     } catch (Exception e) {
+      log.error("Error occurred while processing the request", e);
       // 저장하던 파일 삭제, 에러로그 .log 파일로 저장, 백업이력 실패로 수정
       logError(e);
 
@@ -125,12 +141,14 @@ public class BackupServiceImpl implements BackupService {
             .build();
   }
 
-  private File convertBackupToCsvFile(List<EmployeeForBackupDto> backupContent) {
+  private ResponseEntity<Resource> convertBackupToCsvFile(List<EmployeeForBackupDto> backupContent) {
     File csvFile = null;
     try {
-      csvFile = new File("backup_" + System.currentTimeMillis() + ".csv");
+      // 임시 디렉토리에 파일 생성
+      csvFile = File.createTempFile("backup_", ".csv");
 
-      try (BufferedWriter writer = new BufferedWriter(new FileWriter(csvFile))) {
+      try (BufferedWriter writer = new BufferedWriter(
+              new OutputStreamWriter(new FileOutputStream(csvFile), StandardCharsets.UTF_8))) {
         // 헤더 작성
         writer.write("ID,직원번호,이름,이메일,부서,직급,입사일,상태");
         writer.newLine();
@@ -162,25 +180,23 @@ public class BackupServiceImpl implements BackupService {
             writer.newLine();
           }
         }
+        writer.flush();
+
+        // 파일을 Resource로 변환
+        FileSystemResource resource = new FileSystemResource(csvFile);
+
+        // ResponseEntity 생성
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=backup.csv")
+                .contentType(MediaType.parseMediaType("text/csv;charset=UTF-8"))
+                .body(resource);
       }
-
-      return csvFile;
-
     } catch (IOException e) {
       if (csvFile != null && csvFile.exists()) {
         csvFile.delete();
       }
-      throw new RestApiException(BackupErrorCode.BACKUP_TO_CSV_FAILED, e.getMessage());
+      throw new RestApiException(BackupErrorCode.BACKUP_FILE_CREATION_FAILED, e.getMessage());
     }
-  }
-
-  // CSV 포맷팅 도우미 함수
-  private String escapeCsv(String value) {
-    if (value == null) return "";
-    if (value.contains(",") || value.contains("\"") || value.contains("\n")) {
-      return "\"" + value.replace("\"", "\"\"") + "\"";
-    }
-    return value;
   }
 
 

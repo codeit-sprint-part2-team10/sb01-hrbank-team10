@@ -5,7 +5,6 @@ import com.sprint.example.sb01part2hrbankteam10.entity.Backup;
 import com.sprint.example.sb01part2hrbankteam10.mapper.BackupMapper;
 import com.sprint.example.sb01part2hrbankteam10.repository.BackupRepository;
 import com.sprint.example.sb01part2hrbankteam10.service.BackupService;
-import com.sprint.example.sb01part2hrbankteam10.util.IpUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -32,7 +31,7 @@ public class BackupController {
     // 백업 요청 TODO 에러 코드
     @PostMapping
     public ResponseEntity<Integer> Backup(HttpServletRequest request) {
-        Integer backupId = backupService.performBackup(IpUtil.getClientIp(request));
+        Integer backupId = backupService.performBackup();
         return ResponseEntity.status(HttpStatus.OK).body(backupId);
     }
 

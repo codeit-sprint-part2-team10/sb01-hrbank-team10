@@ -8,7 +8,7 @@ import org.springframework.data.domain.Sort;
 import java.time.LocalDateTime;
 
 public interface BackupService {
-  Integer performBackup(String workerIpAddress);
+  Integer performBackup();
   Page<BackupDto> getBackupList(String workerIpAddress,
                                Backup.BackupStatus status,
                                LocalDateTime startedAtFrom,

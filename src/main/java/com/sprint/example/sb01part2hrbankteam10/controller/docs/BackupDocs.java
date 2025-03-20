@@ -33,7 +33,7 @@ public interface BackupDocs {
                     content = @Content(examples = @ExampleObject(value = "{ 'error': '담당자에게 문의해주세요.' }")))
     })
     @PostMapping
-    ResponseEntity<Integer> Backup(HttpServletRequest request);
+    ResponseEntity<Integer> backup(HttpServletRequest request);
 
     @Operation(summary = "최근 백업 조회", description = "지정된 상태의 가장 최근 백업 정보를 조회합니다. 상태를 지정하지 않으면 성공적으로 완료된(COMPLETED) 백업을 반환합니다.")
     @ApiResponses(value = {

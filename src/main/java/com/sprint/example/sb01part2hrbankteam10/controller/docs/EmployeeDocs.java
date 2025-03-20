@@ -163,7 +163,7 @@ public interface EmployeeDocs {
 
             @Parameter(description = "직원 상태(재직중, 휴직중, 퇴사, 기본값: 재직중)", example = "ACTIVE")
             @RequestParam
-                    (defaultValue = "ACTIVE") String status
+                    (defaultValue = "ACTIVE") Employee.EmployeeStatus status
     );
 
     @Operation(summary = "직원 수 추이 조회", description = "지정된 기간 및 시간 단위로 그룹화된 직원 수 추이를 조회합니다. 파라미터를 제공하지 않으면 최근 12개월 데이터를 월 단위로 반환합니다.")
@@ -177,8 +177,8 @@ public interface EmployeeDocs {
     })
     @GetMapping("/status/trend")
     ResponseEntity<List<EmployeeTrendDto>> getEmployeeTrend(
-        @Parameter(description = "시작 일시", example = "from") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
-        @Parameter(description = "종료 일시", example = "to") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to,
+        @Parameter(description = "시작 일시", example = "from") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDateTime from,
+        @Parameter(description = "종료 일시", example = "to") @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDateTime to,
         @Parameter(description = "시간 단위 (day, week, month, quarter, year)", example = "month")
         @RequestParam(defaultValue = "month") String unit
     );
@@ -193,9 +193,9 @@ public interface EmployeeDocs {
                     content = @Content(examples = @ExampleObject(value = "{ 'error': '담당자에게 문의해주세요.' }")))
     })
     @GetMapping("/count")
-    ResponseEntity<String> getEmployeeDashboard(
+    ResponseEntity<Long> getEmployeeCount(
             @Parameter(description = "직원 상태", example = "ACTIVE")
-            @RequestParam(required = false) String status,
+            @RequestParam(required = false) Employee.EmployeeStatus status,
 
             @Parameter(description = "입사일 시작(지정 시 해당 기간 내 입사한 직원 수 조회, 미지정 시 전체 직원 수 조회)")
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fromDate,

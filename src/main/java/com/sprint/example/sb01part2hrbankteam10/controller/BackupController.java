@@ -31,9 +31,8 @@ public class BackupController implements BackupDocs {
 
     // 백업 요청 TODO 에러 코드
     @PostMapping
-    public ResponseEntity<Integer> backup(HttpServletRequest request) {
     @Override
-    public ResponseEntity<Integer> Backup(HttpServletRequest request) {
+    public ResponseEntity<Integer> backup(HttpServletRequest request) {
         Integer backupId = backupService.performBackup();
         return ResponseEntity.status(HttpStatus.OK).body(backupId);
     }

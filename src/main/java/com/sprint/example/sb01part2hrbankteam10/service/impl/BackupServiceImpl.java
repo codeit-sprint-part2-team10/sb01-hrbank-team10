@@ -148,16 +148,13 @@ public class BackupServiceImpl implements BackupService {
   // 백업 여부 결정 로직: 가장 최근 완료된 배치 작업시간 < 직원 데이터 변경 시간 -> 백업 필요
   private boolean isBackupNeeded() {
 
-    String dataString = "2025-03-11T00:00:00";
-    LocalDateTime lastBackupTime = LocalDateTime.parse(dataString);
-//    LocalDateTime lastBackupTime = backupRepository.findLastCompletedBackupAt();
+    LocalDateTime lastBackupTime = backupRepository.findLastCompletedBackupAt();
 
     if (lastBackupTime == null) {
       lastBackupTime = LocalDateTime.MIN;
     }
-    String dataString2 = "2025-03-12T00:00:00";
-    LocalDateTime lastEmployeeUpdate = LocalDateTime.parse(dataString2);
-//    LocalDateTime lastEmployeeUpdate = employeeHistoryRepository.findLastModifiedAt();
+
+    LocalDateTime lastEmployeeUpdate = employeeHistoryRepository.findLastModifiedAt();
     if (lastEmployeeUpdate == null) {
       lastEmployeeUpdate = LocalDateTime.MIN;
     }

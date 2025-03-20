@@ -24,11 +24,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -38,6 +38,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -56,10 +57,10 @@ public class BackupServiceImpl implements BackupService {
   private final EmployeeHistoryRepository employeeHistoryRepository;
   private final ModelMapper modelMapper;
 
-  @Scheduled(fixedRateString = "${backup.schedule.rate}")
   @Override
   public Integer performBackup() {
-    final String workerIpAddress = "SYSTEM";
+
+    String workerIpAddress = "SYSTEM";
 
     // 로직: if 백업 불필요 -> 건너뜀 상태로 배치이력 저장하고 프로세스 종료
     if (!isBackupNeeded()) {
@@ -149,14 +150,14 @@ public class BackupServiceImpl implements BackupService {
   // 백업 여부 결정 로직: 가장 최근 완료된 배치 작업시간 < 직원 데이터 변경 시간 -> 백업 필요
   private boolean isBackupNeeded() {
 
-    String dataString1 = "2025-03-11T:00:00:00";
-    LocalDateTime lastBackupTime = LocalDateTime.parse(dataString1);
+    String dataString = "2025-03-11T00:00:00";
+    LocalDateTime lastBackupTime = LocalDateTime.parse(dataString);
 //    LocalDateTime lastBackupTime = backupRepository.findLastCompletedBackupAt();
 
     if (lastBackupTime == null) {
       lastBackupTime = LocalDateTime.MIN;
     }
-    String dataString2 = "2025-03-12T:00:00:00";
+    String dataString2 = "2025-03-12T00:00:00";
     LocalDateTime lastEmployeeUpdate = LocalDateTime.parse(dataString2);
 //    LocalDateTime lastEmployeeUpdate = employeeHistoryRepository.findLastModifiedAt();
     if (lastEmployeeUpdate == null) {
@@ -284,7 +285,7 @@ public class BackupServiceImpl implements BackupService {
         ioException.printStackTrace();
       }
     }
-    return null;
+  return null;
   }
 
 
@@ -320,6 +321,7 @@ public class BackupServiceImpl implements BackupService {
     return employeeForBackupDtoList;
   }
 
+  // 서비스 클래스의 getBackupList 메서드 수정
   @Override
   public Page<BackupDto> getBackupList(
           String workerIpAddress,
@@ -332,26 +334,66 @@ public class BackupServiceImpl implements BackupService {
           String sortField,
           Sort.Direction sortDirection) {
 
-    // cursor가 null인 경우 처리 (예: idAfter를 기본값으로 사용)
-    if (cursor == null) {
-      cursor = "";  // 적절한 기본값을 설정
-    }
-
     // 커서가 주어진 경우 이를 idAfter로 변환
     if (cursor != null && !cursor.isEmpty()) {
       try {
-        idAfter = Integer.valueOf(cursor);
-      } catch (NumberFormatException e) {
+        // Base64 디코딩을 통한 ID 추출
+        byte[] decodedBytes = Base64.getDecoder().decode(cursor);
+        String decodedId = new String(decodedBytes);
+        idAfter = Integer.valueOf(decodedId);
+      } catch (Exception e) {
         // 예외 처리: 잘못된 커서 형식
-        throw new IllegalArgumentException("Invalid cursor format.");
+        throw new IllegalArgumentException("커서 형식이 잘못됐습니다.");
       }
     }
+    final Integer finalIdAfter = idAfter;
 
-    Pageable pageable = PageRequest.of(0, size, Sort.by(sortDirection, sortField));
+    // 커서 기반 페이징을 위한 Pageable 객체 (페이지 번호는 항상 0)
+    Pageable basePageable = PageRequest.of(0, size);
 
-    Page<BackupDto> backups = backupRepository.findBackups(workerIpAddress, status, startedAtFrom, startedAtTo, idAfter, pageable);
+    // Specification 생성
+    Specification<Backup> spec = Specification.where(null);
 
-    return backups.map(backup -> modelMapper.map(backup, BackupDto.class));
+    if (workerIpAddress != null) {
+      spec = spec.and((root, query, cb) -> cb.equal(root.get("workerIpAddress"), workerIpAddress));
+    }
+
+    if (status != null) {
+      spec = spec.and((root, query, cb) -> cb.equal(root.get("status"), status));
+    }
+
+    if (startedAtFrom != null && startedAtTo != null) {
+      spec = spec.and((root, query, cb) -> cb.between(root.get("startedAt"), startedAtFrom, startedAtTo));
+    }
+
+    if (idAfter != null) {
+      spec = spec.and((root, query, cb) -> cb.greaterThan(root.get("id"), finalIdAfter));
+    }
+
+    // 정렬 설정
+    Sort sort;
+    if ("startedAt".equals(sortField)) {
+      sort = Sort.by(sortDirection, "startedAt");
+    } else if ("id".equals(sortField)) {
+      sort = Sort.by(sortDirection, "id");
+    } else {
+      // 기본 정렬
+      sort = Sort.by(Sort.Direction.DESC, "startedAt");
+    }
+
+    // 페이징 설정
+    Pageable pageable = PageRequest.of(basePageable.getPageNumber(), basePageable.getPageSize(), sort);
+
+    // 결과 조회
+    Page<Backup> backupPage = backupRepository.findAll(spec, pageable);
+
+    // DTO 변환 로직
+    return backupPage.map(backup -> BackupDto.builder()
+            .id(backup.getId())
+            .workerIpAddress(backup.getWorkerIpAddress())
+            .status(backup.getStatus())
+            .startedAt(backup.getStartedAt())
+            .build());
   }
 
 }

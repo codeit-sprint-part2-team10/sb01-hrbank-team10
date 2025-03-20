@@ -30,7 +30,7 @@ public class BackupController {
 
     // 백업 요청 TODO 에러 코드
     @PostMapping
-    public ResponseEntity<Integer> Backup(HttpServletRequest request) {
+    public ResponseEntity<Integer> backup(HttpServletRequest request) {
         Integer backupId = backupService.performBackup();
         return ResponseEntity.status(HttpStatus.OK).body(backupId);
     }
@@ -54,6 +54,7 @@ public class BackupController {
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "startedAt") String sortField,
             @RequestParam(defaultValue = "DESC") Sort.Direction sortDirection) {
+
 
         Pageable pageable = PageRequest.of(0, size, Sort.by(sortDirection, sortField));
         Page<BackupDto> backupPage = backupService.getBackupList(worker, status, startedAtFrom, startedAtTo, idAfter, null, size, sortField, sortDirection);

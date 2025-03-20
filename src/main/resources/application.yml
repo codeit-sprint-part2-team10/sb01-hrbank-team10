@@ -13,6 +13,10 @@ spring:
       hibernate:
         show_sql: true
         format_sql: true
+        jdbc:                               # PostgreSQL에서 날짜/시간 타입 변환 처리를 위한 설정
+          time_zone=UTC:
+          .lob:
+            non_contextual_creation=true:
   servlet:
     multipart:
       enabled: true
@@ -36,8 +40,4 @@ springdoc:
     filter: true
     show-extensions: true
 
-backup:
-  schedule:
-    rate: 3600000  # 1시간(3600000ms)마다 실행
-  worker:
-    identifier:SYSTEM
+

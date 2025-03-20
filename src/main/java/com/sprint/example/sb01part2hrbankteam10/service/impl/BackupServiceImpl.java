@@ -37,6 +37,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -317,6 +318,7 @@ public class BackupServiceImpl implements BackupService {
     return employeeForBackupDtoList;
   }
 
+  // 서비스 클래스의 getBackupList 메서드 수정
   @Override
   public Page<BackupDto> getBackupList(
           String workerIpAddress,
@@ -329,26 +331,36 @@ public class BackupServiceImpl implements BackupService {
           String sortField,
           Sort.Direction sortDirection) {
 
-    // cursor가 null인 경우 처리 (예: idAfter를 기본값으로 사용)
-    if (cursor == null) {
-      cursor = "";  // 적절한 기본값을 설정
-    }
-
     // 커서가 주어진 경우 이를 idAfter로 변환
     if (cursor != null && !cursor.isEmpty()) {
       try {
-        idAfter = Integer.valueOf(cursor);
-      } catch (NumberFormatException e) {
+        // Base64 디코딩을 통한 ID 추출
+        byte[] decodedBytes = Base64.getDecoder().decode(cursor);
+        String decodedId = new String(decodedBytes);
+        idAfter = Integer.valueOf(decodedId);
+      } catch (Exception e) {
         // 예외 처리: 잘못된 커서 형식
-        throw new IllegalArgumentException("Invalid cursor format.");
+        throw new IllegalArgumentException("커서 형식이 잘못됐습니다.");
       }
     }
 
-    Pageable pageable = PageRequest.of(0, size, Sort.by(sortDirection, sortField));
+    // Pageable 정의
+    Pageable pageable = PageRequest.of(0, size);
 
-    Page<BackupDto> backups = backupRepository.findBackups(workerIpAddress, status, startedAtFrom, startedAtTo, idAfter, pageable);
+    // 정렬 조건에 따라 메서드 선택
+    if ("startedAt".equals(sortField)) {
+      if (sortDirection == Sort.Direction.ASC) {
+        return backupRepository.findBackupsOrderByStartedAtAsc(
+                workerIpAddress, status, startedAtFrom, startedAtTo, idAfter, pageable);
+      } else {
+        return backupRepository.findBackupsOrderByStartedAtDesc(
+                workerIpAddress, status, startedAtFrom, startedAtTo, idAfter, pageable);
+      }
+    }
 
-    return backups.map(backup -> modelMapper.map(backup, BackupDto.class));
+    // 기본 정렬 (startedAt Desc)
+    return backupRepository.findBackupsOrderByStartedAtDesc(
+            workerIpAddress, status, startedAtFrom, startedAtTo, idAfter, pageable);
   }
 
 }

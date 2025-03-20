@@ -18,7 +18,7 @@ public interface BackupRepository extends JpaRepository<Backup, Integer> {
   // 특정 상태의 가장 최근 백업 가져오기
   Backup findFirstByStatusOrderByStartedAtDesc(@Param("status") Backup.BackupStatus status);
 
-  // 백업 목록 조회 (필터링 및 정렬 포함)
+  // 백업 목록 조회 (필터링 및 정렬 포함): 정적 쿼리 - 각 정렬 경우별로 별도 메서드 생성
   @Query("SELECT new com.sprint.example.sb01part2hrbankteam10.dto.BackupDto(b.id, b.workerIpAddress, b.startedAt, b.endedAt, b.status, b.file.id) " +
           "FROM Backup b " +
           "WHERE (:worker IS NULL OR b.workerIpAddress = :worker) " +
@@ -26,10 +26,24 @@ public interface BackupRepository extends JpaRepository<Backup, Integer> {
           "AND (:startedAtFrom IS NULL OR b.startedAt >= :startedAtFrom) " +
           "AND (:startedAtTo IS NULL OR b.startedAt <= :startedAtTo) " +
           "AND (:idAfter IS NULL OR b.id > :idAfter) " +
-          "ORDER BY " +
-          "   CASE WHEN :sortField = 'startedAt' AND :sortDirection = 'ASC' THEN b.startedAt END ASC, " +
-          "   CASE WHEN :sortField = 'startedAt' AND :sortDirection = 'DESC' THEN b.startedAt END DESC")
-  Page<BackupDto> findBackups(
+          "ORDER BY b.startedAt DESC")
+  Page<BackupDto> findBackupsOrderByStartedAtDesc(
+          @Param("worker") String worker,
+          @Param("status") Backup.BackupStatus status,
+          @Param("startedAtFrom") LocalDateTime startedAtFrom,
+          @Param("startedAtTo") LocalDateTime startedAtTo,
+          @Param("idAfter") Integer idAfter,
+          Pageable pageable);
+
+  @Query("SELECT new com.sprint.example.sb01part2hrbankteam10.dto.BackupDto(b.id, b.workerIpAddress, b.startedAt, b.endedAt, b.status, b.file.id) " +
+          "FROM Backup b " +
+          "WHERE (:worker IS NULL OR b.workerIpAddress = :worker) " +
+          "AND (:status IS NULL OR b.status = :status) " +
+          "AND (:startedAtFrom IS NULL OR b.startedAt >= :startedAtFrom) " +
+          "AND (:startedAtTo IS NULL OR b.startedAt <= :startedAtTo) " +
+          "AND (:idAfter IS NULL OR b.id > :idAfter) " +
+          "ORDER BY b.startedAt ASC")
+  Page<BackupDto> findBackupsOrderByStartedAtAsc(
           @Param("worker") String worker,
           @Param("status") Backup.BackupStatus status,
           @Param("startedAtFrom") LocalDateTime startedAtFrom,

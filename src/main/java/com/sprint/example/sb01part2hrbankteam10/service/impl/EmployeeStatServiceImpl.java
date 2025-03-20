@@ -13,7 +13,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.Map;
@@ -24,7 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class EmployeeStatusServiceImpl implements EmployeeStatService {
+public class EmployeeStatServiceImpl implements EmployeeStatService {
 
   private final DashboardRepository dashboardRepository;
   private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE; // YYYY-MM-DD
@@ -108,7 +107,7 @@ public class EmployeeStatusServiceImpl implements EmployeeStatService {
     LocalDateTime recentUpdateToDate = LocalDate.now().atTime(23, 59, 59);
     int recentUpdates = countEmployeesUpdatedInRange(recentUpdateFromDate, recentUpdateToDate);
 
-    // 이번 달 입사 수 (2025년 3월 입사자)
+    // 이번 달 입사 수
     LocalDateTime thisMonthStart = LocalDate.now().withDayOfMonth(1).atStartOfDay();
     LocalDateTime thisMonthEnd = LocalDate.now().atTime(23, 59, 59);
     int thisMonthHires = dashboardRepository.countEmployeesByDateRange(thisMonthStart,
@@ -116,19 +115,6 @@ public class EmployeeStatusServiceImpl implements EmployeeStatService {
 
     // 마지막 백업 수
     int lastBackupCount = getLastBackupCount();
-
-    Map<String, Object> dashboardData = new HashMap<>();
-    dashboardRepository.findEmployeeDistribution("departments", "ACTIVE").forEach(result -> {
-      dashboardRepository.countEmployeesByDateRange(
-          LocalDate.now().withDayOfMonth(1).atStartOfDay(),
-          LocalDate.now().atTime(23, 59, 59));
-    });
-
-    dashboardRepository.findEmployeeTrend(
-        LocalDateTime.now().minusMonths(1),
-        LocalDateTime.now(),
-        "month"
-    ).forEach(result -> {});
 
     return new EmployeeDashboardResponse(
         totalEmployees,

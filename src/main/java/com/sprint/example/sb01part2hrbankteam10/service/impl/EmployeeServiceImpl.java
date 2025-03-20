@@ -103,7 +103,10 @@ public class EmployeeServiceImpl implements EmployeeService {
     EmployeeDto before = EmployeeMapper.toDto(employee);
 
     Optional.ofNullable(request.getName()).ifPresent(employee::updateName);
-    Optional.ofNullable(request.getEmail()).ifPresent(employee::updateEmail);
+    Optional.ofNullable(request.getEmail()).ifPresent(email -> {
+      validateEmail(email);
+      employee.updateEmail(email);
+    });
     Optional.ofNullable(request.getPosition()).ifPresent(employee::updatePosition);
     Optional.ofNullable(request.getStatus()).ifPresent(employee::updateStatus);
     Optional.ofNullable(request.getHireDate()).ifPresent(hireDate -> {
@@ -145,13 +148,14 @@ public class EmployeeServiceImpl implements EmployeeService {
     Employee employee = getByIdOrThrow(id);
     employee.updateStatus(EmployeeStatus.RESIGNED);
 
-    Integer previousProfileImageId = employee.getProfileImage().getId();
-    employee.updateProfileImage(null);
-    fileRepository.deleteById(previousProfileImageId);
-    fileStorage.deleteProfile(previousProfileImageId);
+    if (employee.getProfileImage() != null) {
+      Integer previousProfileImageId = employee.getProfileImage().getId();
+      employee.updateProfileImage(null);
+      fileRepository.deleteById(previousProfileImageId);
+      fileStorage.deleteProfile(previousProfileImageId);
+    }
 
     EmployeeDto before = EmployeeMapper.toDto(employee);
-    EmployeeDto after = EmployeeMapper.toDto(Employee.builder().build());
 
     employeeHistoryService.create(employee.getEmployeeNumber(), ChangeType.DELETED, null, before, null, clientIp);
 

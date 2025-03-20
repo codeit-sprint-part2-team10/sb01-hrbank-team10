@@ -52,41 +52,91 @@ public class EmployeeStatServiceImpl implements EmployeeStatService {
   @Override
   @Transactional(readOnly = true)
   public List<EmployeeTrendDto> getTrend(LocalDateTime from, LocalDateTime to, String unit) {
-    if (from == null) {
-      from = LocalDateTime.now().minusYears(1); // 최근 12개월 전
+    // 기본적으로 최근 12개의 단위를 표시
+    if (from == null || to == null) {
+      to = LocalDateTime.now();
+
+      // 시간 단위에 따라 from 값을 조정하여 정확히 12개의 데이터 포인트가 생성되도록 함
+      switch (unit) {
+        case "day":
+          from = to.minusDays(11); // 12일 (현재 포함)
+          break;
+        case "week":
+          from = to.minusWeeks(11); // 12주 (현재 포함)
+          break;
+        case "month":
+          from = to.minusMonths(11); // 12개월 (현재 포함)
+          break;
+        case "quarter":
+          from = to.minusMonths(33); // 12분기 (현재 포함) = 약 3년
+          break;
+        case "year":
+          from = to.minusYears(11); // 12년 (현재 포함)
+          break;
+        default:
+          from = to.minusMonths(11); // 기본값은 12개월
+          break;
+      }
     }
-    if (to == null) {
-      to = LocalDateTime.now(); // 현재
-    }
 
-    if (!List.of("day", "week", "month", "quarter", "year").contains(unit)) {
-      throw new RestApiException(DepartmentErrorCode.DEPARTMENT_STATUS_NOT_VALID, unit);
-    }
-
-    List<Object[]> trends = dashboardRepository.findEmployeeTrend(from, to, unit);
-
-    // Object[]를 EmployeeTrendDto로 변환 및 change, changeRate 계산
-    List<EmployeeTrendDto> result = new ArrayList<>();
-//    for (int i = 0; i < trends.size(); i++) {
-//      Object[] row = trends.get(i);
-//      String dateStr = (String) row[0]; // period
-//      Integer count = ((Number) row[1]).intValue(); // count
-//      Integer change = (i > 0) ? (count - ((Number) trends.get(i - 1)[1]).intValue()) : 0;
-//      Double changeRate = (i > 0 && ((Number) trends.get(i - 1)[1]).intValue() != 0)
-//          ? round(((double) (count - ((Number) trends.get(i - 1)[1]).intValue()) * 100)
-//          / ((Number) trends.get(i - 1)[1]).intValue(), 2)
-//          : 0.0;
-//
-//      result.add(new EmployeeTrendDto(
-//          dateStr,
-//          count,
-//          change,
-//          changeRate
-//      ));
-//    }
-
-    return result;
+  if (!List.of("day", "week", "month", "quarter", "year").contains(unit)) {
+    throw new RestApiException(DepartmentErrorCode.DEPARTMENT_STATUS_NOT_VALID, unit);
   }
+
+  List<Object[]> trends = dashboardRepository.findEmployeeTrend(from, to, unit);
+
+  // Object[]를 EmployeeTrendDto로 변환 및 change, changeRate 계산
+  List<EmployeeTrendDto> result = new ArrayList<>();
+  for (int i = 0; i < trends.size(); i++) {
+    Object[] row = trends.get(i);
+    String dateStr = (String) row[0]; // period
+    Long count = ((Number) row[1]).longValue(); // count as Long
+    Long change = (i > 0) ? (count - ((Number) trends.get(i - 1)[1]).longValue()) : 0L;
+    Double changeRate = (i > 0 && ((Number) trends.get(i - 1)[1]).longValue() != 0)
+        ? round(((double) (count - ((Number) trends.get(i - 1)[1]).longValue()) * 100)
+        / ((Number) trends.get(i - 1)[1]).longValue(), 2)
+        : 0.0;
+
+    // Format the date based on the unit
+    String formattedDate;
+    switch (unit) {
+      case "day":
+        formattedDate = dateStr; // Keep YYYY-MM-DD
+        break;
+      case "week":
+        formattedDate = dateStr; // Keep YYYY-MM-DD for the first day of the week
+        break;
+      case "month":
+        // Take just year and month, and add the day as 20
+        formattedDate = dateStr.substring(0, 7) + "-20";
+        break;
+      case "quarter":
+        // For quarter, we'll determine which quarter it is from the date
+        int month = Integer.parseInt(dateStr.substring(5, 7));
+        int quarter = (month - 1) / 3 + 1;
+        formattedDate = dateStr.substring(0, 4) + "-" +
+            (quarter == 1 ? "03" : quarter == 2 ? "06" : quarter == 3 ? "09" : "12") +
+            "-20";
+        break;
+      case "year":
+        // For year, format as YYYY-03-20
+        formattedDate = dateStr.substring(0, 4) + "-03-20";
+        break;
+      default:
+        formattedDate = dateStr;
+        break;
+    }
+
+    result.add(new EmployeeTrendDto(
+        formattedDate,
+        count,
+        change,
+        changeRate
+    ));
+  }
+
+  return result;
+}
 
   @Override
   @Transactional(readOnly = true)

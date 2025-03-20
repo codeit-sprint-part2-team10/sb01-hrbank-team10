@@ -1,6 +1,5 @@
 package com.sprint.example.sb01part2hrbankteam10.repository;
 
-import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeTrendDto;
 import com.sprint.example.sb01part2hrbankteam10.entity.Employee;
 import com.sprint.example.sb01part2hrbankteam10.entity.Employee.EmployeeStatus;
 import java.time.LocalDateTime;
@@ -39,24 +38,32 @@ public interface DashboardRepository extends JpaRepository<Employee, Integer> {
   List<Object[]> findEmployeeDistribution(@Param("groupBy") String groupBy,
       @Param("status") EmployeeStatus status);
 
+
   /**
    * 직원 추이 조회
    */
 
   @Query(value =
-      "WITH employee_counts AS (" +
+      "WITH dates AS (" +
+          "  SELECT generate_series(" +
+          "    DATE_TRUNC(:unit, CAST(:from AS timestamp))," +
+          "    DATE_TRUNC(:unit, CAST(:to AS timestamp))," +
+          "    CAST('1 ' || :unit AS interval)" +
+          "  ) AS date" +
+          ")," +
+          "employee_counts AS (" +
           "  SELECT " +
-          "    DATE_TRUNC(:unit, e.hire_date) AS grouped_date, " +
-          "    COUNT(e.id) AS count " +
-          "  FROM employees e " +
-          "  WHERE e.hire_date BETWEEN :from AND :to " +
-          "  GROUP BY grouped_date" +
+          "    d.date AS grouped_date, " +
+          "    COUNT(DISTINCT e.id) AS count " +
+          "  FROM dates d " +
+          "  LEFT JOIN employees e ON e.hire_date <= d.date AND " +
+          "    e.status = 'ACTIVE' " +
+          "  GROUP BY d.date" +
+          "  ORDER BY d.date" +
           ")" +
           "SELECT " +
           "  TO_CHAR(grouped_date, 'YYYY-MM-DD') AS period, " +
-          "  count, " +
-          "  0 AS change, " +
-          "  0.0 AS change_rate " +
+          "  count " +
           "FROM employee_counts " +
           "ORDER BY grouped_date",
       nativeQuery = true)

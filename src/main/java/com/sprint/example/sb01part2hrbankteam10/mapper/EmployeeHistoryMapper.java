@@ -12,9 +12,9 @@ import java.util.stream.Collectors;
 public class EmployeeHistoryMapper {
 
     public static EmployeeHistory toEntity(String employeeNumber, EmployeeHistory.ChangeType type, String memo,
-                                           EmployeeCreateRequest changes, EmployeeDto afterData, String clientIp) {
+        EmployeeDto beforeData, EmployeeDto afterData, String clientIp) {
 
-        List<DiffDto> diffs = compareChanges(null, afterData);
+        List<DiffDto> diffs = compareChanges(beforeData, afterData);
 
         Map<String, Object> changedFields = diffs.stream()
                 .collect(Collectors.toMap(DiffDto::getPropertyName, EmployeeHistoryMapper::toDetailMap));

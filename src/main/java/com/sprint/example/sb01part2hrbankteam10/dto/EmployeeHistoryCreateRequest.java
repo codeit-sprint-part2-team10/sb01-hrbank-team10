@@ -9,6 +9,6 @@ public class EmployeeHistoryCreateRequest {
     private String employeeNumber;
     private EmployeeHistory.ChangeType type;
     private String memo;
-    private EmployeeCreateRequest changes;
+    private EmployeeDto beforeData;
     private EmployeeDto afterData;
 }

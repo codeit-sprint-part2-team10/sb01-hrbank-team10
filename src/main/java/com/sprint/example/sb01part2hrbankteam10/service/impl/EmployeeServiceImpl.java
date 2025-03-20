@@ -86,10 +86,10 @@ public class EmployeeServiceImpl implements EmployeeService {
         .status(EmployeeStatus.ACTIVE)
         .build();
 
-    EmployeeDto before = EmployeeMapper.toDto(Employee.builder().build());
+//    EmployeeDto before = EmployeeMapper.toDto(Employee.builder().build());
     EmployeeDto after = EmployeeMapper.toDto(employeeRepository.save(newEmployee));
 
-//    employeeHistoryService.create(employeeNumber, ChangeType.CREATED, request.getMemo(),before, after, clientIp);
+    employeeHistoryService.create(employeeNumber, ChangeType.CREATED, request.getMemo(), null, after, clientIp);
 
     return after;
   }
@@ -130,7 +130,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     EmployeeDto after = EmployeeMapper.toDto(employee);
-//    employeeHistoryService.create(employee.getEmployeeNumber(), ChangeType.UPDATED, request.getMemo(),before, after, clientIp);
+    employeeHistoryService.create(employee.getEmployeeNumber(), ChangeType.UPDATED, request.getMemo(), before, after, clientIp);
 
     return after;
   }
@@ -153,7 +153,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     EmployeeDto before = EmployeeMapper.toDto(employee);
     EmployeeDto after = EmployeeMapper.toDto(Employee.builder().build());
 
-//    employeeHistoryService.create(employee.getEmployeeNumber(), ChangeType.UPDATED, null, before, after, clientIp);
+    employeeHistoryService.create(employee.getEmployeeNumber(), ChangeType.DELETED, null, before, null, clientIp);
 
     return "직원이 성공적으로 삭제되었습니다.";
   }

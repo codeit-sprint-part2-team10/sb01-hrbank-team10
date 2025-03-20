@@ -31,7 +31,7 @@ public class EmployeeHistoryController {
                 request.getEmployeeNumber(),
                 request.getType(),
                 request.getMemo(),
-                request.getChanges(),
+                request.getBeforeData(),
                 request.getAfterData(),
                 "127.0.0.임시값"
         );

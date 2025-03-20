@@ -20,7 +20,9 @@ public interface FileDocs {
             @ApiResponse(responseCode = "200", description = "다운로드 성공",
                     content = @Content(schema = @Schema(implementation = Resource.class))),
             @ApiResponse(responseCode = "404", description = "파일을 찾을 수 없음",
-                    content = @Content(examples = @ExampleObject(value = "")))
+                    content = @Content(examples = @ExampleObject(value = ""))),
+            @ApiResponse(responseCode = "500", description = "서버 오류",
+                    content = @Content(examples = @ExampleObject(value = "{ 'error': '담당자에게 문의해주세요.' }")))
     })
     @GetMapping("/{id}/download")
     ResponseEntity<Resource> download(

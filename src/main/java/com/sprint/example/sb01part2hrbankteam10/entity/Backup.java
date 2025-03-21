@@ -52,6 +52,12 @@ public class Backup {
     this.status = status;
   }
 
+  public void updateStatus(BackupStatus status, LocalDateTime endedAt, BinaryContent binaryContent) {
+    this.status = status;
+    this.endedAt = endedAt;
+    this.binaryContent = binaryContent;
+  }
+
   public enum BackupStatus {
     IN_PROGRESS,
     COMPLETED,

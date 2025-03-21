@@ -1,8 +1,8 @@
 package com.sprint.example.sb01part2hrbankteam10.service.impl;
 
 import com.sprint.example.sb01part2hrbankteam10.dto.backup.BackupDto;
-import com.sprint.example.sb01part2hrbankteam10.dto.employee.EmployeeDto;
 import com.sprint.example.sb01part2hrbankteam10.dto.backup.EmployeeForBackupDto;
+import com.sprint.example.sb01part2hrbankteam10.dto.employee.EmployeeDto;
 import com.sprint.example.sb01part2hrbankteam10.entity.Backup;
 import com.sprint.example.sb01part2hrbankteam10.entity.Backup.BackupStatus;
 import com.sprint.example.sb01part2hrbankteam10.entity.BinaryContent;
@@ -12,13 +12,12 @@ import com.sprint.example.sb01part2hrbankteam10.global.exception.errorcode.Backu
 import com.sprint.example.sb01part2hrbankteam10.global.exception.errorcode.BinaryContentErrorCode;
 import com.sprint.example.sb01part2hrbankteam10.mapper.EmployeeMapper;
 import com.sprint.example.sb01part2hrbankteam10.repository.BackupRepository;
+import com.sprint.example.sb01part2hrbankteam10.repository.BinaryContentRepository;
 import com.sprint.example.sb01part2hrbankteam10.repository.EmployeeHistoryRepository;
 import com.sprint.example.sb01part2hrbankteam10.repository.EmployeeRepository;
-import com.sprint.example.sb01part2hrbankteam10.repository.BinaryContentRepository;
 import com.sprint.example.sb01part2hrbankteam10.service.BackupService;
 import com.sprint.example.sb01part2hrbankteam10.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.data.domain.Page;
@@ -31,6 +30,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
@@ -46,7 +46,9 @@ import java.util.zip.ZipOutputStream;
 import static org.apache.commons.lang3.StringEscapeUtils.escapeCsv;
 
 // ID,직원번호,이름,이메일,부서,직급,입사일,상태
+
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class BackupServiceImpl implements BackupService {
 
@@ -55,7 +57,6 @@ public class BackupServiceImpl implements BackupService {
   private final BinaryContentStorage binaryContentStorage;
   private final EmployeeRepository employeeRepository;
   private final EmployeeHistoryRepository employeeHistoryRepository;
-  private final ModelMapper modelMapper;
 
   @Override
   public Integer performBackup() {
@@ -64,7 +65,7 @@ public class BackupServiceImpl implements BackupService {
 
     // 로직: if 백업 불필요 -> 건너뜀 상태로 배치이력 저장하고 프로세스 종료
     if (!isBackupNeeded()) {
-      Backup backupHistory = createBackupHistory(workerIpAddress, BackupStatus.SKIPPED, null, null, null);
+      Backup backupHistory = createBackupHistory(workerIpAddress, BackupStatus.SKIPPED, LocalDateTime.now(), LocalDateTime.now(), null);
       return backupRepository.save(backupHistory).getId();
     }
 
@@ -117,9 +118,8 @@ public class BackupServiceImpl implements BackupService {
       binaryContentStorage.saveBackup(fileId, backUpMultipartFile);
 
       // 백업 성공 -> 백업이력 완료로 수정
-      Backup completedBackupHistory = updateBackupHistory(atStartBackupHistory, workerIpAddress,
-          savedBinaryContent);
-      return backupRepository.save(completedBackupHistory).getId();
+      atStartBackupHistory.updateStatus(BackupStatus.COMPLETED, LocalDateTime.now(), savedBinaryContent);
+      return backupRepository.save(atStartBackupHistory).getId();
 
     } catch (Exception e) {
       // 저장하던 파일 삭제, 에러로그 .log 파일로 저장, 백업이력 실패로 수정
@@ -130,10 +130,9 @@ public class BackupServiceImpl implements BackupService {
               .size(BigInteger.valueOf(file.getSize()))
               .build();
 
-
-      Backup failedBackupHistory = createBackupHistory(workerIpAddress, BackupStatus.FAILED,
-              atStartBackupHistory.getStartedAt(), null, savedLogBinaryContent);
-      backupRepository.save(failedBackupHistory);
+      // 백업 실패 시 이력
+      atStartBackupHistory.updateStatus(BackupStatus.FAILED, LocalDateTime.now(), savedLogBinaryContent);
+      backupRepository.save(atStartBackupHistory);
 
       // 파일이 생성되었을 경우에만 삭제
       if (backupFile != null) {
@@ -143,7 +142,7 @@ public class BackupServiceImpl implements BackupService {
           binaryContentStorage.deleteBackup(fileId);
         }
       }
-      throw new RestApiException(BackupErrorCode.BACKUP_ERROR, failedBackupHistory.getId().toString());
+      throw new RestApiException(BackupErrorCode.BACKUP_ERROR, atStartBackupHistory.getId().toString());
     }
   }
 
@@ -172,12 +171,6 @@ public class BackupServiceImpl implements BackupService {
             .endedAt(endedAt)
             .binaryContent(binaryContent)
             .build();
-  }
-
-  private Backup updateBackupHistory(Backup backupHistory, String workerIpAddress, BinaryContent savedBinaryContent) {
-    backupRepository.delete(backupHistory);
-    return createBackupHistory(workerIpAddress, BackupStatus.COMPLETED,
-            backupHistory.getStartedAt(), LocalDateTime.now(), savedBinaryContent);
   }
 
 

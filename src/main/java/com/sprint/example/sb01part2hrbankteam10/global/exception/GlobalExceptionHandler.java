@@ -1,7 +1,6 @@
 package com.sprint.example.sb01part2hrbankteam10.global.exception;
 
 import com.sprint.example.sb01part2hrbankteam10.global.exception.errorcode.GlobalErrorCode;
-import com.sprint.example.sb01part2hrbankteam10.global.response.RestApiResponse;
 import java.time.LocalDateTime;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -31,7 +30,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         .timestamp(LocalDateTime.now())
         .status(HttpStatus.BAD_REQUEST)
         .message("유효성 검증에 실패하셨습니다.")
-        .details(ex.getMessage())
+        .details(ex.getObjectName() + " : " + ex.getBindingResult().getFieldError().getDefaultMessage())
         .build();
 
     return handleExceptionInternal(errorResponse);
@@ -70,6 +69,6 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
       ErrorResponse errorResponse) {
     return ResponseEntity
         .status(errorResponse.getStatus())
-        .body(RestApiResponse.failure(errorResponse));
+        .body(errorResponse);
   }
 }

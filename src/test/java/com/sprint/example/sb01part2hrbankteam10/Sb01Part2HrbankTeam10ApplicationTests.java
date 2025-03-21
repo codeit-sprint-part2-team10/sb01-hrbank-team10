@@ -9,5 +9,4 @@ class Sb01Part2HrbankTeam10ApplicationTests {
   @Test
   void contextLoads() {
   }
-
 }

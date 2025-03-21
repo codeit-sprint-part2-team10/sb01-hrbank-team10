@@ -1,5 +1,5 @@
 -- files
-CREATE TABLE files
+CREATE TABLE binary_contents
 (
     id           SERIAL PRIMARY KEY,
     name         VARCHAR(255) NOT NULL,
@@ -13,13 +13,12 @@ CREATE TABLE backups
 (
     id                SERIAL PRIMARY KEY,
     created_at        TIMESTAMPTZ  NOT NULL,
-    file_id           INTEGER,
-    started_at        TIMESTAMPTZ  NOT NULL,
+    binary_content_id INTEGER,
+    started_at        TIMESTAMPTZ,
     ended_at          TIMESTAMPTZ,
     worker_ip_address VARCHAR(255) NOT NULL,
     status            VARCHAR(20)  NOT NULL,
-    batch_done_at     TIMESTAMPTZ,
-    CONSTRAINT fk_file FOREIGN KEY (file_id) REFERENCES files (id) ON DELETE CASCADE
+    CONSTRAINT fk_binary_contents FOREIGN KEY (binary_content_id) REFERENCES binary_contents (id) ON DELETE CASCADE
 );
 
 -- departments
@@ -27,6 +26,7 @@ CREATE TABLE departments
 (
     id               SERIAL PRIMARY KEY,
     created_at       TIMESTAMPTZ  NOT NULL,
+    updated_at       TIMESTAMPTZ,
     name             VARCHAR(50)  NOT NULL,
     description      VARCHAR(255) NOT NULL,
     established_date TIMESTAMPTZ  NOT NULL,
@@ -38,6 +38,7 @@ CREATE TABLE employees
 (
     id               SERIAL PRIMARY KEY,
     created_at       TIMESTAMPTZ  NOT NULL,
+    updated_at       TIMESTAMPTZ,
     department_id    INTEGER,
     profile_image_id INTEGER,
     name             VARCHAR(50)  NOT NULL,
@@ -54,7 +55,7 @@ CREATE TABLE employees
         REFERENCES departments (id) ON DELETE RESTRICT,
 
     CONSTRAINT fk_profiles_employee FOREIGN KEY (profile_image_id)
-        REFERENCES files (id) ON DELETE CASCADE
+        REFERENCES binary_contents (id) ON DELETE CASCADE
 );
 
 CREATE TABLE employee_histories
@@ -66,8 +67,7 @@ CREATE TABLE employee_histories
     logged_at       TIMESTAMPTZ NOT NULL,
     modified_at     TIMESTAMPTZ NOT NULL,
     ip_address      VARCHAR(50) NOT NULL,
-    changed_fields  jsonb       NOT NULL,
-    changed_by      VARCHAR(50) NOT NULL
+    changed_fields  jsonb       NOT NULL
 );
 
 

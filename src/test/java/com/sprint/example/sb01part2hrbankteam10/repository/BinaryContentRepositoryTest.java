@@ -2,7 +2,7 @@ package com.sprint.example.sb01part2hrbankteam10.repository;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.sprint.example.sb01part2hrbankteam10.entity.File;
+import com.sprint.example.sb01part2hrbankteam10.entity.BinaryContent;
 import jakarta.transaction.Transactional;
 import java.math.BigInteger;
 import org.junit.jupiter.api.Test;
@@ -13,48 +13,48 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE) // 지금 설정된 실제 데이터 베이스를 사용하도록 설정
 @Transactional // 테스트 후 자동으로 롤백되도록 설정
-class FileRepositoryTest {
+class BinaryContentRepositoryTest {
 
   @Autowired
-  private FileRepository fileRepository;
+  private BinaryContentRepository binaryContentRepository;
 
   @Test // 생성 테스트
   void testSaveFile() {
 
     // given
-    File file = File.builder()
+    BinaryContent binaryContent = BinaryContent.builder()
         .name("backup1")
         .contentType("application/zip")
         .size(new BigInteger("1024"))
         .build();
-    fileRepository.save(file);
+    binaryContentRepository.save(binaryContent);
 
     // when
-    File resultCreate = fileRepository.findById(file.getId()).orElse(null);
+    BinaryContent resultCreate = binaryContentRepository.findById(binaryContent.getId()).orElse(null);
 
     // then
     assertNotNull(resultCreate);
-    assertEquals(file.getName(), resultCreate.getName());
-    assertEquals(file.getContentType(), resultCreate.getContentType());
-    assertEquals(file.getSize(), resultCreate.getSize());
+    assertEquals(binaryContent.getName(), resultCreate.getName());
+    assertEquals(binaryContent.getContentType(), resultCreate.getContentType());
+    assertEquals(binaryContent.getSize(), resultCreate.getSize());
   }
 
   @Test // 삭제 테스트
   void testDeleteFile() {
 
     // given
-    File file = File.builder()
+    BinaryContent binaryContent = BinaryContent.builder()
         .name("backup1")
         .contentType("application/zip")
         .size(new BigInteger("1024"))
         .build();
-    fileRepository.save(file);
+    binaryContentRepository.save(binaryContent);
 
     // when
-    fileRepository.deleteById(file.getId());
-    File getFile = fileRepository.findById(file.getId()).orElse(null);
+    binaryContentRepository.deleteById(binaryContent.getId());
+    BinaryContent getBinaryContent = binaryContentRepository.findById(binaryContent.getId()).orElse(null);
 
     // then
-    assertNull(getFile);
+    assertNull(getBinaryContent);
   }
 }

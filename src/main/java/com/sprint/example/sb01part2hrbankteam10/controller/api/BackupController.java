@@ -46,6 +46,12 @@ public class BackupController implements BackupDocs {
         @RequestParam(value = "status", defaultValue = "COMPLETED") Backup.BackupStatus status
     ){
         Backup lastBackup = backupRepository.findFirstByStatusOrderByStartedAtDesc(status);
+
+        // 백업이 없는 경우 빈 DTO 반환
+        if (lastBackup == null) {
+            return ResponseEntity.status(HttpStatus.OK).body(new BackupDto());
+        }
+
         BackupDto lastBackupDto = BackupMapper.toDto(lastBackup);
         return ResponseEntity.status(HttpStatus.OK).body(lastBackupDto);
     }

@@ -1,6 +1,7 @@
 package com.sprint.example.sb01part2hrbankteam10.controller.docs;
 
 import com.sprint.example.sb01part2hrbankteam10.dto.BackupDto;
+import com.sprint.example.sb01part2hrbankteam10.dto.CursorPageResponseBackupDto;
 import com.sprint.example.sb01part2hrbankteam10.entity.Backup;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -60,7 +61,7 @@ public interface BackupDocs {
                     content = @Content(examples = @ExampleObject(value = "{ 'error': '담당자에게 문의해주세요.' }")))
     })
     @GetMapping
-    ResponseEntity<Map<String, Object>> getBackupList(
+    ResponseEntity<CursorPageResponseBackupDto> getBackupList(
             @Parameter(description = "작업자", example = "192.168.0.1")
             @RequestParam(required = false) String worker,
 

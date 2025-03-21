@@ -32,6 +32,9 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer>,
 
   Page<Employee> findAll(Specification<Employee> spec, Pageable pageable);
 
+  /**
+   * 부서, 직함 별 직원 수 조회
+   */
   @Query( value =
       "SELECT "
           + "new com.sprint.example.sb01part2hrbankteam10.dto.EmployeeDistributionDto("
@@ -60,25 +63,10 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer>,
       @Param("status") EmployeeStatus status
   );
 
-  // 오늘 날짜 기준으로 (20일인 경우 20일을 기준으로)
-//  @Query(value = """
-//    SELECT new com.example.dto.EmployeeTrendDto(
-//        DATE_TRUNC(:unit, e.hireDate),
-//        COUNT(e),
-//        COUNT(e) - LAG(COUNT(e), 1, 0) OVER (ORDER BY DATE_TRUNC(:unit, e.hireDate)) AS change,
-//        ((COUNT(e) - LAG(COUNT(e), 1, 0) OVER (ORDER BY DATE_TRUNC(:unit, e.hireDate))) * 100.0 /
-//         NULLIF(LAG(COUNT(e), 1, 0) OVER (ORDER BY DATE_TRUNC(:unit, e.hireDate)), 0)) AS changeRate
-//    )
-//    FROM Employee e
-//    WHERE e.hireDate BETWEEN :startDate AND :endDate
-//    GROUP BY DATE_TRUNC(:unit, e.hireDate)
-//    ORDER BY DATE_TRUNC(:unit, e.hireDate) ASC
-//  """)
-//  List<EmployeeTrendDto> findDataByUnit(
-//      @Param("unit") String unit,
-//      @Param("startDate") LocalDateTime startDate,
-//      @Param("endDate") LocalDateTime endDate
-//  );
+  /**
+   * 직원 수
+   */
+
   @Query(value = """
     SELECT 
         DATE_TRUNC(:unit, e.hire_date) AS date, 
@@ -96,4 +84,37 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer>,
       @Param("startDate") LocalDateTime startDate,
       @Param("endDate") LocalDateTime endDate
   );
+
+  /**
+   * 직원 추이 조회
+   */
+
+  @Query(value =
+      "WITH dates AS (" +
+          "  SELECT generate_series(" +
+          "    DATE_TRUNC(:unit, CAST(:from AS timestamp))," +
+          "    DATE_TRUNC(:unit, CAST(:to AS timestamp))," +
+          "    CAST('1 ' || :unit AS interval)" +
+          "  ) AS date" +
+          ")," +
+          "employee_counts AS (" +
+          "  SELECT " +
+          "    d.date AS grouped_date, " +
+          "    COUNT(DISTINCT e.id) AS count " +
+          "  FROM dates d " +
+          "  LEFT JOIN employees e ON e.hire_date <= d.date AND " +
+          "    e.status = 'ACTIVE' " +
+          "  GROUP BY d.date" +
+          "  ORDER BY d.date" +
+          ")" +
+          "SELECT " +
+          "  TO_CHAR(grouped_date, 'YYYY-MM-DD') AS period, " +
+          "  count " +
+          "FROM employee_counts " +
+          "ORDER BY grouped_date",
+      nativeQuery = true)
+  List<Object[]> findEmployeeTrend(
+      @Param("from") LocalDateTime from,
+      @Param("to") LocalDateTime to,
+      @Param("unit") String unit);
 }

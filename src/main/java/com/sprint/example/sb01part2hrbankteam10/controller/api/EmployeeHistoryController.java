@@ -1,4 +1,4 @@
-package com.sprint.example.sb01part2hrbankteam10.controller;
+package com.sprint.example.sb01part2hrbankteam10.controller.api;
 
 import com.sprint.example.sb01part2hrbankteam10.controller.docs.EmployeeHistoryDocs;
 import com.sprint.example.sb01part2hrbankteam10.dto.employee_history.ChangeLogDto;

@@ -42,8 +42,11 @@ public class BackupController implements BackupDocs {
     // 백업 상태로 가장 최근 백업 얻기
     @GetMapping("/latest")
     @Override
-    public ResponseEntity<BackupDto> getLastBackup(@RequestParam Backup.BackupStatus status){
+    public ResponseEntity<BackupDto> getLastBackup(@RequestParam(value = "status", defaultValue = "COMPLETED") Backup.BackupStatus status){
         Backup lastBackup = backupRepository.findFirstByStatusOrderByStartedAtDesc(status);
+        if (lastBackup == null) {
+            return ResponseEntity.noContent().build(); // 204 No Content 반환
+        }
         BackupDto lastBackupDto = BackupMapper.toDto(lastBackup);
         return ResponseEntity.status(HttpStatus.OK).body(lastBackupDto);
     }

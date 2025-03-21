@@ -435,15 +435,20 @@ public class BackupServiceImpl implements BackupService {
     // 정렬 설정
     Sort sort;
     if ("startedAt".equals(sortField)) {
-      sort = Sort.by(sortDirection, "startedAt");
+      // 시작 시간 기준 정렬 시, 시작 시간이 null인 경우 ID로 정렬
+      // ID 정렬 방향도 주 정렬 방향과 동일하게 설정
+      sort = Sort.by(sortDirection, "startedAt").and(Sort.by(sortDirection, "id"));
     } else if ("id".equals(sortField)) {
       sort = Sort.by(sortDirection, "id");
     } else if ("endedAt".equals(sortField)) {
-      sort = Sort.by(sortDirection, "endedAt");
+      // 종료 시간 기준 정렬 시, 종료 시간이 null인 경우 ID로 정렬
+      // ID 정렬 방향도 주 정렬 방향과 동일하게 설정
+      sort = Sort.by(sortDirection, "endedAt").and(Sort.by(sortDirection, "id"));
     } else {
-      // 기본 정렬
-      sort = Sort.by(Sort.Direction.DESC, "startedAt");
+      // 기본 정렬: 시작 시간 내림차순, 시작 시간이 null인 경우 ID도 내림차순
+      sort = Sort.by(Sort.Direction.DESC, "startedAt").and(Sort.by(Sort.Direction.DESC, "id"));
     }
+
     // 페이징 설정
     Pageable pageable = PageRequest.of(basePageable.getPageNumber(), basePageable.getPageSize(), sort);
 

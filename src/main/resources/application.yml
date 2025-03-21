@@ -5,7 +5,7 @@ spring:
   application:
     name: sb01-hrbank-team10
   profiles:
-    default: dev
+    default: prod
   jpa:
     hibernate:
       ddl-auto: none

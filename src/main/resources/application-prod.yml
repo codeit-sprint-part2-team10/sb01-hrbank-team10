@@ -7,3 +7,5 @@ spring:
     hikari:
       data-source-properties:
         serverTimezone: Asia/Seoul
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect

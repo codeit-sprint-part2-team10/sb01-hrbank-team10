@@ -6,8 +6,8 @@
 # Reference: https://intellij-support.jetbrains.com/hc/en-us/articles/206544839
 
 # env
-env/*.yml
-*.env
+/src/main/resources/env/*
+/src/main/resources/env/*.yml
 
 # User-specific stuff
 .idea/**/workspace.xml

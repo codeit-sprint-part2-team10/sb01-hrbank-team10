@@ -93,24 +93,58 @@ public class DepartmentServiceImpl implements DepartmentService {
 
   @Transactional
   public DepartmentDto update(Integer id, DepartmentUpdateRequest request) {
-    // 1. 부서 존재 확인
-    Department department = departmentRepository.findById(id)
-        .orElseThrow(() -> new RestApiException(DepartmentErrorCode.DEPARTMENT_NOT_FOUND,
-            id.toString()));
+    log.info("부서 업데이트 요청: id={}, request={}", id, request);
+    
+    try {
+      // 1. 부서 존재 확인
+      Department department = departmentRepository.findById(id)
+          .orElseThrow(() -> new RestApiException(DepartmentErrorCode.DEPARTMENT_NOT_FOUND,
+              id.toString()));
+      
+      log.info("부서 조회 성공: {}", department);
 
-    // 2. 중복 이름 확인 (같은 이름으로 업데이트하려는 경우 제외)
-    if (!department.getName().equals(request.getName()) &&
-        departmentRepository.existsByName(request.getName())) {
-      throw new RestApiException(DepartmentErrorCode.DEPARTMENT_NOT_ORDER_VALID, id.toString());
+      // 2. 부서명 중복 확인 및 업데이트
+      if (request.getName() != null) {
+        String name = request.getName();
+        if (!name.equals(department.getName()) && departmentRepository.existsByName(name)) {
+          throw new RestApiException(DepartmentErrorCode.DUPLICATION_NAME, name);
+        }
+        department.updateName(name);
+        log.info("부서명 업데이트: {}", name);
+      }
+
+      // 3. 설명 업데이트
+      if (request.getDescription() != null) {
+        department.updateDescription(request.getDescription());
+        log.info("부서 설명 업데이트: {}", request.getDescription());
+      }
+
+      // 4. 설립일 업데이트
+      if (request.getEstablishedDate() != null) {
+        LocalDateTime date = null;
+        try {
+          date = parseLocalDateTime(request.getEstablishedDate().toString());
+          department.updateEstablishedDate(date);
+          log.info("설립일 업데이트: {}", date);
+        } catch (Exception e) {
+          log.error("설립일 파싱 오류: {}", request.getEstablishedDate(), e);
+          throw new RestApiException(EmployeeErrorCode.INVALID_DATE, 
+              "establishedDate=" + request.getEstablishedDate());
+        }
+      }
+
+      // 5. 저장 및 반환
+      Department updatedDepartment = departmentRepository.save(department);
+      log.info("부서 업데이트 완료: {}", updatedDepartment);
+      
+      return departmentMapper.toDto(updatedDepartment);
+    } catch (RestApiException e) {
+      log.error("부서 업데이트 중 API 오류: {}", e.getMessage());
+      throw e;
+    } catch (Exception e) {
+      log.error("부서 업데이트 중 예외 발생: {}", e.getMessage(), e);
+      throw e;
     }
-
-    // 3. 부서 정보 업데이트
-    department.setName(request.getName());
-    department.setDescription(request.getDescription());
-
-    // 4. 저장 및 반환
-    Department updatedDepartment = departmentRepository.save(department);
-    return departmentMapper.toDto(updatedDepartment);
   }
   @Transactional
   @Override

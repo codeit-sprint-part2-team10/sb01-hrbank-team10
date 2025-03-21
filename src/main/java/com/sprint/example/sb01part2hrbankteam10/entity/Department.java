@@ -52,4 +52,16 @@ public class Department {
     this.description = description;
     this.establishedDate = establishedDate;
   }
+
+  public void updateName(String name) {
+    this.name = name;
+  }
+
+  public void updateDescription(String description) {
+    this.description = description;
+  }
+
+  public void updateEstablishedDate(LocalDateTime establishedDate) {
+    this.establishedDate = establishedDate;
+  }
 }

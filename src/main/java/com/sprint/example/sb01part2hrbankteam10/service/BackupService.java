@@ -1,6 +1,6 @@
 package com.sprint.example.sb01part2hrbankteam10.service;
 
-import com.sprint.example.sb01part2hrbankteam10.dto.BackupDto;
+import com.sprint.example.sb01part2hrbankteam10.dto.backup.BackupDto;
 import com.sprint.example.sb01part2hrbankteam10.entity.Backup;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;

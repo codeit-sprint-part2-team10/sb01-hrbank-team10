@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.sprint.example.sb01part2hrbankteam10.entity.Department;
 import com.sprint.example.sb01part2hrbankteam10.entity.Employee;
 import com.sprint.example.sb01part2hrbankteam10.entity.Employee.EmployeeStatus;
-import com.sprint.example.sb01part2hrbankteam10.entity.File;
+import com.sprint.example.sb01part2hrbankteam10.entity.BinaryContent;
 import jakarta.transaction.Transactional;
 import java.math.BigInteger;
 import java.time.LocalDateTime;
@@ -25,7 +25,7 @@ public class EmployeeRepositoryTest {
   @Autowired
   private DepartmentRepository departmentRepository;
   @Autowired
-  private FileRepository fileRepository;
+  private BinaryContentRepository binaryContentRepository;
 
   @Test
   void testSaveEmployeeWithDepartment() {
@@ -71,12 +71,12 @@ public class EmployeeRepositoryTest {
         .build();
     Department saveDepartment = departmentRepository.save(department);
 
-    File profile = File.builder()
+    BinaryContent profile = BinaryContent.builder()
         .name("backup1")
         .contentType("application/zip")
         .size(new BigInteger("1024"))
         .build();
-    File saveProfile = fileRepository.save(profile);
+    BinaryContent saveProfile = binaryContentRepository.save(profile);
 
     Employee employee = Employee.builder()
         .name("yerim")
@@ -154,12 +154,12 @@ public class EmployeeRepositoryTest {
         .build();
     Department saveDepartment = departmentRepository.save(department);
 
-    File profile = File.builder()
+    BinaryContent profile = BinaryContent.builder()
         .name("backup1")
         .contentType("application/zip")
         .size(new BigInteger("1024"))
         .build();
-    File saveProfile = fileRepository.save(profile);
+    BinaryContent saveProfile = binaryContentRepository.save(profile);
 
     Employee employee = Employee.builder()
         .name("yerim")
@@ -178,7 +178,7 @@ public class EmployeeRepositoryTest {
     // 업데이트
     Employee saveEmployee = employeeRepository.findById(preEmployee.getId()).orElseThrow();
 
-    File newProfile = File.builder()
+    BinaryContent newProfile = BinaryContent.builder()
         .name("new")
         .contentType("application/zip")
         .size(new BigInteger("1024"))
@@ -188,8 +188,8 @@ public class EmployeeRepositoryTest {
     Employee updateEmployee = employeeRepository.save(saveEmployee); // 새 프로필로 설정
 
     // 이전 프로필 삭제 확인
-    fileRepository.deleteById(profile.getId());
-    File deleteProfile = fileRepository.findById(profile.getId()).orElse(null);
+    binaryContentRepository.deleteById(profile.getId());
+    BinaryContent deleteProfile = binaryContentRepository.findById(profile.getId()).orElse(null);
 
     // then
     assertEquals("new",updateEmployee.getProfileImage().getName());
@@ -240,12 +240,12 @@ public class EmployeeRepositoryTest {
         .build();
     Department devDepartment = departmentRepository.save(department2);
 
-    File profile = File.builder()
+    BinaryContent profile = BinaryContent.builder()
         .name("backup1")
         .contentType("application/zip")
         .size(new BigInteger("1024"))
         .build();
-    File saveProfile = fileRepository.save(profile);
+    BinaryContent saveProfile = binaryContentRepository.save(profile);
 
     Employee employee = Employee.builder() // 인사팀
         .name("yerim")
@@ -263,7 +263,7 @@ public class EmployeeRepositoryTest {
     employeeRepository.deleteById(saveEmployee.getId());
     Employee getEmployee = employeeRepository.findById(saveEmployee.getId()).orElse(null);
     Department getDepartment = departmentRepository.findById(devDepartment.getId()).orElse(null);
-    File getProfile = fileRepository.findById(saveProfile.getId()).orElse(null);
+    BinaryContent getProfile = binaryContentRepository.findById(saveProfile.getId()).orElse(null);
 
     // then
     assertNull(getEmployee);

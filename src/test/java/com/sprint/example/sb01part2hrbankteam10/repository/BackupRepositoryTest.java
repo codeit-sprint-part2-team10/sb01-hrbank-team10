@@ -2,7 +2,7 @@ package com.sprint.example.sb01part2hrbankteam10.repository;
 
 import com.sprint.example.sb01part2hrbankteam10.entity.Backup;
 import com.sprint.example.sb01part2hrbankteam10.entity.Backup.BackupStatus;
-import com.sprint.example.sb01part2hrbankteam10.entity.File;
+import com.sprint.example.sb01part2hrbankteam10.entity.BinaryContent;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,22 +24,22 @@ class BackupRepositoryTest {
   @Autowired
   private BackupRepository backupRepository;
   @Autowired
-  private FileRepository fileRepository;
+  private BinaryContentRepository binaryContentRepository;
 
   @Test
   void testSaveBackup() {
     // given
     // 파일 생성
-    File file = File.builder()
+    BinaryContent binaryContent = BinaryContent.builder()
         .name("backup1")
         .contentType("application/zip")
         .size(new BigInteger("1024"))
         .build();
-    fileRepository.save(file);
+    binaryContentRepository.save(binaryContent);
 
     // 백업 파일 생성 : 파일이 널이 아닐 때
     Backup backupFileNotNull = Backup.builder()
-        .file(file)
+        .file(binaryContent)
         .startedAt(LocalDateTime.now())
         .endedAt(LocalDateTime.now())
         .workerIpAddress(InetAddress.getLoopbackAddress().getHostAddress())
@@ -67,14 +67,14 @@ class BackupRepositoryTest {
 
     // then
     // 파일이 널이 아닐 때
-    assertEquals(backupFileNotNull.getFile(), resultCreateFileNotNull.getFile());
+    assertEquals(backupFileNotNull.getBinaryContent(), resultCreateFileNotNull.getBinaryContent());
     assertEquals(backupFileNotNull.getStartedAt(), resultCreateFileNotNull.getStartedAt());
     assertEquals(backupFileNotNull.getEndedAt(), resultCreateFileNotNull.getEndedAt());
     assertEquals(backupFileNotNull.getWorkerIpAddress(), resultCreateFileNotNull.getWorkerIpAddress());
     assertEquals(backupFileNotNull.getStatus(), resultCreateFileNotNull.getStatus());
 
     // 파일이 널일 때
-    assertEquals(backupFileIsNull.getFile(), resultCreateFileIsNull.getFile());
+    assertEquals(backupFileIsNull.getBinaryContent(), resultCreateFileIsNull.getBinaryContent());
     assertEquals(backupFileIsNull.getStartedAt(), resultCreateFileIsNull.getStartedAt());
     assertEquals(backupFileIsNull.getEndedAt(), resultCreateFileIsNull.getEndedAt());
     assertEquals(backupFileIsNull.getWorkerIpAddress(), resultCreateFileIsNull.getWorkerIpAddress());
@@ -85,15 +85,15 @@ class BackupRepositoryTest {
   void testDeleteBackup() {
     // given
     // 파일 생성
-    File file = File.builder()
+    BinaryContent binaryContent = BinaryContent.builder()
         .name("backup1")
         .contentType("application/zip")
         .size(new BigInteger("1024"))
         .build();
-    fileRepository.save(file);
+    binaryContentRepository.save(binaryContent);
 
     Backup backup = Backup.builder()
-        .file(file)
+        .file(binaryContent)
         .startedAt(LocalDateTime.now())
         .endedAt(LocalDateTime.now())
         .workerIpAddress(InetAddress.getLoopbackAddress().getHostAddress())
@@ -109,6 +109,6 @@ class BackupRepositoryTest {
     // 백업 삭제
     assertNull(backupRepository.findById(backup.getId()).orElse(null));
     // 파일도 같이 삭제 됐는지 확인 (참조관계)
-    assertNull(fileRepository.findById(file.getId()).orElse(null));
+    assertNull(binaryContentRepository.findById(binaryContent.getId()).orElse(null));
   }
 }

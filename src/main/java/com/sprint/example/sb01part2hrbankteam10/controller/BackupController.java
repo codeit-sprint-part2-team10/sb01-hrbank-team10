@@ -1,8 +1,8 @@
 package com.sprint.example.sb01part2hrbankteam10.controller;
 
 import com.sprint.example.sb01part2hrbankteam10.controller.docs.BackupDocs;
-import com.sprint.example.sb01part2hrbankteam10.dto.BackupDto;
-import com.sprint.example.sb01part2hrbankteam10.dto.CursorPageResponseBackupDto;
+import com.sprint.example.sb01part2hrbankteam10.dto.backup.BackupDto;
+import com.sprint.example.sb01part2hrbankteam10.dto.backup.CursorPageResponseBackupDto;
 import com.sprint.example.sb01part2hrbankteam10.entity.Backup;
 import com.sprint.example.sb01part2hrbankteam10.mapper.BackupMapper;
 import com.sprint.example.sb01part2hrbankteam10.repository.BackupRepository;
@@ -42,7 +42,9 @@ public class BackupController implements BackupDocs {
     // 백업 상태로 가장 최근 백업 얻기
     @GetMapping("/latest")
     @Override
-    public ResponseEntity<BackupDto> getLastBackup(@RequestParam Backup.BackupStatus status){
+    public ResponseEntity<BackupDto> getLastBackup(
+        @RequestParam(value = "status", defaultValue = "COMPLETED") Backup.BackupStatus status
+    ){
         Backup lastBackup = backupRepository.findFirstByStatusOrderByStartedAtDesc(status);
         BackupDto lastBackupDto = BackupMapper.toDto(lastBackup);
         return ResponseEntity.status(HttpStatus.OK).body(lastBackupDto);
@@ -56,7 +58,7 @@ public class BackupController implements BackupDocs {
             @RequestParam(required = false) Backup.BackupStatus status,
             @RequestParam(required = false) String startedAtFrom,
             @RequestParam(required = false) String startedAtTo,
-            @RequestParam(required = false) Integer fileId,
+            @RequestParam(required = false) Integer binaryContentId,
             @RequestParam(required = false) Integer idAfter,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "startedAt") String sortField,
@@ -67,7 +69,7 @@ public class BackupController implements BackupDocs {
                 LocalDateTime.parse(startedAtFrom, DateTimeFormatter.ISO_DATE_TIME) : null;
         LocalDateTime startTo = startedAtTo != null ?
                 LocalDateTime.parse(startedAtTo, DateTimeFormatter.ISO_DATE_TIME) : null;
-        Page<BackupDto> backupPage = backupService.getBackupList(worker, status, startFrom, startTo, fileId, idAfter, null, size, sortField, sortDirection);
+        Page<BackupDto> backupPage = backupService.getBackupList(worker, status, startFrom, startTo, binaryContentId, idAfter, null, size, sortField, sortDirection);
 
         List<BackupDto> content = backupPage.getContent();
         String nextCursor = backupPage.hasNext() && !content.isEmpty() ?

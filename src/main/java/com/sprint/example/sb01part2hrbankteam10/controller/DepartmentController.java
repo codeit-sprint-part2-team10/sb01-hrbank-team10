@@ -1,11 +1,11 @@
 package com.sprint.example.sb01part2hrbankteam10.controller;
 
 import com.sprint.example.sb01part2hrbankteam10.controller.docs.DepartmentDocs;
-import com.sprint.example.sb01part2hrbankteam10.dto.CursorPageResponseDto;
-import com.sprint.example.sb01part2hrbankteam10.dto.DepartmentCreateRequest;
-import com.sprint.example.sb01part2hrbankteam10.dto.DepartmentDto;
-import com.sprint.example.sb01part2hrbankteam10.dto.DepartmentResponseDto;
-import com.sprint.example.sb01part2hrbankteam10.dto.DepartmentUpdateRequest;
+import com.sprint.example.sb01part2hrbankteam10.dto.page.CursorPageResponseDto;
+import com.sprint.example.sb01part2hrbankteam10.dto.department.DepartmentCreateRequest;
+import com.sprint.example.sb01part2hrbankteam10.dto.department.DepartmentDto;
+import com.sprint.example.sb01part2hrbankteam10.dto.department.DepartmentResponseDto;
+import com.sprint.example.sb01part2hrbankteam10.dto.department.DepartmentUpdateRequest;
 import com.sprint.example.sb01part2hrbankteam10.service.DepartmentService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

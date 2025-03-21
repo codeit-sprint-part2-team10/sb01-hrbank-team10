@@ -1,13 +1,13 @@
 package com.sprint.example.sb01part2hrbankteam10.controller;
 
 import com.sprint.example.sb01part2hrbankteam10.controller.docs.EmployeeDocs;
-import com.sprint.example.sb01part2hrbankteam10.dto.CursorPageResponseDto;
-import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeCreateRequest;
-import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeDistributionDto;
-import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeDto;
-import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeSearchRequest;
-import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeTrendDto;
-import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeUpdateRequest;
+import com.sprint.example.sb01part2hrbankteam10.dto.page.CursorPageResponseDto;
+import com.sprint.example.sb01part2hrbankteam10.dto.employee.EmployeeCreateRequest;
+import com.sprint.example.sb01part2hrbankteam10.dto.employee.EmployeeDistributionDto;
+import com.sprint.example.sb01part2hrbankteam10.dto.employee.EmployeeDto;
+import com.sprint.example.sb01part2hrbankteam10.dto.employee.EmployeeSearchRequest;
+import com.sprint.example.sb01part2hrbankteam10.dto.employee.EmployeeTrendDto;
+import com.sprint.example.sb01part2hrbankteam10.dto.employee.EmployeeUpdateRequest;
 import com.sprint.example.sb01part2hrbankteam10.entity.Employee.EmployeeStatus;
 import com.sprint.example.sb01part2hrbankteam10.service.EmployeeService;
 import com.sprint.example.sb01part2hrbankteam10.service.EmployeeStatService;

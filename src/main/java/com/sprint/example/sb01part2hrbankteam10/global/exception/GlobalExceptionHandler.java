@@ -1,7 +1,6 @@
 package com.sprint.example.sb01part2hrbankteam10.global.exception;
 
 import com.sprint.example.sb01part2hrbankteam10.global.exception.errorcode.GlobalErrorCode;
-import com.sprint.example.sb01part2hrbankteam10.global.response.RestApiResponse;
 import java.time.LocalDateTime;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;

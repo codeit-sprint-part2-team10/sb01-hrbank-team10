@@ -26,8 +26,8 @@ public class Backup {
   private LocalDateTime createdAt;
 
   @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
-  @JoinColumn(name = "file_id")
-  private File file;
+  @JoinColumn(name = "binary_content_id")
+  private BinaryContent binaryContent;
 
   @Column(name = "started_at", columnDefinition = "timestamp with time zone")
   private LocalDateTime startedAt;
@@ -43,9 +43,9 @@ public class Backup {
   private BackupStatus status;
 
   @Builder
-  public Backup(File file, LocalDateTime startedAt, LocalDateTime endedAt, String workerIpAddress,
+  public Backup(BinaryContent binaryContent, LocalDateTime startedAt, LocalDateTime endedAt, String workerIpAddress,
       BackupStatus status, LocalDateTime batchDoneAt) {
-    this.file = file;
+    this.binaryContent = binaryContent;
     this.startedAt = startedAt;
     this.endedAt = endedAt;
     this.workerIpAddress = workerIpAddress;

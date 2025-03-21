@@ -79,7 +79,7 @@ fabric.properties
 # Editor-based Rest Client
 .idea/httpRequests
 
-# Android studio 3.1+ serialized cache file
+# Android studio 3.1+ serialized cache binaryContent
 .idea/caches/build_file_checksums.ser
 
 ### Intellij+all Patch ###
@@ -92,10 +92,10 @@ fabric.properties
 !.idea/runConfigurations
 
 ### Java ###
-# Compiled class file
+# Compiled class binaryContent
 *.class
 
-# Log file
+# Log binaryContent
 *.log
 
 # BlueJ files
@@ -176,13 +176,13 @@ Thumbs.db:encryptable
 ehthumbs.db
 ehthumbs_vista.db
 
-# Dump file
+# Dump binaryContent
 *.stackdump
 
-# Folder config file
+# Folder config binaryContent
 [Dd]esktop.ini
 
-# Recycle Bin used on file shares
+# Recycle Bin used on binaryContent shares
 $RECYCLE.BIN/
 
 # Windows Installer files
@@ -203,7 +203,7 @@ $RECYCLE.BIN/
 # Ignore Gradle GUI config
 gradle-app.setting
 
-# Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
+# Avoid ignoring Gradle wrapper jar binaryContent (.jar files are usually ignored)
 !gradle-wrapper.jar
 
 # Avoid ignore Gradle wrappper properties

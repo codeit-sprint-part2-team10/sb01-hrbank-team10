@@ -1,6 +1,10 @@
 package com.sprint.example.sb01part2hrbankteam10.controller.docs;
 
-import com.sprint.example.sb01part2hrbankteam10.dto.*;
+import com.sprint.example.sb01part2hrbankteam10.dto.department.DepartmentCreateRequest;
+import com.sprint.example.sb01part2hrbankteam10.dto.department.DepartmentDto;
+import com.sprint.example.sb01part2hrbankteam10.dto.department.DepartmentResponseDto;
+import com.sprint.example.sb01part2hrbankteam10.dto.department.DepartmentUpdateRequest;
+import com.sprint.example.sb01part2hrbankteam10.dto.page.CursorPageResponseDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;

@@ -1,8 +1,8 @@
 package com.sprint.example.sb01part2hrbankteam10.controller.docs;
 
-import com.sprint.example.sb01part2hrbankteam10.dto.ChangeLogDto;
-import com.sprint.example.sb01part2hrbankteam10.dto.CursorPageResponseChangeLogDto;
-import com.sprint.example.sb01part2hrbankteam10.dto.DiffDto;
+import com.sprint.example.sb01part2hrbankteam10.dto.employee_history.ChangeLogDto;
+import com.sprint.example.sb01part2hrbankteam10.dto.employee_history.CursorPageResponseChangeLogDto;
+import com.sprint.example.sb01part2hrbankteam10.dto.employee_history.DiffDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;

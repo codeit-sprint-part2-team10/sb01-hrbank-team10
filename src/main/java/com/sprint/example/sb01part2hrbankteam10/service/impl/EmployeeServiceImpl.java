@@ -1,32 +1,30 @@
 package com.sprint.example.sb01part2hrbankteam10.service.impl;
 
-import com.sprint.example.sb01part2hrbankteam10.dto.CursorPageResponseDto;
-import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeCreateRequest;
-import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeDto;
-import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeSearchRequest;
-import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeUpdateRequest;
+import com.sprint.example.sb01part2hrbankteam10.dto.page.CursorPageResponseDto;
+import com.sprint.example.sb01part2hrbankteam10.dto.employee.EmployeeCreateRequest;
+import com.sprint.example.sb01part2hrbankteam10.dto.employee.EmployeeDto;
+import com.sprint.example.sb01part2hrbankteam10.dto.employee.EmployeeSearchRequest;
+import com.sprint.example.sb01part2hrbankteam10.dto.employee.EmployeeUpdateRequest;
+import com.sprint.example.sb01part2hrbankteam10.entity.BinaryContent;
 import com.sprint.example.sb01part2hrbankteam10.entity.Department;
 import com.sprint.example.sb01part2hrbankteam10.entity.Employee;
 import com.sprint.example.sb01part2hrbankteam10.entity.Employee.EmployeeStatus;
 import com.sprint.example.sb01part2hrbankteam10.entity.EmployeeHistory.ChangeType;
-import com.sprint.example.sb01part2hrbankteam10.entity.File;
 import com.sprint.example.sb01part2hrbankteam10.global.exception.RestApiException;
 import com.sprint.example.sb01part2hrbankteam10.global.exception.errorcode.DepartmentErrorCode;
 import com.sprint.example.sb01part2hrbankteam10.global.exception.errorcode.EmployeeErrorCode;
 import com.sprint.example.sb01part2hrbankteam10.mapper.EmployeeMapper;
 import com.sprint.example.sb01part2hrbankteam10.repository.DepartmentRepository;
 import com.sprint.example.sb01part2hrbankteam10.repository.EmployeeRepository;
-import com.sprint.example.sb01part2hrbankteam10.repository.FileRepository;
+import com.sprint.example.sb01part2hrbankteam10.repository.BinaryContentRepository;
 import com.sprint.example.sb01part2hrbankteam10.repository.specification.EmployeeSpecification;
 import com.sprint.example.sb01part2hrbankteam10.service.EmployeeHistoryService;
 import com.sprint.example.sb01part2hrbankteam10.service.EmployeeService;
-import com.sprint.example.sb01part2hrbankteam10.storage.FileStorage;
+import com.sprint.example.sb01part2hrbankteam10.storage.BinaryContentStorage;
 import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
-import java.util.Base64;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
@@ -47,8 +45,8 @@ public class EmployeeServiceImpl implements EmployeeService {
 
   private final DepartmentRepository departmentRepository;
   private final EmployeeRepository employeeRepository;
-  private final FileRepository fileRepository;
-  private final FileStorage fileStorage;
+  private final BinaryContentRepository binaryContentRepository;
+  private final BinaryContentStorage binaryContentStorage;
   private final EmployeeHistoryService employeeHistoryService;
 
   private static final Set<String> SORT_FIELDS = Set.of("name", "employeeNumber", "hireDate");
@@ -63,16 +61,16 @@ public class EmployeeServiceImpl implements EmployeeService {
     LocalDateTime hireDate = parseLocalDateTime(request.getHireDate());
     String employeeNumber = generateEmployeeNumber(hireDate);
 
-    File newProfile = null;
+    BinaryContent newProfile = null;
     if (validateFile(profile)) {
-      newProfile = fileRepository.save(
-          File.builder()
+      newProfile = binaryContentRepository.save(
+          BinaryContent.builder()
               .name(profile.getName())
               .contentType(profile.getContentType())
               .size(BigInteger.valueOf(profile.getSize()))
               .build()
       );
-      fileStorage.saveProfile(newProfile.getId(), profile);
+      binaryContentStorage.saveProfile(newProfile.getId(), profile);
     }
 
     Employee newEmployee = Employee.builder()
@@ -118,10 +116,10 @@ public class EmployeeServiceImpl implements EmployeeService {
       employee.updateDepartment(getDepartmentOrThrow(departmentId));
     });
 
-    File newProfile = null;
+    BinaryContent newProfile = null;
     if (validateFile(profile)) {
-      newProfile = fileRepository.save(
-          File.builder()
+      newProfile = binaryContentRepository.save(
+          BinaryContent.builder()
               .name(profile.getName())
               .contentType(profile.getContentType())
               .size(BigInteger.valueOf(profile.getSize()))
@@ -134,10 +132,10 @@ public class EmployeeServiceImpl implements EmployeeService {
       }
       employee.updateProfileImage(newProfile);              // 프로필 업데이트
       if (previousProfileImageId != null) {
-        fileRepository.deleteById(previousProfileImageId);  // 기존 프로필 데이터 삭제
-        fileStorage.deleteProfile(previousProfileImageId);  // 로컬 데이터 삭제
+        binaryContentRepository.deleteById(previousProfileImageId);  // 기존 프로필 데이터 삭제
+        binaryContentStorage.deleteProfile(previousProfileImageId);  // 로컬 데이터 삭제
       }
-      fileStorage.saveProfile(newProfile.getId(), profile); // 로컬 저장
+      binaryContentStorage.saveProfile(newProfile.getId(), profile); // 로컬 저장
     }
 
     EmployeeDto after = EmployeeMapper.toDto(employee);
@@ -159,8 +157,8 @@ public class EmployeeServiceImpl implements EmployeeService {
     if (employee.getProfileImage() != null) {
       Integer previousProfileImageId = employee.getProfileImage().getId();
       employee.updateProfileImage(null);
-      fileRepository.deleteById(previousProfileImageId);
-      fileStorage.deleteProfile(previousProfileImageId);
+      binaryContentRepository.deleteById(previousProfileImageId);
+      binaryContentStorage.deleteProfile(previousProfileImageId);
     }
 
     EmployeeDto before = EmployeeMapper.toDto(employee);

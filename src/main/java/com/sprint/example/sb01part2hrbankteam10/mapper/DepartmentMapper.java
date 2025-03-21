@@ -1,6 +1,6 @@
 package com.sprint.example.sb01part2hrbankteam10.mapper;
 
-import com.sprint.example.sb01part2hrbankteam10.dto.DepartmentDto;
+import com.sprint.example.sb01part2hrbankteam10.dto.department.DepartmentDto;
 import com.sprint.example.sb01part2hrbankteam10.entity.Department;
 import com.sprint.example.sb01part2hrbankteam10.repository.EmployeeHistoryRepository;
 import com.sprint.example.sb01part2hrbankteam10.repository.EmployeeRepository;

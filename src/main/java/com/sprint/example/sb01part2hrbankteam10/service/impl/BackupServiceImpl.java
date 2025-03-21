@@ -37,11 +37,10 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Base64;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import static org.apache.commons.lang3.StringEscapeUtils.escapeCsv;
 
@@ -60,7 +59,7 @@ public class BackupServiceImpl implements BackupService {
   @Override
   public Integer performBackup() {
 
-    String workerIpAddress = "SYSTEM";
+    String workerIpAddress = "system";
 
     // 로직: if 백업 불필요 -> 건너뜀 상태로 배치이력 저장하고 프로세스 종료
     if (!isBackupNeeded()) {
@@ -80,7 +79,7 @@ public class BackupServiceImpl implements BackupService {
       List<EmployeeForBackupDto> backupContent = fetchEmployeeData();
 
       // 전체 직원 정보를 CSV 파일로 저장 = 스트리밍/버퍼
-      ResponseEntity<Resource> response = convertBackupToCsvFile(backupContent);
+      ResponseEntity<Resource> response = convertBackupToCsvFile(backupContent, atStartBackupHistory.getId());
 
       // 파일을 MultipartFile로 변환 (파일이 생성되었을 경우만)
       if (response.getBody() instanceof FileSystemResource) {
@@ -117,8 +116,7 @@ public class BackupServiceImpl implements BackupService {
       fileStorage.saveBackup(fileId, backUpMultipartFile);
 
       // 백업 성공 -> 백업이력 완료로 수정
-      Backup completedBackupHistory = createBackupHistory(workerIpAddress, BackupStatus.COMPLETED,
-              atStartBackupHistory.getStartedAt(), LocalDateTime.now(), savedFile);
+      Backup completedBackupHistory = updateBackupHistory(atStartBackupHistory, workerIpAddress, savedFile);
       return backupRepository.save(completedBackupHistory).getId();
 
     } catch (Exception e) {
@@ -150,16 +148,13 @@ public class BackupServiceImpl implements BackupService {
   // 백업 여부 결정 로직: 가장 최근 완료된 배치 작업시간 < 직원 데이터 변경 시간 -> 백업 필요
   private boolean isBackupNeeded() {
 
-    String dataString = "2025-03-11T00:00:00";
-    LocalDateTime lastBackupTime = LocalDateTime.parse(dataString);
-//    LocalDateTime lastBackupTime = backupRepository.findLastCompletedBackupAt();
+    LocalDateTime lastBackupTime = backupRepository.findLastCompletedBackupAt();
 
     if (lastBackupTime == null) {
       lastBackupTime = LocalDateTime.MIN;
     }
-    String dataString2 = "2025-03-12T00:00:00";
-    LocalDateTime lastEmployeeUpdate = LocalDateTime.parse(dataString2);
-//    LocalDateTime lastEmployeeUpdate = employeeHistoryRepository.findLastModifiedAt();
+
+    LocalDateTime lastEmployeeUpdate = employeeHistoryRepository.findLastModifiedAt();
     if (lastEmployeeUpdate == null) {
       lastEmployeeUpdate = LocalDateTime.MIN;
     }
@@ -177,14 +172,27 @@ public class BackupServiceImpl implements BackupService {
             .build();
   }
 
-  private ResponseEntity<Resource> convertBackupToCsvFile(List<EmployeeForBackupDto> backupContent) {
+  private Backup updateBackupHistory(Backup backupHistory, String workerIpAddress, com.sprint.example.sb01part2hrbankteam10.entity.File savedFile) {
+    backupRepository.delete(backupHistory);
+    return createBackupHistory(workerIpAddress, BackupStatus.COMPLETED,
+            backupHistory.getStartedAt(), LocalDateTime.now(), savedFile);
+  }
+
+
+  private ResponseEntity<Resource> convertBackupToCsvFile(List<EmployeeForBackupDto> backupContent, Integer backupId) {
     File csvFile = null;
+    File zipFile = null;
+
     try {
       // 임시 디렉토리에 파일 생성
       csvFile = File.createTempFile("backup_", ".csv");
 
       try (BufferedWriter writer = new BufferedWriter(
               new OutputStreamWriter(new FileOutputStream(csvFile), StandardCharsets.UTF_8))) {
+
+        // BOM 마커 추가 (UTF-8 인코딩 명시)
+        writer.write('\uFEFF');
+
         // 헤더 작성
         writer.write("ID,직원번호,이름,이메일,부서,직급,입사일,상태");
         writer.newLine();
@@ -218,19 +226,41 @@ public class BackupServiceImpl implements BackupService {
         }
         writer.flush();
 
-        // 파일을 Resource로 변환
-        FileSystemResource resource = new FileSystemResource(csvFile);
+        // ZIP 파일 생성
+        zipFile = File.createTempFile("backup_", ".zip");
+        try (FileOutputStream fos = new FileOutputStream(zipFile);
+             ZipOutputStream zos = new ZipOutputStream(fos)) {
 
-        // ResponseEntity 생성
+          // ZIP 엔트리 생성 및 CSV 파일 추가
+          ZipEntry zipEntry = new ZipEntry("backup_" + backupId + ".csv");
+          zos.putNextEntry(zipEntry);
+
+          // 버퍼를 사용해 파일 내용 복사
+          byte[] buffer = new byte[1024];
+          try (FileInputStream fis = new FileInputStream(csvFile)) {
+            int length;
+            while ((length = fis.read(buffer)) > 0) {
+              zos.write(buffer, 0, length);
+            }
+          }
+          zos.closeEntry();
+        }
+
+        // 임시 CSV 파일 삭제
+        csvFile.delete();
+
+        // ZIP 파일 반환
+        FileSystemResource resource = new FileSystemResource(zipFile);
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=backup.csv")
-                .contentType(MediaType.parseMediaType("text/csv;charset=UTF-8"))
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"backup_" + backupId + ".zip\"")
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .body(resource);
       }
     } catch (IOException e) {
-      if (csvFile != null && csvFile.exists()) {
-        csvFile.delete();
-      }
+      // 오류 발생 시 임시 파일 정리
+      if (csvFile != null && csvFile.exists()) csvFile.delete();
+      if (zipFile != null && zipFile.exists()) zipFile.delete();
       throw new RestApiException(BackupErrorCode.BACKUP_FILE_CREATION_FAILED, e.getMessage());
     }
   }
@@ -247,6 +277,7 @@ public class BackupServiceImpl implements BackupService {
 
   private MultipartFile logError(Exception e) {
     File logFile = new File("backup_error.log");
+    File zipFile = new File("backup_error.zip");
 
     try (FileWriter fileWriter = new FileWriter(logFile, true);
          BufferedWriter bufferedWriter = new BufferedWriter(fileWriter)) {
@@ -258,14 +289,33 @@ public class BackupServiceImpl implements BackupService {
     }
 
     if (logFile.exists()) {
+      try (FileOutputStream fos = new FileOutputStream(zipFile);
+           ZipOutputStream zos = new ZipOutputStream(fos);
+           FileInputStream fis = new FileInputStream(logFile)) {
+
+        ZipEntry zipEntry = new ZipEntry(logFile.getName());
+        zos.putNextEntry(zipEntry);
+
+        byte[] buffer = new byte[1024];
+        int length;
+        while ((length = fis.read(buffer)) > 0) {
+          zos.write(buffer, 0, length);
+        }
+
+        zos.closeEntry();
+      } catch (IOException ioException) {
+        ioException.printStackTrace();
+      }
+
+      // ZIP 파일을 MultipartFile로 변환
       try {
-        // File을 MultipartFile로 변환하는 방법
         MultipartFile multipartFile = new MockMultipartFile(
-                logFile.getName(),                // 파일 이름
-                logFile.getName(),                // 원본 파일 이름
-                "text/plain",                     // MIME 타입
-                new FileInputStream(logFile)      // 파일 내용
+                zipFile.getName(),
+                zipFile.getName(),
+                "application/zip",
+                new FileInputStream(zipFile)
         );
+
 
         // 파일 DB에 저장
         BigInteger fileSize = BigInteger.valueOf(logFile.length());
@@ -279,6 +329,10 @@ public class BackupServiceImpl implements BackupService {
 
         // 변환된 MultipartFile을 사용하여 저장
         fileStorage.saveBackup(fileId, multipartFile);
+
+        // 로그 파일 삭제
+        logFile.delete();
+
         return multipartFile;
 
       } catch (IOException ioException) {
@@ -328,6 +382,7 @@ public class BackupServiceImpl implements BackupService {
           Backup.BackupStatus status,
           LocalDateTime startedAtFrom,
           LocalDateTime startedAtTo,
+          Integer fileId,
           Integer idAfter,
           String cursor,
           int size,
@@ -354,6 +409,7 @@ public class BackupServiceImpl implements BackupService {
     // Specification 생성
     Specification<Backup> spec = Specification.where(null);
 
+    // 검색 조건으로 조회
     if (workerIpAddress != null) {
       spec = spec.and((root, query, cb) -> cb.equal(root.get("workerIpAddress"), workerIpAddress));
     }
@@ -362,8 +418,12 @@ public class BackupServiceImpl implements BackupService {
       spec = spec.and((root, query, cb) -> cb.equal(root.get("status"), status));
     }
 
-    if (startedAtFrom != null && startedAtTo != null) {
-      spec = spec.and((root, query, cb) -> cb.between(root.get("startedAt"), startedAtFrom, startedAtTo));
+    if (startedAtFrom != null) {
+      spec = spec.and((root, query, cb) -> cb.greaterThanOrEqualTo(root.get("startedAt"), startedAtFrom));
+    }
+
+    if (startedAtTo != null) {
+      spec = spec.and((root, query, cb) -> cb.lessThanOrEqualTo(root.get("startedAt"), startedAtTo));
     }
 
     if (idAfter != null) {
@@ -376,11 +436,12 @@ public class BackupServiceImpl implements BackupService {
       sort = Sort.by(sortDirection, "startedAt");
     } else if ("id".equals(sortField)) {
       sort = Sort.by(sortDirection, "id");
+    } else if ("endedAt".equals(sortField)) {
+      sort = Sort.by(sortDirection, "endedAt");
     } else {
       // 기본 정렬
       sort = Sort.by(Sort.Direction.DESC, "startedAt");
     }
-
     // 페이징 설정
     Pageable pageable = PageRequest.of(basePageable.getPageNumber(), basePageable.getPageSize(), sort);
 
@@ -390,10 +451,11 @@ public class BackupServiceImpl implements BackupService {
     // DTO 변환 로직
     return backupPage.map(backup -> BackupDto.builder()
             .id(backup.getId())
-            .workerIpAddress(backup.getWorkerIpAddress())
+            .worker(backup.getWorkerIpAddress())
             .status(backup.getStatus())
             .startedAt(backup.getStartedAt())
+            .endedAt(backup.getEndedAt())
+            .fileId(Optional.ofNullable(backup.getFile()).map(file -> file.getId()).orElse(null))
             .build());
   }
-
 }

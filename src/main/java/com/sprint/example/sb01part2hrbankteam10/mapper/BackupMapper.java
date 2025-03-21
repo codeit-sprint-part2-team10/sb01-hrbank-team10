@@ -10,7 +10,7 @@ public class BackupMapper {
 
         return BackupDto.builder()
                 .id(backup.getId())
-                .workerIpAddress(backup.getWorkerIpAddress())
+                .worker(backup.getWorkerIpAddress())
                 .startedAt(backup.getStartedAt())
                 .endedAt(backup.getEndedAt())
                 .status(backup.getStatus())

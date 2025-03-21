@@ -13,6 +13,7 @@ public interface BackupService {
                                Backup.BackupStatus status,
                                LocalDateTime startedAtFrom,
                                LocalDateTime startedAtTo,
+                               Integer fileId,
                                Integer idAfter,
                                String cursor,
                                int size,

@@ -14,9 +14,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
-import java.time.LocalDateTime;
 import java.util.Map;
 
 @Tag(name = "Backup", description = "백업 관리 API")
@@ -69,10 +70,13 @@ public interface BackupDocs {
             @RequestParam(required = false) Backup.BackupStatus status,
 
             @Parameter(description = "시작 시간(부터)", example = "2023-01-01T12:00:00Z")
-            @RequestParam(required = false) LocalDateTime startedAtFrom,
+            @RequestParam(required = false) String startedAtFrom,
 
             @Parameter(description = "시작 시간(까지)", example = "2024-12-31T23:59:59")
-            @RequestParam(required = false) LocalDateTime startedAtTo,
+            @RequestParam(required = false) String startedAtTo,
+
+            @Parameter(description = "백업 파일", example = "40")
+            @RequestParam(required = false) Integer fileId,
 
             @Parameter(description = "이전 페이지 마지막 요소 ID")
             @RequestParam(required = false) Integer idAfter,

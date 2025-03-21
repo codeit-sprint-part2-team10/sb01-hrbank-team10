@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class BackupDto {
   Integer id;
-  String workerIpAddress;
+  String worker;
   LocalDateTime startedAt;
   LocalDateTime endedAt;
   BackupStatus status;

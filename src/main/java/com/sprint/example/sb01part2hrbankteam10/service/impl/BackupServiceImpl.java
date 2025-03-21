@@ -1,21 +1,22 @@
 package com.sprint.example.sb01part2hrbankteam10.service.impl;
 
-import com.sprint.example.sb01part2hrbankteam10.dto.BackupDto;
-import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeDto;
-import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeForBackupDto;
+import com.sprint.example.sb01part2hrbankteam10.dto.backup.BackupDto;
+import com.sprint.example.sb01part2hrbankteam10.dto.employee.EmployeeDto;
+import com.sprint.example.sb01part2hrbankteam10.dto.backup.EmployeeForBackupDto;
 import com.sprint.example.sb01part2hrbankteam10.entity.Backup;
 import com.sprint.example.sb01part2hrbankteam10.entity.Backup.BackupStatus;
+import com.sprint.example.sb01part2hrbankteam10.entity.BinaryContent;
 import com.sprint.example.sb01part2hrbankteam10.entity.Employee;
 import com.sprint.example.sb01part2hrbankteam10.global.exception.RestApiException;
 import com.sprint.example.sb01part2hrbankteam10.global.exception.errorcode.BackupErrorCode;
-import com.sprint.example.sb01part2hrbankteam10.global.exception.errorcode.FileErrorCode;
+import com.sprint.example.sb01part2hrbankteam10.global.exception.errorcode.BinaryContentErrorCode;
 import com.sprint.example.sb01part2hrbankteam10.mapper.EmployeeMapper;
 import com.sprint.example.sb01part2hrbankteam10.repository.BackupRepository;
 import com.sprint.example.sb01part2hrbankteam10.repository.EmployeeHistoryRepository;
 import com.sprint.example.sb01part2hrbankteam10.repository.EmployeeRepository;
-import com.sprint.example.sb01part2hrbankteam10.repository.FileRepository;
+import com.sprint.example.sb01part2hrbankteam10.repository.BinaryContentRepository;
 import com.sprint.example.sb01part2hrbankteam10.service.BackupService;
-import com.sprint.example.sb01part2hrbankteam10.storage.FileStorage;
+import com.sprint.example.sb01part2hrbankteam10.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.core.io.FileSystemResource;
@@ -50,8 +51,8 @@ import static org.apache.commons.lang3.StringEscapeUtils.escapeCsv;
 public class BackupServiceImpl implements BackupService {
 
   private final BackupRepository backupRepository;
-  private final FileRepository fileRepository;
-  private final FileStorage fileStorage;
+  private final BinaryContentRepository binaryContentRepository;
+  private final BinaryContentStorage binaryContentStorage;
   private final EmployeeRepository employeeRepository;
   private final EmployeeHistoryRepository employeeHistoryRepository;
   private final ModelMapper modelMapper;
@@ -96,16 +97,16 @@ public class BackupServiceImpl implements BackupService {
 
       // 파일 정보를 먼저 DB에 저장 후 ID를 가져옴
       BigInteger fileSize = BigInteger.valueOf(backupFile.length());
-      com.sprint.example.sb01part2hrbankteam10.entity.File fileEntity = com.sprint.example.sb01part2hrbankteam10.entity.File.builder()
+      BinaryContent binaryContentEntity = BinaryContent.builder()
               .name(backupFile.getName())
               .contentType("text/csv")
               .size(fileSize)
               .build();
 
       // 저장하고 ID 반환받기
-      Integer fileId = fileRepository.save(fileEntity).getId();
-      com.sprint.example.sb01part2hrbankteam10.entity.File savedFile = fileRepository.findById(fileId)
-              .orElseThrow(() -> new RestApiException(FileErrorCode.FILE_NOT_FOUND, "파일을 찾을 수 없습니다."));
+      Integer fileId = binaryContentRepository.save(binaryContentEntity).getId();
+      BinaryContent savedBinaryContent = binaryContentRepository.findById(fileId)
+              .orElseThrow(() -> new RestApiException(BinaryContentErrorCode.BINARY_CONTENT_NOT_FOUND, "파일을 찾을 수 없습니다."));
 
       // 확실히 ID가 있는지 확인
       if (fileId == null) {
@@ -113,16 +114,17 @@ public class BackupServiceImpl implements BackupService {
       }
 
       // 그 후에 파일 저장
-      fileStorage.saveBackup(fileId, backUpMultipartFile);
+      binaryContentStorage.saveBackup(fileId, backUpMultipartFile);
 
       // 백업 성공 -> 백업이력 완료로 수정
-      Backup completedBackupHistory = updateBackupHistory(atStartBackupHistory, workerIpAddress, savedFile);
+      Backup completedBackupHistory = updateBackupHistory(atStartBackupHistory, workerIpAddress,
+          savedBinaryContent);
       return backupRepository.save(completedBackupHistory).getId();
 
     } catch (Exception e) {
       // 저장하던 파일 삭제, 에러로그 .log 파일로 저장, 백업이력 실패로 수정
       MultipartFile file = logError(e);
-      com.sprint.example.sb01part2hrbankteam10.entity.File savedLogFile = com.sprint.example.sb01part2hrbankteam10.entity.File.builder()
+      BinaryContent savedLogBinaryContent = BinaryContent.builder()
               .name(file.getName())
               .contentType(file.getContentType())
               .size(BigInteger.valueOf(file.getSize()))
@@ -130,15 +132,15 @@ public class BackupServiceImpl implements BackupService {
 
 
       Backup failedBackupHistory = createBackupHistory(workerIpAddress, BackupStatus.FAILED,
-              atStartBackupHistory.getStartedAt(), null, savedLogFile);
+              atStartBackupHistory.getStartedAt(), null, savedLogBinaryContent);
       backupRepository.save(failedBackupHistory);
 
       // 파일이 생성되었을 경우에만 삭제
       if (backupFile != null) {
-        Integer fileId = fileRepository.findByName(backupFile.getName());
+        Integer fileId = binaryContentRepository.findByName(backupFile.getName());
         if (fileId != null) {
-          fileRepository.deleteById(fileId);
-          fileStorage.deleteBackup(fileId);
+          binaryContentRepository.deleteById(fileId);
+          binaryContentStorage.deleteBackup(fileId);
         }
       }
       throw new RestApiException(BackupErrorCode.BACKUP_ERROR, failedBackupHistory.getId().toString());
@@ -162,20 +164,20 @@ public class BackupServiceImpl implements BackupService {
     return lastBackupTime.isBefore(lastEmployeeUpdate);
   }
 
-  private Backup createBackupHistory(String workerIpAddress, BackupStatus status, LocalDateTime startedAt, LocalDateTime endedAt, com.sprint.example.sb01part2hrbankteam10.entity.File file) {
+  private Backup createBackupHistory(String workerIpAddress, BackupStatus status, LocalDateTime startedAt, LocalDateTime endedAt, BinaryContent binaryContent) {
     return Backup.builder()
             .workerIpAddress(workerIpAddress)
             .status(status)
             .startedAt(startedAt)
             .endedAt(endedAt)
-            .file(file)
+            .binaryContent(binaryContent)
             .build();
   }
 
-  private Backup updateBackupHistory(Backup backupHistory, String workerIpAddress, com.sprint.example.sb01part2hrbankteam10.entity.File savedFile) {
+  private Backup updateBackupHistory(Backup backupHistory, String workerIpAddress, BinaryContent savedBinaryContent) {
     backupRepository.delete(backupHistory);
     return createBackupHistory(workerIpAddress, BackupStatus.COMPLETED,
-            backupHistory.getStartedAt(), LocalDateTime.now(), savedFile);
+            backupHistory.getStartedAt(), LocalDateTime.now(), savedBinaryContent);
   }
 
 
@@ -319,16 +321,16 @@ public class BackupServiceImpl implements BackupService {
 
         // 파일 DB에 저장
         BigInteger fileSize = BigInteger.valueOf(logFile.length());
-        com.sprint.example.sb01part2hrbankteam10.entity.File file = com.sprint.example.sb01part2hrbankteam10.entity.File.builder()
+        BinaryContent binaryContent = BinaryContent.builder()
                 .name(logFile.getName())
                 .contentType("text/plain")
                 .size(fileSize)
                 .build();
 
-        Integer fileId = fileRepository.save(file).getId();
+        Integer fileId = binaryContentRepository.save(binaryContent).getId();
 
         // 변환된 MultipartFile을 사용하여 저장
-        fileStorage.saveBackup(fileId, multipartFile);
+        binaryContentStorage.saveBackup(fileId, multipartFile);
 
         // 로그 파일 삭제
         logFile.delete();
@@ -455,7 +457,7 @@ public class BackupServiceImpl implements BackupService {
             .status(backup.getStatus())
             .startedAt(backup.getStartedAt())
             .endedAt(backup.getEndedAt())
-            .fileId(Optional.ofNullable(backup.getFile()).map(file -> file.getId()).orElse(null))
+            .fileId(Optional.ofNullable(backup.getBinaryContent()).map(file -> file.getId()).orElse(null))
             .build());
   }
 }

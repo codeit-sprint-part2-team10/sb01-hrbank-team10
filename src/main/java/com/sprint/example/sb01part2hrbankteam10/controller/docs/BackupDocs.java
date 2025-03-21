@@ -1,7 +1,7 @@
 package com.sprint.example.sb01part2hrbankteam10.controller.docs;
 
-import com.sprint.example.sb01part2hrbankteam10.dto.BackupDto;
-import com.sprint.example.sb01part2hrbankteam10.dto.CursorPageResponseBackupDto;
+import com.sprint.example.sb01part2hrbankteam10.dto.backup.BackupDto;
+import com.sprint.example.sb01part2hrbankteam10.dto.backup.CursorPageResponseBackupDto;
 import com.sprint.example.sb01part2hrbankteam10.entity.Backup;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -76,7 +76,7 @@ public interface BackupDocs {
             @RequestParam(required = false) String startedAtTo,
 
             @Parameter(description = "백업 파일", example = "40")
-            @RequestParam(required = false) Integer fileId,
+            @RequestParam(required = false) Integer binaryContentId,
 
             @Parameter(description = "이전 페이지 마지막 요소 ID")
             @RequestParam(required = false) Integer idAfter,

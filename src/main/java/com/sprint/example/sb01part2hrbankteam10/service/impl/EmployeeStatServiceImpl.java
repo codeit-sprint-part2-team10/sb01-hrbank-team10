@@ -1,14 +1,12 @@
 package com.sprint.example.sb01part2hrbankteam10.service.impl;
 
-import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeDistributionDto;
-import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeTrendDto;
-import com.sprint.example.sb01part2hrbankteam10.dto.response.EmployeeDashboardResponse;
+import com.sprint.example.sb01part2hrbankteam10.dto.employee.EmployeeDistributionDto;
+import com.sprint.example.sb01part2hrbankteam10.dto.employee.EmployeeTrendDto;
 import com.sprint.example.sb01part2hrbankteam10.entity.Employee;
 import com.sprint.example.sb01part2hrbankteam10.entity.Employee.EmployeeStatus;
 import com.sprint.example.sb01part2hrbankteam10.global.exception.RestApiException;
 import com.sprint.example.sb01part2hrbankteam10.global.exception.errorcode.DepartmentErrorCode;
 import com.sprint.example.sb01part2hrbankteam10.repository.BackupRepository;
-import com.sprint.example.sb01part2hrbankteam10.repository.DashboardRepository;
 import com.sprint.example.sb01part2hrbankteam10.repository.EmployeeRepository;
 import com.sprint.example.sb01part2hrbankteam10.repository.specification.EmployeeSpecification;
 import com.sprint.example.sb01part2hrbankteam10.service.EmployeeStatService;
@@ -17,9 +15,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.Map;
-import java.util.HashMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.domain.Specification;
@@ -32,7 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class EmployeeStatServiceImpl implements EmployeeStatService {
 
   private final EmployeeRepository employeeRepository;
-  private final DashboardRepository dashboardRepository;
   private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE; // YYYY-MM-DD
   private final BackupRepository backupRepository;
 
@@ -83,7 +77,7 @@ public class EmployeeStatServiceImpl implements EmployeeStatService {
     throw new RestApiException(DepartmentErrorCode.DEPARTMENT_STATUS_NOT_VALID, unit);
   }
 
-  List<Object[]> trends = dashboardRepository.findEmployeeTrend(from, to, unit);
+  List<Object[]> trends = employeeRepository.findEmployeeTrend(from, to, unit);
 
   // Object[]를 EmployeeTrendDto로 변환 및 change, changeRate 계산
   List<EmployeeTrendDto> result = new ArrayList<>();

@@ -1,6 +1,8 @@
 package com.sprint.example.sb01part2hrbankteam10.mapper;
 
-import com.sprint.example.sb01part2hrbankteam10.dto.*;
+import com.sprint.example.sb01part2hrbankteam10.dto.employee.EmployeeDto;
+import com.sprint.example.sb01part2hrbankteam10.dto.employee_history.ChangeLogDto;
+import com.sprint.example.sb01part2hrbankteam10.dto.employee_history.DiffDto;
 import com.sprint.example.sb01part2hrbankteam10.entity.EmployeeHistory;
 import org.springframework.stereotype.Component;
 
@@ -40,8 +42,8 @@ public class EmployeeHistoryMapper {
         addDiffIfChanged(changes, "name", beforeData.getName(), afterData.getName());
         addDiffIfChanged(changes, "email", beforeData.getEmail(), afterData.getEmail());
         addDiffIfChanged(changes, "position", beforeData.getPosition(), afterData.getPosition());
-        addDiffIfChanged(changes, "departmentId", beforeData.getDepartmentId(), afterData.getDepartmentId());
-        addDiffIfChanged(changes, "departmentName", beforeData.getDepartmentName(), afterData.getDepartmentName());
+//        addDiffIfChanged(changes, "departmentId", beforeData.getDepartmentId(), afterData.getDepartmentId());
+        addDiffIfChanged(changes, "department", beforeData.getDepartmentName(), afterData.getDepartmentName());
         addDiffIfChanged(changes, "hireDate", beforeData.getHireDate(), afterData.getHireDate());
         addDiffIfChanged(changes, "status", beforeData.getStatus(), afterData.getStatus());
         // 프로필 이미지 비교는 주석 처리되어 있으므로 그대로 유지합니다.

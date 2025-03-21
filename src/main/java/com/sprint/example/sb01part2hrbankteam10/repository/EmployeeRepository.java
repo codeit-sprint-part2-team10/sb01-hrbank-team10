@@ -1,7 +1,7 @@
 package com.sprint.example.sb01part2hrbankteam10.repository;
 
-import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeDistributionDto;
-import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeTrendDto;
+import com.sprint.example.sb01part2hrbankteam10.dto.employee.EmployeeDistributionDto;
+import com.sprint.example.sb01part2hrbankteam10.dto.employee.EmployeeTrendDto;
 import com.sprint.example.sb01part2hrbankteam10.entity.Employee;
 import com.sprint.example.sb01part2hrbankteam10.entity.Employee.EmployeeStatus;
 import java.time.LocalDateTime;
@@ -37,7 +37,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer>,
    */
   @Query( value =
       "SELECT "
-          + "new com.sprint.example.sb01part2hrbankteam10.dto.EmployeeDistributionDto("
+          + "new com.sprint.example.sb01part2hrbankteam10.dto.employee.EmployeeDistributionDto("
           + "e.position , COUNT(e.id), COUNT(e) * 100.0 / (SELECT COUNT(e) FROM Employee e)) "
           + "FROM Employee e "
           + "WHERE e.status = :status "
@@ -50,7 +50,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer>,
 
   @Query( value =
       "SELECT "
-          + "new com.sprint.example.sb01part2hrbankteam10.dto.EmployeeDistributionDto("
+          + "new com.sprint.example.sb01part2hrbankteam10.dto.employee.EmployeeDistributionDto("
           + "d.name, COUNT(e), COUNT(e) * 100.0 / (SELECT COUNT(e) FROM Employee e)) "
           + "FROM Employee e "
           + "LEFT JOIN Department d "
@@ -116,5 +116,6 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer>,
   List<Object[]> findEmployeeTrend(
       @Param("from") LocalDateTime from,
       @Param("to") LocalDateTime to,
-      @Param("unit") String unit);
+      @Param("unit") String unit
+  );
 }

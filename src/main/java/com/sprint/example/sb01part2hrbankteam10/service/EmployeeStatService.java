@@ -1,8 +1,7 @@
 package com.sprint.example.sb01part2hrbankteam10.service;
 
-import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeDistributionDto;
-import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeTrendDto;
-import com.sprint.example.sb01part2hrbankteam10.dto.response.EmployeeDashboardResponse;
+import com.sprint.example.sb01part2hrbankteam10.dto.employee.EmployeeDistributionDto;
+import com.sprint.example.sb01part2hrbankteam10.dto.employee.EmployeeTrendDto;
 import com.sprint.example.sb01part2hrbankteam10.entity.Employee.EmployeeStatus;
 import java.time.LocalDate;
 import java.time.LocalDateTime;

@@ -1,10 +1,10 @@
 package com.sprint.example.sb01part2hrbankteam10.service.impl;
 
-import com.sprint.example.sb01part2hrbankteam10.dto.CursorPageResponseDto;
-import com.sprint.example.sb01part2hrbankteam10.dto.DepartmentCreateRequest;
-import com.sprint.example.sb01part2hrbankteam10.dto.DepartmentDto;
-import com.sprint.example.sb01part2hrbankteam10.dto.DepartmentResponseDto;
-import com.sprint.example.sb01part2hrbankteam10.dto.DepartmentUpdateRequest;
+import com.sprint.example.sb01part2hrbankteam10.dto.page.CursorPageResponseDto;
+import com.sprint.example.sb01part2hrbankteam10.dto.department.DepartmentCreateRequest;
+import com.sprint.example.sb01part2hrbankteam10.dto.department.DepartmentDto;
+import com.sprint.example.sb01part2hrbankteam10.dto.department.DepartmentResponseDto;
+import com.sprint.example.sb01part2hrbankteam10.dto.department.DepartmentUpdateRequest;
 import com.sprint.example.sb01part2hrbankteam10.entity.Department;
 import com.sprint.example.sb01part2hrbankteam10.global.exception.RestApiException;
 import com.sprint.example.sb01part2hrbankteam10.global.exception.errorcode.DepartmentErrorCode;
@@ -17,7 +17,6 @@ import com.sprint.example.sb01part2hrbankteam10.service.DepartmentService;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeParseException;
-import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;

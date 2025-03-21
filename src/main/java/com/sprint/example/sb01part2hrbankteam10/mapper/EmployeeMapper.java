@@ -1,6 +1,6 @@
 package com.sprint.example.sb01part2hrbankteam10.mapper;
 
-import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeDto;
+import com.sprint.example.sb01part2hrbankteam10.dto.employee.EmployeeDto;
 import com.sprint.example.sb01part2hrbankteam10.entity.Employee;
 import org.springframework.stereotype.Component;
 

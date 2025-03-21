@@ -1,5 +1,5 @@
 -- files
-CREATE TABLE files
+CREATE TABLE binary_contents
 (
     id           SERIAL PRIMARY KEY,
     name         VARCHAR(255) NOT NULL,
@@ -13,12 +13,12 @@ CREATE TABLE backups
 (
     id                SERIAL PRIMARY KEY,
     created_at        TIMESTAMPTZ  NOT NULL,
-    file_id           INTEGER,
+    binary_content_id INTEGER,
     started_at        TIMESTAMPTZ,
     ended_at          TIMESTAMPTZ,
     worker_ip_address VARCHAR(255) NOT NULL,
     status            VARCHAR(20)  NOT NULL,
-    CONSTRAINT fk_file FOREIGN KEY (file_id) REFERENCES files (id) ON DELETE CASCADE
+    CONSTRAINT fk_binary_contents FOREIGN KEY (binary_content_id) REFERENCES binary_contents (id) ON DELETE CASCADE
 );
 
 -- departments
@@ -55,7 +55,7 @@ CREATE TABLE employees
         REFERENCES departments (id) ON DELETE RESTRICT,
 
     CONSTRAINT fk_profiles_employee FOREIGN KEY (profile_image_id)
-        REFERENCES files (id) ON DELETE CASCADE
+        REFERENCES binary_contents (id) ON DELETE CASCADE
 );
 
 CREATE TABLE employee_histories

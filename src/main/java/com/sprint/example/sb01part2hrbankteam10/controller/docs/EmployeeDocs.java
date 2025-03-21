@@ -1,7 +1,11 @@
 package com.sprint.example.sb01part2hrbankteam10.controller.docs;
 
-import com.sprint.example.sb01part2hrbankteam10.dto.*;
-import com.sprint.example.sb01part2hrbankteam10.dto.response.EmployeeDashboardResponse;
+import com.sprint.example.sb01part2hrbankteam10.dto.employee.EmployeeCreateRequest;
+import com.sprint.example.sb01part2hrbankteam10.dto.employee.EmployeeDistributionDto;
+import com.sprint.example.sb01part2hrbankteam10.dto.employee.EmployeeDto;
+import com.sprint.example.sb01part2hrbankteam10.dto.employee.EmployeeTrendDto;
+import com.sprint.example.sb01part2hrbankteam10.dto.employee.EmployeeUpdateRequest;
+import com.sprint.example.sb01part2hrbankteam10.dto.page.CursorPageResponseDto;
 import com.sprint.example.sb01part2hrbankteam10.entity.Employee;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -186,7 +190,7 @@ public interface EmployeeDocs {
     @Operation(summary = "직원 수 조회", description = "지정된 조건에 맞는 직원 수를 조회합니다. 상태 필터링 및 입사일 기간 필터링이 가능합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "조회 성공",
-                    content = @Content(schema = @Schema(implementation = EmployeeDashboardResponse.class))),
+                    content = @Content(schema = @Schema(implementation = Integer.class))),
             @ApiResponse(responseCode = "400", description = "잘못된 요청",
                     content = @Content(examples = @ExampleObject(value = ""))),
             @ApiResponse(responseCode = "500", description = "서버 오류",

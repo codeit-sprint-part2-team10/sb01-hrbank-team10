@@ -19,7 +19,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.data.annotation.CreatedDate;
@@ -72,11 +71,11 @@ public class Employee {
 
   @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval = true)
   @JoinColumn(name = "profile_image_id")
-  private File profileImage;
+  private BinaryContent profileImage;
 
   @Builder
   public Employee(String name, String email, String employeeNumber, String position,
-      LocalDateTime hireDate, EmployeeStatus status, Department department, File profileImage) {
+      LocalDateTime hireDate, EmployeeStatus status, Department department, BinaryContent profileImage) {
     this.name = name;
     this.email = email;
     this.employeeNumber = employeeNumber;
@@ -118,7 +117,7 @@ public class Employee {
     this.department = department;
   }
 
-  public void updateProfileImage(File profileImage) {
+  public void updateProfileImage(BinaryContent profileImage) {
     this.profileImage = profileImage;
   }
 }

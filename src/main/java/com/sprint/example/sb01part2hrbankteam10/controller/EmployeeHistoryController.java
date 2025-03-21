@@ -1,14 +1,12 @@
 package com.sprint.example.sb01part2hrbankteam10.controller;
 
 import com.sprint.example.sb01part2hrbankteam10.controller.docs.EmployeeHistoryDocs;
-import com.sprint.example.sb01part2hrbankteam10.dto.ChangeLogDto;
-import com.sprint.example.sb01part2hrbankteam10.dto.CursorPageResponseChangeLogDto;
-import com.sprint.example.sb01part2hrbankteam10.dto.DiffDto;
-import com.sprint.example.sb01part2hrbankteam10.dto.EmployeeHistoryCreateRequest;
+import com.sprint.example.sb01part2hrbankteam10.dto.employee_history.ChangeLogDto;
+import com.sprint.example.sb01part2hrbankteam10.dto.employee_history.CursorPageResponseChangeLogDto;
+import com.sprint.example.sb01part2hrbankteam10.dto.employee_history.DiffDto;
+import com.sprint.example.sb01part2hrbankteam10.dto.employee.EmployeeHistoryCreateRequest;
 import com.sprint.example.sb01part2hrbankteam10.service.EmployeeHistoryService;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.builder.Diff;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

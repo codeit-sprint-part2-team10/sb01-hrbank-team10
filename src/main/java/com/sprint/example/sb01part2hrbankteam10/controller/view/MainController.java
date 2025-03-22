@@ -11,4 +11,9 @@ public class MainController {
     return "forward:/index.html";
   }
 
+  @GetMapping("/dashboard")
+  public String dashboard() {
+    return "forward:/index.html";
+  }
+
 }

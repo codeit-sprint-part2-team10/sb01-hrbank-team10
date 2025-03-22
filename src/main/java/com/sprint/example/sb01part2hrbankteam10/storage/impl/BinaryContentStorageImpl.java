@@ -15,6 +15,8 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.Arrays;
+import java.util.List;
 
 
 @Component
@@ -44,6 +46,9 @@ public class BinaryContentStorageImpl implements BinaryContentStorage {
   // 프로필 파일 저장
   @Override
   public Integer saveProfile(Integer fileId, MultipartFile file){
+    // 파일 확장자 검증
+    validateFileExtension(file);
+
     // fileId로 경로 생성 -> resolvePath
     Path path = profileResolvePath(fileId);
 
@@ -55,6 +60,28 @@ public class BinaryContentStorageImpl implements BinaryContentStorage {
       throw new RestApiException(BinaryContentErrorCode.BINARY_CONTENT_WRITE_ERROR, e.getMessage());
     }
     return fileId;
+  }
+
+  // 허용된 프로필 이미지 확장자인지 검증
+  private void validateFileExtension(MultipartFile file) {
+    // 허용된 확장자 목록
+    List<String> allowedExtensions = Arrays.asList("jpg", "jpeg", "png", "gif");
+
+    String originalFilename = file.getOriginalFilename();
+    if (originalFilename == null || originalFilename.isEmpty()) {
+      throw new RestApiException(BinaryContentErrorCode.INVALID_FILE_TYPE, "파일명이 유효하지 않습니다.");
+    }
+
+    String extension = "";
+    int lastDotIndex = originalFilename.lastIndexOf('.');
+    if (lastDotIndex > 0) {
+      extension = originalFilename.substring(lastDotIndex + 1).toLowerCase();
+    }
+
+    if (!allowedExtensions.contains(extension)) {
+      throw new RestApiException(BinaryContentErrorCode.INVALID_FILE_TYPE,
+              "지원하지 않는 파일 형식입니다. 지원되는 형식: " + String.join(", ", allowedExtensions));
+    }
   }
 
   // 백업 파일 저장

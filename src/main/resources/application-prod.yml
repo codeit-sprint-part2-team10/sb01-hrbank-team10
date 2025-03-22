@@ -1,13 +1,11 @@
 spring:
-  config:
-    import:
-      - classpath:/env/env-prod.yml
-
   datasource:
     driver-class-name: org.postgresql.Driver
-    url: jdbc:postgresql://${RAILWAY_PRIVATE_DOMAIN}:${PGPORT}/${POSTGRES_DB}
+    url: jdbc:postgresql://${PGHOST}:${PGPORT}/${PGDATABASE}
     username: ${PGUSER}
     password: ${PGPASSWORD}
     hikari:
       data-source-properties:
         serverTimezone: Asia/Seoul
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect

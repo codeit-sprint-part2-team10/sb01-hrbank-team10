@@ -5,7 +5,7 @@ spring:
   application:
     name: sb01-hrbank-team10
   profiles:
-    default: dev # dev 환경에서 prod 하면 사진은 로컬로 저장되므로 문제가 생길 수 있습니다 :)
+    active: prod # dev 환경에서 prod 하면 사진은 로컬로 저장되므로 문제가 생길 수 있습니다 :)
   jpa:
     hibernate:
       ddl-auto: none

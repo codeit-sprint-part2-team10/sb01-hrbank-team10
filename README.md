@@ -248,10 +248,9 @@ Client
          Database (PostgreSQL)
 ```
 ---
-## 아키텍처
-### 📋 **배포 다이어그램**
+## 📋 **배포 다이어그램**
 ![image](https://github.com/user-attachments/assets/9f8cb677-280c-41e1-9020-c1f7bfffbcf8)
-### ☁️ **ERD**
+## ☁️ **ERD**
 ![image](https://github.com/user-attachments/assets/b6f32614-0b67-4d77-8e1f-220a2f25d344)
 
 ---

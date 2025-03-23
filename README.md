@@ -4,10 +4,12 @@
 - ⭐ 프로젝트 배포 : https://sb01-hrbank-team10-production-6d34.up.railway.app/dashboard
 - 🔗 프로젝트 문서 (다른 모든 프로젝트 링크들) : https://bit.ly/41VauFT
 ## **팀원 구성**
+<!--
 ![image-5](https://github.com/user-attachments/assets/2a3ef82c-1f75-4564-9a9d-88524917cc9d)
 ![image-6](https://github.com/user-attachments/assets/f49a90c5-a83c-4d24-9903-45fecc2e564c)
 ![image-7](https://github.com/user-attachments/assets/a9f2a71e-644f-442e-b085-fce6c68e1edd)
 ![image-8](https://github.com/user-attachments/assets/d63d7e19-d01b-4f9b-9fb9-1a6a0db457d3)
+-->
 
 | 이름 | 이메일 | GitHub |
 |------|--------|--------|

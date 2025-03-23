@@ -75,7 +75,7 @@ HR Bank는 이러한 현실적인 어려움을 해결하고자 **기업의 인�
 
 ### 👤 변희재
 
-![image-2](https://github.com/user-attachments/assets/8b3e4458-5989-47eb-bbfb-a5516d3c8ec7)
+![스크린샷 2025-03-24 오전 1 01 37](https://github.com/user-attachments/assets/66f000b8-0b7d-4356-a9ec-0aea19bd7bd3)
 ![image](https://github.com/user-attachments/assets/e969ab6d-6cc3-4dd3-8886-caeeb8d68431)
 
 - **부서 관리 API**

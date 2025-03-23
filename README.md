@@ -6,7 +6,7 @@
 - 📊 PPT :
 - 📼 시연 영상 :
 - 🛣️ Swagger API : 
-- 👥 팀 노션 : https://bit.ly/4iVjzFL
+- 👥 팀 협업용 노션 : https://bit.ly/4iVjzFL
 - 📅 JIRA : https://bit.ly/41UzLjC
 - 💬 Slack : https://app.slack.com/client/T08HFEGMUMB/D08HHLZ1YR0
 - ☁️ ERD Cloud : https://www.erdcloud.com/d/PN3jnQz2q8aqyxLdX

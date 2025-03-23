@@ -1,15 +1,15 @@
 # 👨🏻‍💻 **PART2_10팀**
 # 🏦 HR Bank : Batch로 인사 데이터를 안전하게 관리하는 Open EMS
 ## **프로젝트 링크**
-- ⭐ 프로젝트 배포 : https://sb01-hrbank-team10-production-6d34.up.railway.app/dashboard
-- 📃 프로젝트 문서 : https://bit.ly/4c1zlg0
-- 📊 PPT :
-- 📼 시연 영상 :
-- 🛣️ Swagger API : 
-- 👥 팀 노션 : https://bit.ly/4iVjzFL
-- 📅 JIRA : https://bit.ly/41UzLjC
-- 💬 Slack : https://app.slack.com/client/T08HFEGMUMB/D08HHLZ1YR0
-- ☁️ ERD Cloud : https://www.erdcloud.com/d/PN3jnQz2q8aqyxLdX
+⭐ 프로젝트 배포 : https://sb01-hrbank-team10-production-6d34.up.railway.app/dashboard
+📃 프로젝트 문서 : https://bit.ly/4c1zlg0
+📊 PPT :
+📼 시연 영상 :
+🛣️ Swagger API : 
+👥 팀 노션 : https://bit.ly/4iVjzFL
+📅 JIRA : https://bit.ly/41UzLjC
+💬 Slack : https://app.slack.com/client/T08HFEGMUMB/D08HHLZ1YR0
+☁️ ERD Cloud : https://www.erdcloud.com/d/PN3jnQz2q8aqyxLdX
 
 ## **팀원 구성**
 | 이름 | 이메일 | GitHub |

@@ -49,88 +49,93 @@ public class EmployeeStatServiceImpl implements EmployeeStatService {
     // 기본적으로 최근 12개의 단위를 표시
     if (from == null || to == null) {
       to = LocalDateTime.now();
-
-      // 시간 단위에 따라 from 값을 조정하여 정확히 12개의 데이터 포인트가 생성되도록 함
-      switch (unit) {
-        case "day":
-          from = to.minusDays(11); // 12일 (현재 포함)
-          break;
-        case "week":
-          from = to.minusWeeks(11); // 12주 (현재 포함)
-          break;
-        case "month":
-          from = to.minusMonths(11); // 12개월 (현재 포함)
-          break;
-        case "quarter":
-          from = to.minusMonths(33); // 12분기 (현재 포함) = 약 3년
-          break;
-        case "year":
-          from = to.minusYears(11); // 12년 (현재 포함)
-          break;
-        default:
-          from = to.minusMonths(11); // 기본값은 12개월
-          break;
-      }
     }
 
-  if (!List.of("day", "week", "month", "quarter", "year").contains(unit)) {
-    throw new RestApiException(DepartmentErrorCode.DEPARTMENT_STATUS_NOT_VALID, unit);
-  }
+    if (!List.of("day", "week", "month", "quarter", "year").contains(unit)) {
+      throw new RestApiException(DepartmentErrorCode.DEPARTMENT_STATUS_NOT_VALID, unit);
+    }
 
-  List<Object[]> trends = employeeRepository.findEmployeeTrend(from, to, unit);
+    String intervalNumber = "1 ";
 
-  // Object[]를 EmployeeTrendDto로 변환 및 change, changeRate 계산
-  List<EmployeeTrendDto> result = new ArrayList<>();
-  for (int i = 0; i < trends.size(); i++) {
-    Object[] row = trends.get(i);
-    String dateStr = (String) row[0]; // period
-    Long count = ((Number) row[1]).longValue(); // count as Long
-    Long change = (i > 0) ? (count - ((Number) trends.get(i - 1)[1]).longValue()) : 0L;
-    Double changeRate = (i > 0 && ((Number) trends.get(i - 1)[1]).longValue() != 0)
-        ? round(((double) (count - ((Number) trends.get(i - 1)[1]).longValue()) * 100)
-        / ((Number) trends.get(i - 1)[1]).longValue(), 2)
-        : 0.0;
-
-    // Format the date based on the unit
-    String formattedDate;
+    // 시간 단위에 따라 from 값을 조정하여 정확히 12개의 데이터 포인트가 생성되도록 함
     switch (unit) {
       case "day":
-        formattedDate = dateStr; // Keep YYYY-MM-DD
+        from = to.minusDays(11); // 12일 (현재 포함)
         break;
       case "week":
-        formattedDate = dateStr; // Keep YYYY-MM-DD for the first day of the week
+        from = to.minusWeeks(11); // 12주 (현재 포함)
         break;
       case "month":
-        // Take just year and month, and add the day as 20
-        formattedDate = dateStr.substring(0, 7) + "-20";
+        from = to.minusMonths(11); // 12개월 (현재 포함)
         break;
       case "quarter":
-        // For quarter, we'll determine which quarter it is from the date
-        int month = Integer.parseInt(dateStr.substring(5, 7));
-        int quarter = (month - 1) / 3 + 1;
-        formattedDate = dateStr.substring(0, 4) + "-" +
-            (quarter == 1 ? "03" : quarter == 2 ? "06" : quarter == 3 ? "09" : "12") +
-            "-20";
+        from = to.minusMonths(33); // 12분기 (현재 포함) = 약 3년
+        unit = "month";
+        intervalNumber = "3 ";
         break;
       case "year":
-        // For year, format as YYYY-03-20
-        formattedDate = dateStr.substring(0, 4) + "-03-20";
+        from = to.minusYears(11); // 12년 (현재 포함)
         break;
       default:
-        formattedDate = dateStr;
+        from = to.minusMonths(11); // 기본값은 12개월
         break;
     }
 
-    result.add(new EmployeeTrendDto(
-        formattedDate,
-        count,
-        change,
-        changeRate
-    ));
-  }
+    List<Object[]> trends = employeeRepository.findEmployeeTrend(from, to, unit, intervalNumber);
 
-  return result;
-}
+    // Object[]를 EmployeeTrendDto로 변환 및 change, changeRate 계산
+    List<EmployeeTrendDto> result = new ArrayList<>();
+    for (int i = 0; i < trends.size(); i++) {
+      Object[] row = trends.get(i);
+      String dateStr = (String) row[0]; // period
+      Long count = ((Number) row[1]).longValue(); // count as Long
+      Long change = (i > 0) ? (count - ((Number) trends.get(i - 1)[1]).longValue()) : 0L;
+      Double changeRate = (i > 0 && ((Number) trends.get(i - 1)[1]).longValue() != 0)
+          ? round(((double) (count - ((Number) trends.get(i - 1)[1]).longValue()) * 100)
+          / ((Number) trends.get(i - 1)[1]).longValue(), 2)
+          : 0.0;
+
+      // Format the date based on the unit
+      String formattedDate;
+      switch (unit) {
+        case "day":
+          formattedDate = dateStr; // Keep YYYY-MM-DD
+          break;
+        case "week":
+          formattedDate = dateStr; // Keep YYYY-MM-DD for the first day of the week
+          break;
+        case "month":
+          // Take just year and month, and add the day as 20
+//          formattedDate = dateStr.substring(0, 7) + "-20";
+          formattedDate = dateStr.substring(0, 7) + "-" + to.getDayOfMonth();
+          break;
+        case "quarter":
+          // For quarter, we'll determine which quarter it is from the date
+          int month = Integer.parseInt(dateStr.substring(5, 7));
+          int quarter = (month - 1) / 3 + 1;
+          formattedDate = dateStr.substring(0, 4) + "-" +
+              (quarter == 1 ? "03" : quarter == 2 ? "06" : quarter == 3 ? "09" : "12") +
+              "-20";
+          break;
+        case "year":
+          // For year, format as YYYY-03-20 -> 2014, 2015
+          formattedDate = dateStr.substring(0, 4) + "-"+ to.getMonthValue() +"-" + to.getDayOfMonth();
+          break;
+        default:
+          formattedDate = dateStr;
+          break;
+      }
+
+      result.add(new EmployeeTrendDto(
+          formattedDate,
+          count,
+          change,
+          changeRate
+      ));
+    }
+
+    return result;
+  }
 
   @Override
   @Transactional(readOnly = true)

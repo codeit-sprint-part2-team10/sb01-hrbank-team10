@@ -150,9 +150,9 @@ public class EmployeeServiceImpl implements EmployeeService {
   }
 
   @Override
+  @Transactional
   public String deleteById(Integer id, String clientIp) {
     Employee employee = getByIdOrThrow(id);
-    employee.updateStatus(EmployeeStatus.RESIGNED);
 
     if (employee.getProfileImage() != null) {
       Integer previousProfileImageId = employee.getProfileImage().getId();
@@ -161,8 +161,8 @@ public class EmployeeServiceImpl implements EmployeeService {
       binaryContentStorage.deleteProfile(previousProfileImageId);
     }
 
+    employeeRepository.deleteById(employee.getId());
     EmployeeDto before = EmployeeMapper.toDto(employee);
-
     employeeHistoryService.create(employee.getEmployeeNumber(), ChangeType.DELETED, null, before, null, clientIp);
 
     return "직원이 성공적으로 삭제되었습니다.";

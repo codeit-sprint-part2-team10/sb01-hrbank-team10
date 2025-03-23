@@ -94,7 +94,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer>,
           "  SELECT generate_series(" +
           "    DATE_TRUNC(:unit, CAST(:from AS timestamp))," +
           "    DATE_TRUNC(:unit, CAST(:to AS timestamp))," +
-          "    CAST('1 ' || :unit AS interval)" +
+          "    CAST(:intervalNumber || :unit AS interval)" +
           "  ) AS date" +
           ")," +
           "employee_counts AS (" +
@@ -116,6 +116,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer>,
   List<Object[]> findEmployeeTrend(
       @Param("from") LocalDateTime from,
       @Param("to") LocalDateTime to,
-      @Param("unit") String unit
+      @Param("unit") String unit,
+      @Param("intervalNumber") String intervalNumber
   );
 }

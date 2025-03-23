@@ -2,8 +2,7 @@
 # 🏦 HR Bank : Batch로 인사 데이터를 안전하게 관리하는 Open EMS
 ## **프로젝트 링크**
 - ⭐ 프로젝트 배포 : https://sb01-hrbank-team10-production-6d34.up.railway.app/dashboard
-- 🔗 프로젝트 문서 (다른 모든 프로젝트 링크들) : https://bit.ly/4c1zlg0
-
+- 🔗 프로젝트 문서 (다른 모든 프로젝트 링크들) : https://bit.ly/41VauFT
 ## **팀원 구성**
 | 이름 | 이메일 | GitHub |
 |------|--------|--------|

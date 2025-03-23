@@ -59,7 +59,6 @@ HR Bank는 이러한 현실적인 어려움을 해결하고자 **기업의 인�
 ### 👤 연예림
 
 ![image](https://github.com/user-attachments/assets/4f849541-c75e-45ac-b070-1386b13e5a89)
-
 ![image](https://github.com/user-attachments/assets/1a2f56de-1d4e-4c77-87e6-d1a6d3e1b544)
 
 
@@ -76,7 +75,8 @@ HR Bank는 이러한 현실적인 어려움을 해결하고자 **기업의 인�
 
 ### 👤 변희재
 
-(자신이 개발한 기능에 대한 사진이나 gif 파일 첨부)
+![image.png](attachment:a01ca91e-0ac7-445c-989e-1a04adef3097:image.png)
+![image.png](attachment:1c2b70fa-a422-4405-bd21-d7753e15e50f:image.png)
 
 - **부서 관리 API**
     - 부서 정보 CRUD 구현 (Spring Data JPA 사용)
@@ -87,7 +87,8 @@ HR Bank는 이러한 현실적인 어려움을 해결하고자 **기업의 인�
 
 ### 👤 전민기
 
-(자신이 개발한 기능에 대한 사진이나 gif 파일 첨부)
+![image.png](attachment:5a81eeb8-0438-43a9-9dd2-76f3817755d7:image.png)
+![image.png](attachment:28bafe83-ba63-4258-b551-f38f577438a5:image.png)
 
 - **직원 정보 수정 이력 관리 API**
     - 직원 정보 수정 시 이력 자동 기록 (변경된 데이터만 저장)
@@ -134,7 +135,7 @@ src
     │       │   │   ├── DepartmentController.java
     │       │   │   ├── EmployeeController.java
     │       │   │   └── EmployeeHistoryController.java
-	  │       │   ├── view
+    │       │   ├── view
     │       │   │   └── ViewController.java
     │       ├── dto
     │       │   ├── backup

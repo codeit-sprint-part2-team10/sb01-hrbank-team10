@@ -4,17 +4,16 @@
 - ⭐ 프로젝트 배포 : https://sb01-hrbank-team10-production-6d34.up.railway.app/dashboard
 - 🔗 프로젝트 문서 (다른 모든 프로젝트 링크들) : https://bit.ly/41VauFT
 ## **팀원 구성**
-![image-5](https://github.com/user-attachments/assets/2a3ef82c-1f75-4564-9a9d-88524917cc9d)
-![image-6](https://github.com/user-attachments/assets/f49a90c5-a83c-4d24-9903-45fecc2e564c)
-![image-7](https://github.com/user-attachments/assets/a9f2a71e-644f-442e-b085-fce6c68e1edd)
-![image-8](https://github.com/user-attachments/assets/d63d7e19-d01b-4f9b-9fb9-1a6a0db457d3)
 
-| 이름 | 이메일 | GitHub |
-|------|--------|--------|
-| **연예림** | yinneu@gmail.com | [github.com/yinneu](https://github.com/yinneu) |
-| **변희재** | pion0458@gmail.com | [github.com/Heyaaz](https://github.com/Heyaaz) |
-| **전민기** | mingi3070@gmail.com | [github.com/mingi96](https://github.com/mingi96) |
-| **정연경** | edaily0129@gmail.com | [github.com/Yeonkyung-Jeong](https://github.com/Yeonkyung-Jeong) |
+
+
+
+
+| ![image-5](https://github.com/user-attachments/assets/2a3ef82c-1f75-4564-9a9d-88524917cc9d) | ![image-6](https://github.com/user-attachments/assets/f49a90c5-a83c-4d24-9903-45fecc2e564c) | ![image-7](https://github.com/user-attachments/assets/a9f2a71e-644f-442e-b085-fce6c68e1edd) | ![image-8](https://github.com/user-attachments/assets/d63d7e19-d01b-4f9b-9fb9-1a6a0db457d3) |
+|------|--------|--------|--- |
+| **연예림** | **변희재** | **전민기** | **정연경** |
+| yinneu@gmail.com   | pion0458@gmail.com | mingi3070@gmail.com | edaily0129@gmail.com  |
+| [github.com/yinneu](https://github.com/yinneu) | [github.com/Heyaaz](https://github.com/Heyaaz) | [github.com/mingi96](https://github.com/mingi96) | [github.com/Yeonkyung-Jeong](https://github.com/Yeonkyung-Jeong)  |
 ---
 
 ## **프로젝트 소개**

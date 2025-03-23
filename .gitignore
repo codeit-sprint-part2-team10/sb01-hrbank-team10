@@ -23,6 +23,7 @@
 .idea/**/contentModel.xml
 checkstyle.xml
 savedFiles
+README.md
 
 # Sensitive or high-churn files
 .idea/**/dataSources/

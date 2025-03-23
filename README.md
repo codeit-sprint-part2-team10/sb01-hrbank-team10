@@ -2,8 +2,7 @@
 # 🏦 HR Bank : Batch로 인사 데이터를 안전하게 관리하는 Open EMS
 ## **프로젝트 링크**
 - ⭐ 프로젝트 배포 : https://sb01-hrbank-team10-production-6d34.up.railway.app/dashboard
-- 🔗 프로젝트 문서 (다른 모든 프로젝트 링크들) : https://bit.ly/4c1zlg0
-
+- 🔗 프로젝트 문서 (다른 모든 프로젝트 링크들) : https://bit.ly/41VauFT
 ## **팀원 구성**
 | 이름 | 이메일 | GitHub |
 |------|--------|--------|
@@ -99,7 +98,6 @@ HR Bank는 이러한 현실적인 어려움을 해결하고자 **기업의 인�
 
 ### 👤 정연경
 ![image](https://github.com/user-attachments/assets/66fa7070-0aea-433c-9167-69c3cad2f968)
-
 ![image](https://github.com/user-attachments/assets/19c7b545-c850-433c-9d4a-8f44c6cc2a1f)
 
 
@@ -113,109 +111,112 @@ HR Bank는 이러한 현실적인 어려움을 해결하고자 **기업의 인�
     - 데이터 백업 이력 목록 조회 및 관리 (정렬 및 커서 페이지네이션)
 ---
 
-## 📂**파일 구조**
+## 📂 **파일 구조**
 ```
-src
-└── main
-    ├── java
-    │   └── sb01part2hrbankteam10
-    │       ├── config
-    │       │   ├── ModelMapperConfig.java
-    │       │   ├── SchedulerConfig.java
-    │       │   └── SwaggerConfig.java
-    │       ├── controller
-    │       │   ├── docs
-    │       │   │   ├── BackupDocs.java
-    │       │   │   ├── BinaryContentDocs.java
-    │       │   │   ├── DepartmentDocs.java
-    │       │   │   ├── EmployeeDocs.java
-    │       │   │   └── EmployeeHistoryDocs.java
-    │       │   ├── api
-    │       │   │   ├── BackupController.java
-    │       │   │   ├── BinaryContentController.java
-    │       │   │   ├── DepartmentController.java
-    │       │   │   ├── EmployeeController.java
-    │       │   │   └── EmployeeHistoryController.java
-    │       │   ├── view
-    │       │   │   └── ViewController.java
-    │       ├── dto
-    │       │   ├── backup
-    │       │   │   ├── BackupDto.java
-    │       │   │   ├── CursorPageResponseBackupDto.java
-    │       │   │   └── EmployeeForBackupDto.java
-    │       │   ├── binary_content
-    │       │   │   └── BinaryContentUploadResponse.java
-    │       │   ├── department
-    │       │   │   ├── DepartmentCreateRequest.java
-    │       │   │   ├── DepartmentDto.java
-    │       │   │   ├── DepartmentResponseDto.java
-    │       │   │   └── DepartmentUpdateRequest.java
-    │       │   ├── employee
-    │       │   │   ├── EmployeeCreateRequest.java
-    │       │   │   ├── EmployeeDistributionDto.java
-    │       │   │   ├── EmployeeDto.java
-    │       │   │   ├── EmployeeHistoryCreateRequest.java
-    │       │   │   ├── EmployeeSearchRequest.java
-    │       │   │   ├── EmployeeTrendDto.java
-    │       │   │   └── EmployeeUpdateRequest.java
-    │       │   ├── employee_history
-    │       │   │   ├── ChangeLogDto.java
-    │       │   │   ├── CursorPageResponseChangeLogDto.java
-    │       │   │   └── DiffDto.java
-    │       │   └── page
-    │       │       └── CursorPageResponseDto.java
-    │       ├── entity
-    │       │   ├── Backup.java
-    │       │   ├── BinaryContent.java
-    │       │   ├── Department.java
-    │       │   ├── Employee.java
-    │       │   └── EmployeeHistory.java
-    │       ├── global
-    │       │   ├── converter
-    │       │   │   └── JsonConverter.java
-    │       │   ├── exception
-    │       │   │   ├── errorcode
-    │       │   │   │   └── ErrorCode.java
-    │       │   │   ├── ErrorResponse.java
-    │       │   │   ├── GlobalExceptionHandler.java
-    │       │   │   └── RestApiException.java
-    │       │   └── mapper
-    │       │       ├── BackupMapper.java
-    │       │       ├── DepartmentMapper.java
-    │       │       ├── DepartmentUpdateMapper.java
-    │       │       ├── EmployeeHistoryMapper.java
-    │       │       └── EmployeeMapper.java
-    │       ├── repository
-    │       │   ├── specification
-    │       │   │   └── EmployeeSpecification.java
-    │       │   ├── BackupRepository.java
-    │       │   ├── BinaryContentRepository.java
-    │       │   ├── DepartmentRepository.java
-    │       │   ├── EmployeeHistoryRepository.java
-    │       │   └── EmployeeRepository.java
-    │       ├── service
-    │       │   ├── impl
-    │       │   │   ├── BackupServiceImpl.java
-    │       │   │   ├── BinaryContentServiceImpl.java
-    │       │   │   ├── DepartmentServiceImpl.java
-    │       │   │   ├── EmployeeHistoryServiceImpl.java
-    │       │   │   ├── EmployeeServiceImpl.java
-    │       │   │   └── EmployeeStatServiceImpl.java
-    │       │   ├── BackupService.java
-    │       │   ├── BinaryContentService.java
-    │       │   ├── DepartmentService.java
-    │       │   ├── EmployeeHistoryService.java
-    │       │   ├── EmployeeService.java
-    │       │   └── EmployeeStatService.java
-    │       ├── storage
-    │       │   ├── impl
-    │       │   │   └── BinaryContentStorageImpl.java
-    │       │   └── BinaryContentStorage.java
-    │       ├── util
-    │       │   └── IpUtil.java
-    │       └── Sb01Part2HrbankTeam10Application.java
-    └── resources
-           └──application.yml
+📂 src
+└── 📂 main
+    ├── 📂 java
+    │   └── 📂 sb01part2hrbankteam10
+    │       ├── 📂 config
+    │       │   ├── 📂 scheduler
+    │       │   │   └── 📄 BackupScheduler.java
+    │       │   ├── 📄 ModelMapperConfig.java
+    │       │   ├── 📄 SchedulerConfig.java
+    │       │   └── 📄 SwaggerConfig.java
+    │       ├── 📂 controller
+    │       │   ├── 📂 docs
+    │       │   │   ├── 📄 BackupDocs.java
+    │       │   │   ├── 📄 BinaryContentDocs.java
+    │       │   │   ├── 📄 DepartmentDocs.java
+    │       │   │   ├── 📄 EmployeeDocs.java
+    │       │   │   └── 📄 EmployeeHistoryDocs.java
+    │       │   ├── 📂 api
+    │       │   │   ├── 📄 BackupController.java
+    │       │   │   ├── 📄 BinaryContentController.java
+    │       │   │   ├── 📄 DepartmentController.java
+    │       │   │   ├── 📄 EmployeeController.java
+    │       │   │   └── 📄 EmployeeHistoryController.java
+    │       │   ├── 📂 view
+    │       │   │   └── 📄 ViewController.java
+    │       ├── 📂 dto
+    │       │   ├── 📂 backup
+    │       │   │   ├── 📄 BackupDto.java
+    │       │   │   ├── 📄 CursorPageResponseBackupDto.java
+    │       │   │   └── 📄 EmployeeForBackupDto.java
+    │       │   ├── 📂 binary_content
+    │       │   │   └── 📄 BinaryContentUploadResponse.java
+    │       │   ├── 📂 department
+    │       │   │   ├── 📄 DepartmentCreateRequest.java
+    │       │   │   ├── 📄 DepartmentDto.java
+    │       │   │   ├── 📄 DepartmentResponseDto.java
+    │       │   │   └── 📄 DepartmentUpdateRequest.java
+    │       │   ├── 📂 employee
+    │       │   │   ├── 📄 EmployeeCreateRequest.java
+    │       │   │   ├── 📄 EmployeeDistributionDto.java
+    │       │   │   ├── 📄 EmployeeDto.java
+    │       │   │   ├── 📄 EmployeeHistoryCreateRequest.java
+    │       │   │   ├── 📄 EmployeeSearchRequest.java
+    │       │   │   ├── 📄 EmployeeTrendDto.java
+    │       │   │   └── 📄 EmployeeUpdateRequest.java
+    │       │   ├── 📂 employee_history
+    │       │   │   ├── 📄 ChangeLogDto.java
+    │       │   │   ├── 📄 CursorPageResponseChangeLogDto.java
+    │       │   │   └── 📄 DiffDto.java
+    │       │   └── 📂 page
+    │       │       └── 📄 CursorPageResponseDto.java
+    │       ├── 📂 entity
+    │       │   ├── 📄 Backup.java
+    │       │   ├── 📄 BinaryContent.java
+    │       │   ├── 📄 Department.java
+    │       │   ├── 📄 Employee.java
+    │       │   └── 📄 EmployeeHistory.java
+    │       ├── 📂 global
+    │       │   ├── 📂 converter
+    │       │   │   └── 📄 JsonConverter.java
+    │       │   ├── 📂 exception
+    │       │   │   ├── 📂 errorcode
+    │       │   │   │   └── 📄 ErrorCode.java
+    │       │   │   ├── 📄 ErrorResponse.java
+    │       │   │   ├── 📄 GlobalExceptionHandler.java
+    │       │   │   └── 📄 RestApiException.java
+    │       │   └── 📂 mapper
+    │       │       ├── 📄 BackupMapper.java
+    │       │       ├── 📄 DepartmentMapper.java
+    │       │       ├── 📄 DepartmentUpdateMapper.java
+    │       │       ├── 📄 EmployeeHistoryMapper.java
+    │       │       └── 📄 EmployeeMapper.java
+    │       ├── 📂 repository
+    │       │   ├── 📂 specification
+    │       │   │   └── 📄 EmployeeSpecification.java
+    │       │   ├── 📄 BackupRepository.java
+    │       │   ├── 📄 BinaryContentRepository.java
+    │       │   ├── 📄 DepartmentRepository.java
+    │       │   ├── 📄 EmployeeHistoryRepository.java
+    │       │   └── 📄 EmployeeRepository.java
+    │       ├── 📂 service
+    │       │   ├── 📂 impl
+    │       │   │   ├── 📄 BackupServiceImpl.java
+    │       │   │   ├── 📄 BinaryContentServiceImpl.java
+    │       │   │   ├── 📄 DepartmentServiceImpl.java
+    │       │   │   ├── 📄 EmployeeHistoryServiceImpl.java
+    │       │   │   ├── 📄 EmployeeServiceImpl.java
+    │       │   │   └── 📄 EmployeeStatServiceImpl.java
+    │       │   ├── 📄 BackupService.java
+    │       │   ├── 📄 BinaryContentService.java
+    │       │   ├── 📄 DepartmentService.java
+    │       │   ├── 📄 EmployeeHistoryService.java
+    │       │   ├── 📄 EmployeeService.java
+    │       │   └── 📄 EmployeeStatService.java
+    │       ├── 📂 storage
+    │       │   ├── 📂 impl
+    │       │   │   └── 📄 BinaryContentStorageImpl.java
+    │       │   └── 📄 BinaryContentStorage.java
+    │       ├── 📂 util
+    │       │   └── 📄 IpUtil.java
+    │       └── 📄 Sb01Part2HrbankTeam10Application.java
+    └── 📂 resources
+        └── 📄 application.yml
+
 ```
 ---
 

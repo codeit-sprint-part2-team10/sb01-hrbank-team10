@@ -256,8 +256,5 @@ Client
 ## ☁️ **ERD**
 ![image](https://github.com/user-attachments/assets/b6f32614-0b67-4d77-8e1f-220a2f25d344)
 
----
 
-## **구현 홈페이지**
-https://www.codeit.kr/
 

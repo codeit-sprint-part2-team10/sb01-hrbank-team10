@@ -103,15 +103,18 @@ HR Bank는 이러한 현실적인 어려움을 해결하고자 **기업의 인�
     - 이력 목록 조회 및 상세 이력 조회 기능 (다양한 조건 검색, 정렬 및 커서 페이지네이션)
 
 ### 👤 정연경
+![image](https://github.com/user-attachments/assets/66fa7070-0aea-433c-9167-69c3cad2f968)
 
-(자신이 개발한 기능에 대한 사진이나 gif 파일 첨부)
+![image](https://github.com/user-attachments/assets/19c7b545-c850-433c-9d4a-8f44c6cc2a1f)
+
 
 - **파일 관리 API**
     - 바이너리 CRUD 구현 (Spring Data JPA 사용)
     - 파일 메타 정보, 실제 파일 분리 저장 처리
     - 파일 업로드, 저장, 다운로드 기능 구현
 - **데이터 백업 관리 API**
-    - 자동 배치 작업 구현 (Spring Scheduler 기반)
+    - 데이터 백업 구현
+    - 데이터 자동 배치 작업 구현 (Spring Scheduler 기반)
     - 데이터 백업 이력 목록 조회 및 관리 (정렬 및 커서 페이지네이션)
 ---
 

@@ -255,7 +255,8 @@ Client
 ```
 ---
 ## 📋 **배포 다이어그램**
-![image](https://github.com/user-attachments/assets/9f8cb677-280c-41e1-9020-c1f7bfffbcf8)
+![image](https://github.com/user-attachments/assets/8c9a757e-2f0a-42d5-9fb8-064eb2b9ceed)
+
 ## ☁️ **ERD**
 ![image](https://github.com/user-attachments/assets/b6f32614-0b67-4d77-8e1f-220a2f25d344)
 

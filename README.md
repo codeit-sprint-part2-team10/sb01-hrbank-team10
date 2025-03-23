@@ -21,7 +21,7 @@
 ---
 
 ## **프로젝트 소개**
-**< Open EMS(Enterprise Management System) ‘HR Bank’의 Spring 백엔드 시스템 구축 >**
+### **< Open EMS(Enterprise Management System) ‘HR Bank’의 Spring 백엔드 시스템 구축 >**
 
 🕛 **프로젝트 기간**: 2025.03.13 ~ 2025.03.24
 💭 **Abstract - 프로젝트 고안 이유**

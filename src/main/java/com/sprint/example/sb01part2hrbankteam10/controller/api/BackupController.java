@@ -25,7 +25,6 @@ import java.util.List;
 @RestController
 @RequestMapping("api/backups")
 @RequiredArgsConstructor
-// TODO implements BackupDocs 추가
 public class BackupController implements BackupDocs {
 
     private final BackupService backupService;
@@ -35,7 +34,7 @@ public class BackupController implements BackupDocs {
     @PostMapping
     @Override
     public ResponseEntity<Integer> backup(HttpServletRequest request) {
-        Integer backupId = backupService.performBackup();
+        Integer backupId = backupService.performBackupByHand(request);
         return ResponseEntity.status(HttpStatus.OK).body(backupId);
     }
 

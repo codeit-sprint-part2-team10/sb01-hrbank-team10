@@ -104,8 +104,8 @@ HR Bank는 이러한 현실적인 어려움을 해결하고자 **기업의 인�
     - 이력 목록 조회 및 상세 이력 조회 기능 (다양한 조건 검색, 정렬 및 커서 페이지네이션)
 
 ### 👤 정연경
-![image](https://github.com/user-attachments/assets/66fa7070-0aea-433c-9167-69c3cad2f968)
-![image](https://github.com/user-attachments/assets/19c7b545-c850-433c-9d4a-8f44c6cc2a1f)
+![image](https://github.com/user-attachments/assets/4973b172-166c-4199-b5f7-d41358befb53)
+![image](https://github.com/user-attachments/assets/0f22b09c-8b98-4faf-b462-9e7a5fa3347e)
 
 
 - **파일 관리 API**

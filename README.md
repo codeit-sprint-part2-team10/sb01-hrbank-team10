@@ -249,5 +249,29 @@ Client
 ## ☁️ **ERD**
 ![image](https://github.com/user-attachments/assets/b6f32614-0b67-4d77-8e1f-220a2f25d344)
 
-
+| 문제상황 | 원인 | 해결 방법 | 배운 점 |
+| --- | --- | --- | --- |
+| 직원 생성 시 이력 생성 실패 | beforeData 누락 | 파라미터를 EmployeeCreateRequest로 변경 | 생성 로직에서도
+이력 처리 필수 |
+| 변경되지 않은 직원 생성 시 오류 | null 참조로 인한
+예외 | null 체크 추가 | null 체크의 중요성 재확인 |
+| 부서명 검색 오류 | 검색 조건 처리 미흡 | like 검색 방식 보완 | 필터 기능에 대한 검증 필요 |
+| ChangeLog JSONB
+필드 매핑 오류 | 매핑 누락 | 매핑 로직 수정 | JSONB 타입 활용시
+매핑 주의 |
+| 중복 시작, 시작 시간 필터 오류 | 쿼리 조건 처리 미흡 | @DateTimeFormat 및
+기본값 보완 | API 파라미터 처리 시
+예외 케이스 고려 필수 |
+| 백업 실행되지 않았을 때 NPE | null 체크 누락 | status 값이 null일 경우
+빈 DTO 반환 | null 체크의 중요성  |
+| 프로필 적용 시 이미지 파일 외 타입 허용 문제 | 파일 타입 검증 누락 | validateFileExtension
+메서드 추가 | 입력값 검증의 중요성  |
+| 동적 쿼리 구현 복잡성 | JPQL만으로 처리
+어려움 | Specification 패턴 적용 | 동적 쿼리 구현 기법
+습득 |
+| 브랜치 관리 문제 | 브랜치 설정 오류 | main→dev PR 미리 close | 브랜치 전략 수립
+중요성  |
+| 환경변수 설정 문제 | 개발/배포 환경 분리 미흡 | 환경별 yml 분리 및
+intellij 환경변수 활용 | 환경 설정 분리의
+중요성 |
 

@@ -1,4 +1,4 @@
-# **🧑 PART2_10팀 👨🏻‍💻**
+# **PART2_10팀 👨🏻‍💻**
 
 ## **프로젝트 링크**
 - ⭐ 프로젝트 배포 : https://sb01-hrbank-team10-production-6d34.up.railway.app/dashboard
@@ -14,10 +14,10 @@
 ## **팀원 구성**
 | 이름 | 이메일 | GitHub |
 |------|--------|--------|
-| 연예림 | yinneu@gmail.com | [github.com/yinneu](https://github.com/yinneu) |
-| 변희재 | pion0458@gmail.com | [github.com/Heyaaz](https://github.com/Heyaaz) |
-| 전민기 | mingi3070@gmail.com | [github.com/mingi96](https://github.com/mingi96) |
-| 정연경 | edaily0129@gmail.com | [github.com/Yeonkyung-Jeong](https://github.com/Yeonkyung-Jeong) |
+| **연예림** | yinneu@gmail.com | [github.com/yinneu](https://github.com/yinneu) |
+| **변희재** | pion0458@gmail.com | [github.com/Heyaaz](https://github.com/Heyaaz) |
+| **전민기** | mingi3070@gmail.com | [github.com/mingi96](https://github.com/mingi96) |
+| **정연경** | edaily0129@gmail.com | [github.com/Yeonkyung-Jeong](https://github.com/Yeonkyung-Jeong) |
 ---
 
 ## **프로젝트 소개**
@@ -66,9 +66,10 @@ HR Bank는 이러한 현실적인 어려움을 해결하고자 **기업의 인�
 ## **팀원별 구현 기능 상세**
 ### 👤 연예림
 
-![image.png](attachment:3a6fd01f-41fc-4368-bd65-ddf4a3510b25:image.png)
+![image](https://github.com/user-attachments/assets/4f849541-c75e-45ac-b070-1386b13e5a89)
 
-![image.png](attachment:7a827889-5167-4dfb-a7fc-ca64f67e7fc8:image.png)
+![image](https://github.com/user-attachments/assets/1a2f56de-1d4e-4c77-87e6-d1a6d3e1b544)
+
 
 - **직원 관리 API**
     - 직원 정보 CRUD 구현 (Spring Data JPA 사용)
@@ -118,8 +119,106 @@ HR Bank는 이러한 현실적인 어려움을 해결하고자 **기업의 인�
 ## 📂**파일 구조**
 ```
 src
-┣ main
-@@ -72,24 +156,44 @@ src
+└── main
+    ├── java
+    │   └── sb01part2hrbankteam10
+    │       ├── config
+    │       │   ├── ModelMapperConfig.java
+    │       │   ├── SchedulerConfig.java
+    │       │   └── SwaggerConfig.java
+    │       ├── controller
+    │       │   ├── docs
+    │       │   │   ├── BackupDocs.java
+    │       │   │   ├── BinaryContentDocs.java
+    │       │   │   ├── DepartmentDocs.java
+    │       │   │   ├── EmployeeDocs.java
+    │       │   │   └── EmployeeHistoryDocs.java
+    │       │   ├── api
+    │       │   │   ├── BackupController.java
+    │       │   │   ├── BinaryContentController.java
+    │       │   │   ├── DepartmentController.java
+    │       │   │   ├── EmployeeController.java
+    │       │   │   └── EmployeeHistoryController.java
+	  │       │   ├── view
+    │       │   │   └── ViewController.java
+    │       ├── dto
+    │       │   ├── backup
+    │       │   │   ├── BackupDto.java
+    │       │   │   ├── CursorPageResponseBackupDto.java
+    │       │   │   └── EmployeeForBackupDto.java
+    │       │   ├── binary_content
+    │       │   │   └── BinaryContentUploadResponse.java
+    │       │   ├── department
+    │       │   │   ├── DepartmentCreateRequest.java
+    │       │   │   ├── DepartmentDto.java
+    │       │   │   ├── DepartmentResponseDto.java
+    │       │   │   └── DepartmentUpdateRequest.java
+    │       │   ├── employee
+    │       │   │   ├── EmployeeCreateRequest.java
+    │       │   │   ├── EmployeeDistributionDto.java
+    │       │   │   ├── EmployeeDto.java
+    │       │   │   ├── EmployeeHistoryCreateRequest.java
+    │       │   │   ├── EmployeeSearchRequest.java
+    │       │   │   ├── EmployeeTrendDto.java
+    │       │   │   └── EmployeeUpdateRequest.java
+    │       │   ├── employee_history
+    │       │   │   ├── ChangeLogDto.java
+    │       │   │   ├── CursorPageResponseChangeLogDto.java
+    │       │   │   └── DiffDto.java
+    │       │   └── page
+    │       │       └── CursorPageResponseDto.java
+    │       ├── entity
+    │       │   ├── Backup.java
+    │       │   ├── BinaryContent.java
+    │       │   ├── Department.java
+    │       │   ├── Employee.java
+    │       │   └── EmployeeHistory.java
+    │       ├── global
+    │       │   ├── converter
+    │       │   │   └── JsonConverter.java
+    │       │   ├── exception
+    │       │   │   ├── errorcode
+    │       │   │   │   └── ErrorCode.java
+    │       │   │   ├── ErrorResponse.java
+    │       │   │   ├── GlobalExceptionHandler.java
+    │       │   │   └── RestApiException.java
+    │       │   └── mapper
+    │       │       ├── BackupMapper.java
+    │       │       ├── DepartmentMapper.java
+    │       │       ├── DepartmentUpdateMapper.java
+    │       │       ├── EmployeeHistoryMapper.java
+    │       │       └── EmployeeMapper.java
+    │       ├── repository
+    │       │   ├── specification
+    │       │   │   └── EmployeeSpecification.java
+    │       │   ├── BackupRepository.java
+    │       │   ├── BinaryContentRepository.java
+    │       │   ├── DepartmentRepository.java
+    │       │   ├── EmployeeHistoryRepository.java
+    │       │   └── EmployeeRepository.java
+    │       ├── service
+    │       │   ├── impl
+    │       │   │   ├── BackupServiceImpl.java
+    │       │   │   ├── BinaryContentServiceImpl.java
+    │       │   │   ├── DepartmentServiceImpl.java
+    │       │   │   ├── EmployeeHistoryServiceImpl.java
+    │       │   │   ├── EmployeeServiceImpl.java
+    │       │   │   └── EmployeeStatServiceImpl.java
+    │       │   ├── BackupService.java
+    │       │   ├── BinaryContentService.java
+    │       │   ├── DepartmentService.java
+    │       │   ├── EmployeeHistoryService.java
+    │       │   ├── EmployeeService.java
+    │       │   └── EmployeeStatService.java
+    │       ├── storage
+    │       │   ├── impl
+    │       │   │   └── BinaryContentStorageImpl.java
+    │       │   └── BinaryContentStorage.java
+    │       ├── util
+    │       │   └── IpUtil.java
+    │       └── Sb01Part2HrbankTeam10Application.java
+    └── resources
+           └──application.yml
 ```
 ---
 

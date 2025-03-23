@@ -2,12 +2,12 @@
 
 ## **프로젝트 링크**
 - ⭐ 프로젝트 배포 : https://sb01-hrbank-team10-production-6d34.up.railway.app/dashboard
-- 📃 프로젝트 문서 : https://harvest-typhoon-397.notion.site/README-1b4b0d5bc00b809aba4cd2fd9157cc75?pvs=4
+- 📃 프로젝트 문서 : https://bit.ly/4c1zlg0
 - 📊 PPT :
 - 📼 시연 영상 :
-- 🛣️ Swagger API
-- 👥 팀 노션 : https://harvest-typhoon-397.notion.site/HR-Bank-1b4b0d5bc00b80bb9679f4721163df97?pvs=4
-- 📅 JIRA : https://edaily0129-1741827545913.atlassian.net/jira/software/projects/OPS/list?atlOrigin=eyJpIjoiZTE3YTI4YWVhYjBiNGIwZTk1NTE5ZTIyZDczMjdjZWEiLCJwIjoiaiJ9
+- 🛣️ Swagger API : 
+- 👥 팀 노션 : https://bit.ly/4iVjzFL
+- 📅 JIRA : https://bit.ly/41UzLjC
 - 💬 Slack : https://app.slack.com/client/T08HFEGMUMB/D08HHLZ1YR0
 - ☁️ ERD Cloud : https://www.erdcloud.com/d/PN3jnQz2q8aqyxLdX
 

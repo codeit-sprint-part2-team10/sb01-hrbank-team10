@@ -2,14 +2,14 @@
 
 ## **프로젝트 링크**
 - ⭐ 프로젝트 배포 : https://sb01-hrbank-team10-production-6d34.up.railway.app/dashboard
--  📃프로젝트 문서 : https://harvest-typhoon-397.notion.site/README-1b4b0d5bc00b809aba4cd2fd9157cc75?pvs=4
--  📊 PPT :
--  📼 시연 영상 :
--  🛣️ Swagger API
--  👥 팀 노션 : https://harvest-typhoon-397.notion.site/HR-Bank-1b4b0d5bc00b80bb9679f4721163df97?pvs=4
--  📅 JIRA : https://edaily0129-1741827545913.atlassian.net/jira/software/projects/OPS/list?atlOrigin=eyJpIjoiZTE3YTI4YWVhYjBiNGIwZTk1NTE5ZTIyZDczMjdjZWEiLCJwIjoiaiJ9
--  💬 Slack : https://app.slack.com/client/T08HFEGMUMB/D08HHLZ1YR0
--  ☁️ ERD Cloud : https://www.erdcloud.com/d/PN3jnQz2q8aqyxLdX
+- 📃 프로젝트 문서 : https://harvest-typhoon-397.notion.site/README-1b4b0d5bc00b809aba4cd2fd9157cc75?pvs=4
+- 📊 PPT :
+- 📼 시연 영상 :
+- 🛣️ Swagger API
+- 👥 팀 노션 : https://harvest-typhoon-397.notion.site/HR-Bank-1b4b0d5bc00b80bb9679f4721163df97?pvs=4
+- 📅 JIRA : https://edaily0129-1741827545913.atlassian.net/jira/software/projects/OPS/list?atlOrigin=eyJpIjoiZTE3YTI4YWVhYjBiNGIwZTk1NTE5ZTIyZDczMjdjZWEiLCJwIjoiaiJ9
+- 💬 Slack : https://app.slack.com/client/T08HFEGMUMB/D08HHLZ1YR0
+- ☁️ ERD Cloud : https://www.erdcloud.com/d/PN3jnQz2q8aqyxLdX
 
 ## **팀원 구성**
 | 이름 | 이메일 | GitHub |
@@ -38,7 +38,7 @@ HR Bank는 이러한 현실적인 어려움을 해결하고자 **기업의 인�
 - **이력 관리:** 직원 데이터 변경 사항의 상세한 이력 기록 및 관리
 - **대시보드 제공:** 인적 자원 현황을 한눈에 파악할 수 있는 직관적 데이터 시각화 제공
   
-💡 ***Index*** 
+💡 **Index**
 (*효율적 인사 관리 / Batch 시스템 / 데이터 안정성 / 자동 백업 / 이력 관리 / 대시보드*)
 ---
 

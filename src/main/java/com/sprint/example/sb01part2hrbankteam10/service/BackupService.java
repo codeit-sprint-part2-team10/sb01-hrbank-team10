@@ -2,13 +2,17 @@ package com.sprint.example.sb01part2hrbankteam10.service;
 
 import com.sprint.example.sb01part2hrbankteam10.dto.backup.BackupDto;
 import com.sprint.example.sb01part2hrbankteam10.entity.Backup;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 
 import java.time.LocalDateTime;
 
 public interface BackupService {
-  Integer performBackup();
+  Integer performBackupByHand(HttpServletRequest request);
+
+  Integer performBackupByBatch();
+
   Page<BackupDto> getBackupList(String workerIpAddress,
                                Backup.BackupStatus status,
                                LocalDateTime startedAtFrom,

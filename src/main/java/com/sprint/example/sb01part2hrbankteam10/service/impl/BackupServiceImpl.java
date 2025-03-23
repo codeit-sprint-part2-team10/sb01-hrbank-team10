@@ -17,6 +17,8 @@ import com.sprint.example.sb01part2hrbankteam10.repository.EmployeeHistoryReposi
 import com.sprint.example.sb01part2hrbankteam10.repository.EmployeeRepository;
 import com.sprint.example.sb01part2hrbankteam10.service.BackupService;
 import com.sprint.example.sb01part2hrbankteam10.storage.BinaryContentStorage;
+import com.sprint.example.sb01part2hrbankteam10.util.IpUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -58,11 +60,23 @@ public class BackupServiceImpl implements BackupService {
   private final EmployeeRepository employeeRepository;
   private final EmployeeHistoryRepository employeeHistoryRepository;
 
+  // 백업 서비스에서 두 가지 다른 메서드로 분리
   @Override
-  public Integer performBackup() {
+  public Integer performBackupByHand(HttpServletRequest request) {
+    // 수동 백업 - 요청자의 IP 주소 사용
+    String workerIpAddress = IpUtil.getClientIp(request);
+    return executeBackup(workerIpAddress);
+  }
 
+  @Override
+  public Integer performBackupByBatch() {
+    // batch에 의한 백업 - system으로 표시
     String workerIpAddress = "system";
+    return executeBackup(workerIpAddress);
+  }
 
+
+  private Integer executeBackup(String workerIpAddress) {
     // 로직: if 백업 불필요 -> 건너뜀 상태로 배치이력 저장하고 프로세스 종료
     if (!isBackupNeeded()) {
       Backup backupHistory = createBackupHistory(workerIpAddress, BackupStatus.SKIPPED, LocalDateTime.now(), LocalDateTime.now(), null);
@@ -132,7 +146,6 @@ public class BackupServiceImpl implements BackupService {
 
       // 백업 실패 시 이력
       atStartBackupHistory.updateStatus(BackupStatus.FAILED, LocalDateTime.now(), savedLogBinaryContent);
-      backupRepository.save(atStartBackupHistory);
 
       // 파일이 생성되었을 경우에만 삭제
       if (backupFile != null) {

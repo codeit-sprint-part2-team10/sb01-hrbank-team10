@@ -102,7 +102,8 @@ public class EmployeeStatServiceImpl implements EmployeeStatService {
           formattedDate = dateStr; // Keep YYYY-MM-DD
           break;
         case "week":
-          formattedDate = dateStr; // Keep YYYY-MM-DD for the first day of the week
+          LocalDate weekDate = LocalDate.parse(dateStr);
+          formattedDate = weekDate.plusDays(weekDate.getDayOfWeek().getValue()-1).toString(); // Keep YYYY-MM-DD for the first day of the week
           break;
         case "month":
           // Take just year and month, and add the day as 20

@@ -127,9 +127,8 @@ HR Bank는 이러한 현실적인 어려움을 해결하고자 **기업의 인�
 <br>
 
 ### 👤 정연경
-
-<img src="https://github.com/user-attachments/assets/0f22b09c-8b98-4faf-b462-9e7a5fa3347e" width="500"/>
 <img src="https://github.com/user-attachments/assets/4973b172-166c-4199-b5f7-d41358befb53" width="500"/>
+<img src="https://github.com/user-attachments/assets/0f22b09c-8b98-4faf-b462-9e7a5fa3347e" width="500"/>
 
 <!--![image](https://github.com/user-attachments/assets/4973b172-166c-4199-b5f7-d41358befb53)
 ![image](https://github.com/user-attachments/assets/0f22b09c-8b98-4faf-b462-9e7a5fa3347e)-->

@@ -1,8 +1,14 @@
 # 👨🏻‍💻 **PART2_10팀**
 # 🏦 HR Bank : Batch로 인사 데이터를 안전하게 관리하는 Open EMS
+
+<br>
+
 ## **프로젝트 링크**
-- ⭐ 프로젝트 배포 : https://sb01-hrbank-team10-production-6d34.up.railway.app/dashboard
-- 🔗 프로젝트 문서 (다른 모든 프로젝트 링크들) : https://bit.ly/41VauFT
+- ⭐ 프로젝트 배포 : <a href="https://sb01-hrbank-team10-production-6d34.up.railway.app/">🏦 HR Bank</a>
+- 🔗 프로젝트 문서 (다른 모든 프로젝트 링크들) : <a href="https://bit.ly/41VauFT">프로젝트 문서</a>
+
+<br>
+
 ## **팀원 구성**
 
 | <img src="https://github.com/user-attachments/assets/65710c9f-1c8b-4a57-83e5-6b0dfbda7ca5" width="850"/> | ![image (3)](https://github.com/user-attachments/assets/9712701d-49ce-4f33-8bf8-8a04c1157837) | ![image-7](https://github.com/user-attachments/assets/a9f2a71e-644f-442e-b085-fce6c68e1edd) | ![image-8](https://github.com/user-attachments/assets/d63d7e19-d01b-4f9b-9fb9-1a6a0db457d3) |
@@ -11,8 +17,7 @@
 | yinneu@gmail.com | pion0458@gmail.com | mingi3070@gmail.com | edaily0129@gmail.com |
 | [github.com/yinneu](https://github.com/yinneu)| mingi3070@gmail.com | [github.com/mingi96](https://github.com/mingi96) | [github.com/Yeonkyung-Jeong](https://github.com/Yeonkyung-Jeong) |
 
-
----
+<br>
 
 ## **프로젝트 소개**
 ### **< Open EMS(Enterprise Management System) ‘HR Bank’의 Spring 백엔드 시스템 구축 >**
@@ -25,6 +30,8 @@
 
 HR Bank는 이러한 현실적인 어려움을 해결하고자 **기업의 인적 자원을 안정적으로 관리하고 데이터 기반의 신속한 의사결정을 지원할 수 있는 통합 시스템**으로서 고안되었다.
 
+<br>
+
 🖊️ **프로젝트 내용 요약**
 
 - **부서 및 직원 정보 관리:** 체계적인 부서 및 직원 데이터의 등록, 수정, 삭제, 조회 기능 제공
@@ -34,7 +41,9 @@ HR Bank는 이러한 현실적인 어려움을 해결하고자 **기업의 인�
 - **대시보드 제공:** 인적 자원 현황을 한눈에 파악할 수 있는 직관적 데이터 시각화 제공 <br>
 💡 **Index**
 (*효율적 인사 관리 / Batch 시스템 / 데이터 안정성 / 자동 백업 / 이력 관리 / 대시보드*)
----
+
+<br>
+
 ## **기술 스택**
 💻 **Backend**
 - Spring Boot
@@ -47,6 +56,8 @@ HR Bank는 이러한 현실적인 어려움을 해결하고자 **기업의 인�
 
 - PostgreSQL
 
+
+
 ⚡ **기타 협업 Tool**
 
 - Git & Github
@@ -54,7 +65,9 @@ HR Bank는 이러한 현실적인 어려움을 해결하고자 **기업의 인�
 - Slack
 - Notion
 - Discord
----
+
+
+<br>
 
 ## **팀원별 구현 기능 상세**
 ### 👤 연예림
@@ -73,6 +86,8 @@ HR Bank는 이러한 현실적인 어려움을 해결하고자 **기업의 인�
 - **인프라**
     - Railway DB 설정
     - Railway 활용한 서비스 배포
+ 
+<br>
 
 ### 👤 변희재
 
@@ -85,6 +100,8 @@ HR Bank는 이러한 현실적인 어려움을 해결하고자 **기업의 인�
 - **대시보드 API**
     - 주요 지표 제공 (총 직원 수, 최근 수정 이력 건수, 이번달 입사자 등)
     - 최근 1년 직원 변동 추이, 부서 및 직무별 직원 분포 등 데이터 시각화 API 제공
+ 
+<br>
 
 ### 👤 전민기
 
@@ -97,11 +114,12 @@ HR Bank는 이러한 현실적인 어려움을 해결하고자 **기업의 인�
     - 수정 전/후 데이터 차이 기록 및 관리
     - 직원 추가, 정보 수정, 삭제 유형별 이력 구분 및 처리
     - 이력 목록 조회 및 상세 이력 조회 기능 (다양한 조건 검색, 정렬 및 커서 페이지네이션)
+ 
+<br>
 
 ### 👤 정연경
 ![image](https://github.com/user-attachments/assets/4973b172-166c-4199-b5f7-d41358befb53)
 ![image](https://github.com/user-attachments/assets/0f22b09c-8b98-4faf-b462-9e7a5fa3347e)
-
 
 - **파일 관리 API**
     - 바이너리 CRUD 구현 (Spring Data JPA 사용)
@@ -111,7 +129,9 @@ HR Bank는 이러한 현실적인 어려움을 해결하고자 **기업의 인�
     - 데이터 백업 구현
     - 데이터 자동 배치 작업 구현 (Spring Scheduler 기반)
     - 데이터 백업 이력 목록 조회 및 관리 (정렬 및 커서 페이지네이션)
----
+
+
+<br>
 
 ## 📂 **파일 구조**
 ```
@@ -220,7 +240,9 @@ HR Bank는 이러한 현실적인 어려움을 해결하고자 **기업의 인�
         └── 📄 application.yml
 
 ```
----
+
+<br>
+
 
 ## 🌐 **계층 구조**
 ```
@@ -248,6 +270,9 @@ Client
                 ▼
          Database (PostgreSQL)
 ```
+
+<br>
+
 ---
 ## 📋 **배포 다이어그램**
 ![image](https://github.com/user-attachments/assets/79c636b0-015d-40dd-807f-78abbfbc4b58)

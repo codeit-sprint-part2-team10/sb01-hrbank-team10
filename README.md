@@ -5,7 +5,7 @@
 - 🔗 프로젝트 문서 (다른 모든 프로젝트 링크들) : https://bit.ly/41VauFT
 ## **팀원 구성**
 
-| <img src="https://github.com/user-attachments/assets/65710c9f-1c8b-4a57-83e5-6b0dfbda7ca5" width="840"/> | ![image (3)](https://github.com/user-attachments/assets/9712701d-49ce-4f33-8bf8-8a04c1157837) | ![image-7](https://github.com/user-attachments/assets/a9f2a71e-644f-442e-b085-fce6c68e1edd) | ![image-8](https://github.com/user-attachments/assets/d63d7e19-d01b-4f9b-9fb9-1a6a0db457d3) |
+| <img src="https://github.com/user-attachments/assets/65710c9f-1c8b-4a57-83e5-6b0dfbda7ca5" width="850"/> | ![image (3)](https://github.com/user-attachments/assets/9712701d-49ce-4f33-8bf8-8a04c1157837) | ![image-7](https://github.com/user-attachments/assets/a9f2a71e-644f-442e-b085-fce6c68e1edd) | ![image-8](https://github.com/user-attachments/assets/d63d7e19-d01b-4f9b-9fb9-1a6a0db457d3) |
 |------|--------|--------|------|
 | **연예림** | **변희재** | **전민기** | **정연경** |
 | yinneu@gmail.com | pion0458@gmail.com | mingi3070@gmail.com | edaily0129@gmail.com |

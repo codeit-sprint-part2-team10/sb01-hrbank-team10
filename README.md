@@ -71,9 +71,11 @@ HR Bank는 이러한 현실적인 어려움을 해결하고자 **기업의 인�
 
 ## **팀원별 구현 기능 상세**
 ### 👤 연예림
+<img src="https://github.com/user-attachments/assets/4f849541-c75e-45ac-b070-1386b13e5a89" width="500"/>
+<img src="https://github.com/user-attachments/assets/1a2f56de-1d4e-4c77-87e6-d1a6d3e1b544" width="500"/>
 
-![image](https://github.com/user-attachments/assets/4f849541-c75e-45ac-b070-1386b13e5a89)
-![image](https://github.com/user-attachments/assets/1a2f56de-1d4e-4c77-87e6-d1a6d3e1b544)
+<!-- ![image](https://github.com/user-attachments/assets/4f849541-c75e-45ac-b070-1386b13e5a89)
+![image](https://github.com/user-attachments/assets/1a2f56de-1d4e-4c77-87e6-d1a6d3e1b544) -->
 
 
 - **직원 관리 API**
@@ -91,8 +93,12 @@ HR Bank는 이러한 현실적인 어려움을 해결하고자 **기업의 인�
 
 ### 👤 변희재
 
-![스크린샷 2025-03-24 오전 1 01 37](https://github.com/user-attachments/assets/66f000b8-0b7d-4356-a9ec-0aea19bd7bd3)
-![image](https://github.com/user-attachments/assets/e969ab6d-6cc3-4dd3-8886-caeeb8d68431)
+<img src="https://github.com/user-attachments/assets/e969ab6d-6cc3-4dd3-8886-caeeb8d68431" width="500"/>
+<img src="https://github.com/user-attachments/assets/66f000b8-0b7d-4356-a9ec-0aea19bd7bd3" width="500"/>
+
+
+<!-- ![스크린샷 2025-03-24 오전 1 01 37](https://github.com/user-attachments/assets/66f000b8-0b7d-4356-a9ec-0aea19bd7bd3)
+![image](https://github.com/user-attachments/assets/e969ab6d-6cc3-4dd3-8886-caeeb8d68431) -->
 
 - **부서 관리 API**
     - 부서 정보 CRUD 구현 (Spring Data JPA 사용)
@@ -105,8 +111,11 @@ HR Bank는 이러한 현실적인 어려움을 해결하고자 **기업의 인�
 
 ### 👤 전민기
 
-![image-3](https://github.com/user-attachments/assets/99583f97-1026-445f-bdee-2f2522fb862f)
-![image-4](https://github.com/user-attachments/assets/8aaf65e2-3ff8-402f-a642-d083c34e320a)
+<img src="https://github.com/user-attachments/assets/8aaf65e2-3ff8-402f-a642-d083c34e320a" width="500"/>
+<img src="https://github.com/user-attachments/assets/99583f97-1026-445f-bdee-2f2522fb862f" width="500"/>
+
+<!-- ![image-3](https://github.com/user-attachments/assets/99583f97-1026-445f-bdee-2f2522fb862f)
+![image-4](https://github.com/user-attachments/assets/8aaf65e2-3ff8-402f-a642-d083c34e320a) -->
 
 
 - **직원 정보 수정 이력 관리 API**
@@ -118,8 +127,12 @@ HR Bank는 이러한 현실적인 어려움을 해결하고자 **기업의 인�
 <br>
 
 ### 👤 정연경
-![image](https://github.com/user-attachments/assets/4973b172-166c-4199-b5f7-d41358befb53)
-![image](https://github.com/user-attachments/assets/0f22b09c-8b98-4faf-b462-9e7a5fa3347e)
+
+<img src="https://github.com/user-attachments/assets/0f22b09c-8b98-4faf-b462-9e7a5fa3347e" width="500"/>
+<img src="https://github.com/user-attachments/assets/4973b172-166c-4199-b5f7-d41358befb53" width="500"/>
+
+<!--![image](https://github.com/user-attachments/assets/4973b172-166c-4199-b5f7-d41358befb53)
+![image](https://github.com/user-attachments/assets/0f22b09c-8b98-4faf-b462-9e7a5fa3347e)-->
 
 - **파일 관리 API**
     - 바이너리 CRUD 구현 (Spring Data JPA 사용)

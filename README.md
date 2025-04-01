@@ -15,7 +15,7 @@
 |------|--------|--------|------|
 | **연예림** | **변희재** | **전민기** | **정연경** |
 | yinneu@gmail.com | pion0458@gmail.com | mingi3070@gmail.com | edaily0129@gmail.com |
-| [github.com/yinneu](https://github.com/yinneu)| mingi3070@gmail.com | [github.com/mingi96](https://github.com/mingi96) | [github.com/Yeonkyung-Jeong](https://github.com/Yeonkyung-Jeong) |
+| [github.com/yinneu](https://github.com/yinneu)| https://github.com/Heyaaz | [github.com/mingi96](https://github.com/mingi96) | [github.com/Yeonkyung-Jeong](https://github.com/Yeonkyung-Jeong) |
 
 <br>
 
